@@ -9,11 +9,10 @@
 - 🖥️ Discuter et valider des idées d'interface ou un modèle de données
 - 📑 Illustrer et préciser une spécification avec les développeurs comme les usagers
 
-**🛠 Usages :**
+**🛠 Usages concrets :**
 
-- 🖼️ Copie d’écran
-- 🎥 Enregistrement vidéo court (1 min)
-- 📊 Illustration des données et des cas d'exemple
+- 🖼️ Copie d’écran ou capture vidéo 
+- 📊 Illustration avec des données réalistes 
 - 👥 Tests utilisateurs (UI/UX)
 
 **📥 Dépôt :**
