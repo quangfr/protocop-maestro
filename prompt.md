@@ -1,81 +1,114 @@
-# Créer un prototype HTML
+# 1️⃣ Créer un prototype HTML standalone
 
-## 1️⃣ Identité
-**Nom** : MAESTRO  
-**Style** : clair, type SAP IBP  
-**Objectif** : suivre les demandes et opérations de maintenance, avec vue sur les capacités et indicateurs
+**Nom affiché** : MAESTRO  
+**Style** : Thème clair, interface SAP IBP-like (cartes, onglets, entêtes figées, couleurs codes capacité, boutons arrondis)  
+**Objectif** : Gérer en local les demandes et opérations de maintenance sur moteurs d’avion : création, édition, suivi des capacités et visualisation d’indicateurs clés, le tout dans un fichier HTML unique sans dépendances externes.
 
-## 2️⃣ Les données de base
-**Urgency** : Low, Medium, High, Urgent  
-**Status** : Open, Ready, In Progress, Done  
-**Shops** : Shop 1 à Shop 10  
-**Locations** : CDG, LYS, NCE, TLS, ORY  
-**Operation Types** : Inspection, Disassembly, Cleaning, NDT, Repair, Assembly, Balancing, Test Bench, Painting, Documentation, Shipping, QA  
-**Mapping Request → Operations** :
-- Light Check → Inspection, Cleaning, Documentation, QA
-- Standard Overhaul → Disassembly, NDT, Repair, Assembly
-- Major Overhaul → Disassembly, Repair, Assembly, Test Bench
+---
 
-**Durées par défaut** :
-- Inspection = 1 semaine
-- Disassembly = 3 semaines
-- Cleaning = 1 semaine
-- NDT = 2 semaines
-- Repair = 4 semaines
-- Assembly = 3 semaines
-- Balancing = 1 semaine
-- Test Bench = 2 semaines
-- Painting = 1 semaine
-- Documentation = 1 semaine
-- Shipping = 1 semaine
-- QA = 1 semaine
+# 2️⃣ Modèle de données
 
-**Capacités par défaut** :
-- Chaque shop a 4–10 opérations autorisées
-- Capacité : 1–3 opérations/semaine
-- Exceptions possibles (dates spécifiques + capacité modifiée)
+## Objets métiers
 
-**Données initiales** : 10 demandes, 30 opérations
+### Demande (Request)
+- **Propriétés** : ID, Client, Modèle moteur, Localisation, Atelier (Shop), Type de demande, Urgence, Statut, Date demande, Date de fin estimée, Notes
+- **Validations** : champs obligatoires (Client, Moteur, Localisation, Shop, Type, Urgence, Statut), ID auto, Date fin calculée automatiquement
+- **Contraintes** : chaque type de demande impose exactement 4 opérations requises ; relations vers un Shop et un Type de demande existants
 
-## 3️⃣ Par onglet
-### 📝 FORM_New_Request
-- Formulaire pour créer une demande
-- Champs obligatoires en jaune
-- Calcul automatique de la date estimée de fin (durées totales + marge)
-- Panneau d’aide : liste des opérations requises selon le type choisi + test de capacité
+### Opération (Operation)
+- **Propriétés** : ID, Request ID, Shop, Type d’opération, Statut, Date début, Durée (1–5 semaines), Date fin
+- **Validations** : champs obligatoires (Request ID, Shop, Type op, Statut), ID auto, Date fin calculée depuis début+durée
+- **Contraintes** : Type op autorisé par Shop, lié à une demande existante
 
-### 🛠 FORM_Edit_Operations
-- Formulaire pour éditer une opération
-- Panneau d’aide : opérations possibles dans le shop + capacité par défaut
+### Listes maîtres (`mdLists`)
+- Urgency, Status, Shop, Location, Operation Type, Engine Model, Customer, Request Type
 
-### 📋 TR_Maint_Requests
-- Tableau des demandes avec recherche et entêtes fixes
-- Clic sur Request ID ou Ops # → ouvre OP_Maint_Operations filtré
-- Boutons Import / Export JSON
+### Mapping Request Type → Ops requises
+- **Règle** : chaque Request Type doit avoir exactement 4 types d’opération distincts
 
-### 📋 OP_Maint_Operations
-- Tableau des opérations avec recherche et entêtes fixes
-- Filtrage par Request ID
-- Clic sur Operation ID → ouvre FORM_Edit_Operations pré-rempli
-- Clic sur Request ID → retourne sur TR_Maint_Requests filtré
+### Durées par type d’opération (`opDur`)
+- **Valeur** : entre 1 et 5 semaines
 
-### 📚 MD_Lists
-- Édition des listes de valeurs, mapping, durées et capacités
-- Boutons : “Appliquer” (rafraîchit) / “Réinitialiser” (revient aux données par défaut)
-- JSON Viewer : voir toutes les données, copier, télécharger
+### Capacités atelier (`shopCapabilities`)
+- **Propriétés** : Ops autorisées, capacité par défaut, localisation, exceptions de capacité par période
 
-### 📊 KPI_Dashboard
-- KPI : % de demandes urgentes terminées à temps
-- Heatmap : taux d’utilisation des capacités par lieu × atelier (vert < 50 %, jaune 50–99 %, rouge ≥ 100 %)
+## Relations
+- 1 Demande → N Opérations
+- 1 Shop → N Operation Types autorisés
+- 1 Request Type → exactement 4 Operation Types
+- ShopCapabilities liés à Shop et Location
 
-## 4️⃣ Règles communes
-**Navigation** :
-- Clic sur Request ID ou Ops # → onglet opérations filtré
-- Clic sur Operation ID → formulaire d’édition pré-rempli
-- Clic sur Request ID dans opérations → retour aux demandes filtrées
+## Données d’exemple (seed)
+- Urgency : 4 valeurs
+- Status : 4 valeurs
+- Shops : 10 (S01 à S10)
+- Locations : 5
+- Operation Types : 12
+- Engine Models : 5
+- Customers : 5
+- Request Types : 3 (4 ops chacune)
+- Durées : 1 à 5 semaines
+- Transactions : 10 demandes, 30 opérations aléatoires
 
-**Contraintes techniques** :
-- Un seul fichier HTML
-- Vanilla JS uniquement
-- Pas de dépendances externes
-- 100 % offline
+---
+
+# 3️⃣ Navigation et écrans
+
+## Onglets / écrans
+
+### Nouvelle demande
+- Formulaire création demande (champs obligatoires en jaune)
+- Helper panel : liste des 4 ops requises par type, Capacity Lookup (date+shop+op type → capacity/used/free)
+- **Actions** : créer demande, recalculer date fin estimée
+
+### Éditer opérations
+- Formulaire création/édition opération
+- Helper panel : liste ops autorisées par shop, capacité par défaut et exceptions
+- **Actions** : sauvegarder ou supprimer opération
+
+### Demandes
+- Tableau filtrable par Request ID
+- Liens sur Request ID / nombre d’ops → ouvrent tableau opérations filtré
+
+### Opérations
+- Tableau filtrable par Operation ID ou Request ID
+- Liens sur Request ID → ouvrent tableau demandes filtré
+- Liens sur Operation ID → ouvrent formulaire édition opération pré-rempli
+
+### Listes maîtres
+- Colonnes éditables pour chaque liste
+- Table mapping (Request Type → 4 ops) avec contrôle unicité
+- Table durées par type op
+- Bouton **Apply MD Changes**
+- JSON Viewer (read-only, collapsible, copy, download)
+
+### KPI Dashboard
+- On-time % urgent (calcul sur demandes Urgent livrées à temps)
+- Heatmap capacité hebdo (Location × Shop, 8 semaines, codes couleur vert/jaune/rouge)
+
+## Navigation
+- Barre d’onglets persistante en haut
+- Clics sur IDs dans les tableaux pour naviguer avec filtre appliqué
+- Passage auto à l’écran concerné après clic
+
+---
+
+# 4️⃣ Techniques
+
+## Fonctionnalités avancées
+- Fichier HTML autonome (offline, Vanilla JS, pas de dépendance externe)
+- Données seed aléatoires au démarrage
+- Dropdowns dynamiques (filtrage ops par shop)
+- Calculs auto (dates fin, capacity lookup, KPI)
+- Recherche texte avec rafraîchissement instantané
+- Import / Export JSON complet (tous objets métiers)
+- JSON Viewer avec sections repliables, copy/download
+- Tableaux avec entêtes sticky et survol ligne
+- KPI & Heatmap calculés à la volée
+- Responsive simplifié (stack en mobile)
+
+## Contraintes techniques
+- Pas de stockage persistant natif (hors export/import JSON)
+- Pas de backend, toute logique côté client
+- Capacités calculées à la semaine ISO entière
+- Mapping et durées doivent respecter les validations sinon avertissement
