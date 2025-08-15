@@ -1,4 +1,4 @@
-# 1️⃣ Créer un prototype HTML standalone
+# 1️⃣ Identité
 
 **Nom affiché** : MAESTRO  
 **Style** : Thème clair, interface SAP IBP-like (cartes, onglets, entêtes figées, couleurs codes capacité, boutons arrondis)  
