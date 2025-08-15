@@ -19,7 +19,18 @@
 **📥 Dépôt :**
 - readme.md : questionnaire (et ex synthétique MAESTRO) à mettre dans GPT pour créer son prompt
 - prompt.md : exemple de prompt complet MAESTRO à mettre dans GPT pour générer le prototype
-- prototype.html : exemple de prototype MAESTRO à télécharger et à ouvrir dans un navigateur 
+- prototype.html : exemple de prototype MAESTRO à télécharger et à ouvrir dans un navigateur
+
+
+## 🤖 Astuces
+
+- 🔍 Prototyper petit d’abord
+- ✏️ Demander à GPT de poser des questions pour préciser ton prompt
+- 🆘 Demander à GPT de te proposer des améliorations
+- 🔄 Mettre le plus d'ajouts dans ton prompt avant régénération
+- 📥 Demander à GPT de re-décrire ton prompt à partir du code ou de tes ajouts
+- 📋 Plus ton prompt est précis, plus ton prototype sera fidèle mais plus la génération prend du temps
+  
 ---
 
 ## 1️⃣ Identité
@@ -77,14 +88,3 @@
 **Exemple : MAESTRO**
 
 - HTML unique, offline, Vanilla JS, dropdowns dynamiques, import/export JSON, recherche, entêtes sticky, thème clair SAP-like
-
----
-
-## 5️⃣ 💡 Astuces
-
-- 🔍 Prototyper petit d’abord
-- ✏️ Demander à ChatGPT de poser des questions pour préciser ton prompt
-- 🆘 Demander à ChatGPT de te proposer des améliorations
-- 🔄 Mettre le plus d'ajouts dans ton prompt avant régénération
-- 📥 Demander à ChatGPT de re-décrire ton prompte à partir du code ou de tes ajouts
-- 📋 Plus ton prompt est précis, plus ton prototype sera fidèle mais plus la génération prend du temps
