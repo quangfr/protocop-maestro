@@ -321,7 +321,7 @@ function seedMasterData(){
   S.mdLists={
     Urgency:["Low","Medium","High","Urgent"],
     Status:["Open","Ready","In Progress","Done"],
-    Shop:Array.from({length:10},(_,i)=>"S"+pad(i+1)),
+    Shop:Array.from({length:15},(_,i)=>"S"+pad(i+1)),
     Location:["Paris","Lyon","Toulouse","Bordeaux","Nantes"],
     "Operation Type":["Inspection","Disassembly","Cleaning","Borescope","NDT","Parts Ordering","Repair Module A","Repair Module B","Reassembly","Test Bench","Calibration","Final QA"],
     "Engine Model":["CFM56","LEAP-1A","LEAP-1B","SaM146","Silvercrest"],
@@ -355,7 +355,7 @@ function seedMasterData(){
 /*** --- SEED TRANSACTIONS --- ***/
 function seedTransactions(){
   const today=new Date(); const reqs=[];
-  for(let i=1;i<=10;i++){
+  for(let i=1;i<=50;i++){
     const id="R"+pad(i,3);
     const customer=randPick(S.mdLists.Customer);
     const engine=randPick(S.mdLists["Engine Model"]);
@@ -377,7 +377,7 @@ function seedTransactions(){
   for(let i=0;i<S.requests.length;i++){
     const req=S.requests[i]; const count=(i%6);
     const allowed=S.shopCapabilities[req.shop].allowedOps;
-    for(let j=0;j<count && k<=30;j++){
+    for(let j=0;j<count && k<=200;j++){
       const id="O"+pad(k++,3);
       const opType=randPick(allowed); const status=randPick(S.mdLists.Status);
       const start=addDays(new Date(req.rdate),7*(j+1));
@@ -386,7 +386,7 @@ function seedTransactions(){
       ops.push({id,reqId:req.id,shop:req.shop,opType,status,start:fmtDate(start),finish:fmtDate(finish),duration});
     }
   }
-  while(ops.length<30){
+  while(ops.length<200){
     const req=randPick(S.requests); const id="O"+pad(k++,3);
     const opType=randPick(S.shopCapabilities[req.shop].allowedOps); const status=randPick(S.mdLists.Status);
     const start=addDays(new Date(req.rdate),7*(1+Math.floor(Math.random()*6)));
@@ -394,7 +394,7 @@ function seedTransactions(){
     const finish=addWeeks(start,duration);
     ops.push({id,reqId:req.id,shop:req.shop,opType,status,start:fmtDate(start),finish:fmtDate(finish),duration});
   }
-  S.operations=ops.slice(0,30);
+  S.operations=ops.slice(0,200);
 }
 
 /*** --- TABS --- ***/
