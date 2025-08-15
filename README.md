@@ -25,10 +25,10 @@
 **🤖 Astuces**
 
 - 🔍 Prototyper petit d’abord
-- ✏️ Demander à GPT de poser des questions pour préciser ton prompt
-- 🆘 Demander à GPT de te proposer des améliorations
-- 🔄 Mettre le plus d'ajouts dans ton prompt avant régénération
-- 📥 Demander à GPT de re-décrire ton prompt à partir du code ou de tes ajouts
+- ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
+- 🆘 Demander à GPT de te proposer des pistes d'améliorations
+- 🔄 Mettre le plus de demandes possibles dans ton prompt avant régénération
+- 📥 Demander à GPT de re-décrire ton prompt à partir du code ou de tes demandes additionnelles
 - 📋 Plus ton prompt est précis, plus ton prototype sera fidèle mais plus la génération prend du temps
   
 ---
