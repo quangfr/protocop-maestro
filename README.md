@@ -1,4 +1,4 @@
-# 🚀 Protocop GO-LIVE : CHATGPT pour créer un prototype HTML
+# 🚀 Protocop GO-LIVE : prompt GPT pour créer un prototype HTML
 
 **🎯 But du doc :** cadrer un **prototype HTML autonome** (offline, sans dépendance)
 
@@ -16,6 +16,10 @@
 - 📊 Illustration des données et des cas d'exemple
 - 👥 Tests utilisateurs (UI/UX)
 
+**📥 Dépôt :**
+- readme.md : questionnaire (et ex synthétique MAESTRO) à mettre dans GPT pour créer son prompt
+- prompt.md : exemple de prompt complet MAESTRO à mettre dans GPT pour générer le prototype
+- prototype.html : exemple de prototype MAESTRO à télécharger et à ouvrir dans un navigateur 
 ---
 
 ## 1️⃣ Identité
@@ -79,7 +83,8 @@
 ## 5️⃣ 💡 Astuces
 
 - 🔍 Prototyper petit d’abord
-- ✏️ Demander à ChatGPT de proposer des améliorations
-- 🔄 Affiner ton prompt avant régénération
-- 📥 Réutiliser les prompts enrichis
-- 📋 Plus ton prompt est précis, plus ton prototype sera fidèle
+- ✏️ Demander à ChatGPT de poser des questions pour préciser ton prompt
+- 🆘 Demander à ChatGPT de te proposer des améliorations
+- 🔄 Mettre le plus d'ajouts dans ton prompt avant régénération
+- 📥 Demander à ChatGPT de re-décrire ton prompte à partir du code ou de tes ajouts
+- 📋 Plus ton prompt est précis, plus ton prototype sera fidèle mais plus la génération prend du temps
