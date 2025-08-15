@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MAESTRO — Maintenance Cockpit (Offline)</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --ink:#1f2a44; --muted:#6b7a90;
+    --accent:#0a6ed1; --line:#e3e8f0; --ok:#1f8f4e; --warn:#d29e00; --bad:#c93333;
+    --yellow:#fffacd; --pill:#eef4fb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font:14px/1.45 "Segoe UI", Roboto, Arial, sans-serif; color:var(--ink); background:var(--bg)}
+  .appbar{position:sticky; top:0; z-index:50; display:flex; gap:16px; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid var(--line)}
+  .app-title{font-weight:700; letter-spacing:.2px}
+  .app-badge{background:var(--pill); color:var(--accent); padding:3px 8px; border-radius:999px; font-size:12px; font-weight:600}
+  .grow{flex:1}
+  .toolbar{display:flex; gap:8px; align-items:center}
+  .btn{background:#fff; border:1px solid var(--line); color:var(--ink); padding:8px 10px; border-radius:8px; cursor:pointer}
+  .btn.primary{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .btn:disabled{opacity:.55; cursor:not-allowed}
+  input[type=file]{display:none}
+  label.file{border:1px dashed var(--accent); color:var(--accent); background:#fff}
+  .mini{font-size:12px; color:var(--muted)}
+
+  .tabs{display:flex; gap:4px; padding:8px 8px 0; border-bottom:1px solid var(--line); position:sticky; top:52px; background:var(--bg); z-index:40}
+  .tab{padding:10px 12px; cursor:pointer; border-radius:8px 8px 0 0; border:1px solid transparent; color:var(--muted); font-weight:600}
+  .tab.active{background:#fff; color:var(--ink); border:1px solid var(--line); border-bottom-color:#fff}
+  .screen{display:none; padding:16px} .screen.active{display:block}
+
+  .row{display:flex; gap:16px; align-items:stretch}
+  .col{display:flex; flex-direction:column; gap:12px}
+  .w-60{flex:0 0 60%} .w-40{flex:0 0 40%}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px}
+  .card h3{margin:0 0 8px 0; font-size:16px}
+  .card h4{margin:10px 0 6px 0; font-size:13px; color:var(--muted)}
+  .note{font-size:12px; color:var(--muted)}
+  .divider{height:1px; background:var(--line); margin:8px 0}
+  .pill{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; background:var(--pill); border:1px solid var(--line)}
+  .helper-list{display:flex; flex-wrap:wrap; gap:6px}
+
+  .form-grid{display:grid; gap:10px; grid-template-columns:repeat(2, minmax(180px,1fr))}
+  .field{display:flex; flex-direction:column; gap:4px}
+  .field label{font-size:12px; color:var(--muted)}
+  .field input,.field select,.field textarea{border:1px solid var(--line); border-radius:8px; padding:8px; background:#fff; font:inherit; color:inherit}
+  select.required,.required select{background:var(--yellow)}
+  .nowrap{white-space:nowrap}
+
+  .table-wrap{overflow:auto; border:1px solid var(--line); border-radius:12px; background:#fff}
+  table{border-collapse:separate; border-spacing:0; width:100%}
+  thead th{position:sticky; top:0; background:#fff; z-index:2; border-bottom:1px solid var(--line); text-align:left; padding:10px; font-size:12px; color:var(--muted); backdrop-filter:blur(4px)}
+  tbody td{border-bottom:1px solid var(--line); padding:9px 10px; vertical-align:top}
+  tbody tr:hover{background:#fcfdff}
+  .link{color:var(--accent); text-decoration:underline; cursor:pointer}
+  .searchbar{display:flex; gap:8px; align-items:center; margin-bottom:10px}
+  .searchbar input{padding:8px; border:1px solid var(--line); border-radius:8px; width:260px}
+
+  .kpi{display:flex; gap:16px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px}
+  .kpi h2{margin:0; font-size:22px}
+  .kpi .badge{font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid var(--line); background:#eef4fb}
+  .kpi .value{font-size:26px; font-weight:800}
+  .kpi .value.ok{color:var(--ok)} .kpi .value.warn{color:var(--warn)} .kpi .value.bad{color:var(--bad)}
+  .heatmap{overflow:auto; border:1px solid var(--line); border-radius:12px; background:#fff}
+  .heatmap table{min-width:820px}
+  .cell{text-align:center; font-size:12px; padding:6px 8px; border-bottom:1px solid var(--line)}
+  .legend{display:flex; gap:8px; align-items:center; font-size:12px; color:var(--muted)}
+  .swatch{width:16px; height:12px; border:1px solid var(--line); border-radius:3px}
+  .sw-green{background:#cfead1} .sw-yellow{background:#fff0b3} .sw-red{background:#f7c2c2}
+
+  .md-grid{display:grid; gap:12px; grid-template-columns:repeat(4, minmax(180px,1fr))}
+  .md-col{border:1px solid var(--line); border-radius:12px; background:#fff; padding:10px}
+  .md-col h4{margin:0 0 6px 0}
+  .md-col textarea{width:100%; min-height:160px; border:1px solid var(--line); border-radius:8px; padding:8px; font:inherit}
+
+  .mini-table{width:100%; border-collapse:separate; border-spacing:0}
+  .mini-table th{position:sticky; top:0; background:#fff; z-index:1; text-align:left; font-size:12px; color:var(--muted); padding:8px; border-bottom:1px solid var(--line)}
+  .mini-table td{padding:6px; border-bottom:1px solid var(--line)}
+  .mini-table select,.mini-table input{width:100%; padding:6px; border:1px solid var(--line); border-radius:8px; background:#fff; font:inherit}
+  .warning{color:var(--bad); font-size:12px}
+
+  .json-viewer-header{display:flex; gap:8px; align-items:center; margin-top:6px}
+  .jsonbox{border:1px solid var(--line); border-radius:12px; background:#fff; padding:10px}
+  details summary{cursor:pointer; user-select:none; font-weight:600}
+  pre{margin:6px 0 0 0; overflow:auto; max-height:300px}
+  @media (max-width:980px){ .row{flex-direction:column} .w-60,.w-40{flex:1 1 auto} .form-grid{grid-template-columns:1fr} .md-grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+  <div class="appbar">
+    <span class="app-title">MAESTRO</span>
+    <span class="app-badge">SAP IBP‑style</span>
+    <div class="grow"></div>
+    <div class="toolbar">
+      <button id="btnExport" class="btn">Export JSON</button>
+      <label class="btn file" for="importFile">Import JSON</label>
+      <input id="importFile" type="file" accept="application/json" />
+      <span class="mini">Offline / Vanilla JS</span>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <!-- FORM_New_Request -->
+  <div id="screen-FORM_New_Request" class="screen active">
+    <div class="row">
+      <div class="col w-60">
+        <div class="card">
+          <h3>FORM_New_Request</h3>
+          <div class="form-grid">
+            <div class="field"><label>Request ID</label><input id="nr_reqId" type="text" placeholder="Auto-generated" disabled></div>
+            <div class="field required"><label>Customer *</label><select id="nr_customer" class="required"></select></div>
+            <div class="field required"><label>Engine Model *</label><select id="nr_engine" class="required"></select></div>
+            <div class="field required"><label>Location *</label><select id="nr_location" class="required"></select></div>
+            <div class="field required"><label>Shop *</label><select id="nr_shop" class="required"></select></div>
+            <div class="field required"><label>Request Type *</label><select id="nr_rtype" class="required"></select></div>
+            <div class="field required"><label>Urgency *</label><select id="nr_urgency" class="required"></select></div>
+            <div class="field required"><label>Status *</label><select id="nr_status" class="required"></select></div>
+            <div class="field"><label>Request Date</label><input id="nr_rdate" type="date"></div>
+            <div class="field"><label>Estimated End Date (auto)</label><input id="nr_estEnd" type="date" disabled></div>
+            <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="nr_notes" rows="3" placeholder="Context, constraints..."></textarea></div>
+          </div>
+          <div class="row" style="margin-top:6px">
+            <button id="btnCreateRequest" class="btn primary">Create Request</button>
+            <button id="btnCalcEstEnd" class="btn">Recalculate Estimated End</button>
+            <span class="note">Estimated end = sum(required ops durations) + waiting time.</span>
+          </div>
+        </div>
+      </div>
+      <div class="col w-40">
+        <div class="card">
+          <h3>Helper • Required Operations by Request Type</h3>
+          <div id="helper_reqtype_ops" class="helper-list"></div>
+          <div class="divider"></div>
+          <h3>Capacity Lookup</h3>
+          <div class="form-grid">
+            <div class="field"><label>Date</label><input id="cap_date" type="date"></div>
+            <div class="field"><label>Shop</label><select id="cap_shop"></select></div>
+            <div class="field"><label>Operation Type</label><select id="cap_optype"></select></div>
+            <div class="field"><label>&nbsp;</label><button id="btnCapLookup" class="btn">Check Capacity</button></div>
+          </div>
+          <div id="cap_result" class="note"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM_Edit_Operations -->
+  <div id="screen-FORM_Edit_Operations" class="screen">
+    <div class="row">
+      <div class="col w-60">
+        <div class="card">
+          <h3>FORM_Edit_Operations</h3>
+          <div class="form-grid">
+            <div class="field"><label>Operation ID</label><input id="op_id" type="text" placeholder="Auto-generated" disabled></div>
+            <div class="field required"><label>Request ID *</label><select id="op_req" class="required"></select></div>
+            <div class="field required"><label>Shop *</label><select id="op_shop" class="required"></select></div>
+            <div class="field required"><label>Operation Type *</label><select id="op_type" class="required"></select></div>
+            <div class="field required"><label>Status *</label><select id="op_status" class="required"></select></div>
+            <div class="field"><label>Start Date</label><input id="op_start" type="date"></div>
+            <div class="field"><label>Duration (weeks)</label>
+              <select id="op_dur"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            </div>
+            <div class="field"><label>Finish Date (auto)</label><input id="op_finish" type="date" disabled></div>
+          </div>
+          <div class="row" style="margin-top:6px">
+            <button id="btnSaveOperation" class="btn primary">Add / Update Operation</button>
+            <button id="btnDeleteOperation" class="btn">Delete Operation</button>
+            <span class="note">Operation Type list is filtered by selected Shop’s capabilities.</span>
+          </div>
+        </div>
+      </div>
+      <div class="col w-40">
+        <div class="card">
+          <h3>Helper • Allowed Operation Types by Shop</h3>
+          <div class="field"><label>Shop</label><select id="helper_shop"></select></div>
+          <div id="helper_shop_ops" class="helper-list"></div>
+          <div class="divider"></div>
+          <div id="helper_shop_capacity" class="note"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TR_Maint_Requests -->
+  <div id="screen-TR_Maint_Requests" class="screen">
+    <div class="card">
+      <h3>TR_Maint_Requests</h3>
+      <div class="searchbar">
+        <input id="req_search" placeholder="Search by Request ID (e.g., R003)" />
+        <button id="req_clear" class="btn">Clear</button>
+        <span class="note">Click a Request ID or Ops # to jump to Operations filtered on it.</span>
+      </div>
+      <div class="table-wrap">
+        <table id="tbl_requests">
+          <thead><tr>
+            <th>Request ID</th><th>Customer</th><th>Engine</th><th>Location</th><th>Shop</th>
+            <th>Type</th><th>Urgency</th><th>Status</th><th>Request Date</th><th>Est. End</th><th>Ops #</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- OP_Maint_Operations -->
+  <div id="screen-OP_Maint_Operations" class="screen">
+    <div class="card">
+      <h3>OP_Maint_Operations</h3>
+      <div class="searchbar">
+        <input id="op_search" placeholder="Search by Operation ID (e.g., O012) or Request ID (R005)" />
+        <button id="op_clear" class="btn">Clear</button>
+        <span class="note">Click a Request ID to jump to Requests filtered on it.</span>
+      </div>
+      <div class="table-wrap">
+        <table id="tbl_operations">
+          <thead><tr>
+            <th>Operation ID</th><th>Request ID</th><th>Shop</th><th>Op Type</th><th>Status</th><th>Start</th><th>Finish</th><th>Duration (w)</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MD_Lists -->
+  <div id="screen-MD_Lists" class="screen">
+    <div class="card">
+      <h3>MD_Lists (Master Data)</h3>
+      <div class="note">One column per list (newline‑separated). Below: editable mapping (Request Type → 4 Operation Types) and default durations (weeks) per Operation Type. JSON Viewer at the end.</div>
+      <div class="md-grid" id="md_grid"></div>
+    </div>
+
+    <div class="row">
+      <div class="col w-60">
+        <div class="card">
+          <h3>Request Type ↔ Operation Types (4 required per Request Type)</h3>
+          <div class="warning" id="map_warning" style="display:none"></div>
+          <table class="mini-table" id="map_table">
+            <thead><tr><th>Request Type</th><th>Op #1</th><th>Op #2</th><th>Op #3</th><th>Op #4</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col w-40">
+        <div class="card">
+          <h3>Operation Type Default Duration (weeks)</h3>
+          <table class="mini-table" id="dur_table">
+            <thead><tr><th>Operation Type</th><th>Duration (1–5)</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="row">
+        <button id="btnApplyMD" class="btn primary">Apply MD Changes</button>
+        <span class="note">Applies lists, mapping & durations, refreshes forms/helpers/tables/KPI & JSON Viewer.</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>JSON Viewer (read‑only)</h3>
+      <div class="json-viewer-header">
+        <button id="jsonCopy" class="btn">Copy</button>
+        <button id="jsonDownload" class="btn">Download</button>
+        <span class="note">Sections are collapsible.</span>
+      </div>
+      <div id="jsonViewer" class="jsonbox">
+        <!-- generated -->
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI_Dashboard -->
+  <div id="screen-KPI_Dashboard" class="screen">
+    <div class="row">
+      <div class="col w-40">
+        <div class="kpi">
+          <div><h2>On‑time % urgent</h2><div class="badge" id="urgent_meta">Urgent requests</div></div>
+          <div class="grow"></div>
+          <div class="value" id="urgent_value">—</div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <h3>Legend</h3>
+          <div class="legend">
+            <span class="swatch sw-green"></span> &lt; 50% used
+            <span class="swatch sw-yellow"></span> 50–99% used
+            <span class="swatch sw-red"></span> 100%+
+          </div>
+          <div class="note" style="margin-top:6px">Capacity usage = (concurrent operation‑weeks scheduled) / (default capacity) per Shop × Week.</div>
+        </div>
+      </div>
+      <div class="col w-60">
+        <div class="card">
+          <h3>Weekly Capacity Usage Heatmap • Location × Shop</h3>
+          <div class="heatmap"><table id="tbl_heatmap"></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*** --- STATE & UTILS --- ***/
+const S = {
+  mdLists:{}, requestTypeToOps:{}, opDur:{},
+  shops:[], shopCapabilities:{}, requests:[], operations:[],
+  tabs:["FORM_New_Request","FORM_Edit_Operations","TR_Maint_Requests","OP_Maint_Operations","MD_Lists","KPI_Dashboard"],
+};
+const $ = s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const pad=(n,z=2)=>String(n).padStart(z,'0');
+function fmtDate(d){ if(!(d instanceof Date)) d=new Date(d); const tz=new Date(d.getTime()-d.getTimezoneOffset()*60000); return tz.toISOString().slice(0,10) }
+function addDays(d,days){ const x=new Date(d); x.setDate(x.getDate()+days); return x }
+const addWeeks=(d,w)=>addDays(d,w*7);
+function weekKey(d){ const x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())); const dayNum=(x.getUTCDay()+6)%7; x.setUTCDate(x.getUTCDate()-dayNum+3); const firstThursday=new Date(Date.UTC(x.getUTCFullYear(),0,4)); const diff=x-firstThursday; const wk=1+Math.round(diff/(7*24*3600*1000)); return x.getUTCFullYear()+"-W"+pad(wk); }
+const randPick=a=>a[Math.floor(Math.random()*a.length)];
+
+/*** --- SEED MASTER DATA --- ***/
+function seedMasterData(){
+  S.mdLists={
+    Urgency:["Low","Medium","High","Urgent"],
+    Status:["Open","Ready","In Progress","Done"],
+    Shop:Array.from({length:10},(_,i)=>"S"+pad(i+1)),
+    Location:["Paris","Lyon","Toulouse","Bordeaux","Nantes"],
+    "Operation Type":["Inspection","Disassembly","Cleaning","Borescope","NDT","Parts Ordering","Repair Module A","Repair Module B","Reassembly","Test Bench","Calibration","Final QA"],
+    "Engine Model":["CFM56","LEAP-1A","LEAP-1B","SaM146","Silvercrest"],
+    Customer:["Air France","EasyJet","Qatar Airways","Ryanair","China Airlines"],
+    "Request Type":["Routine Check","Module Overhaul","Full Overhaul"]
+  };
+  S.requestTypeToOps={
+    "Routine Check":["Inspection","Borescope","Calibration","Final QA"],
+    "Module Overhaul":["Disassembly","Repair Module A","Reassembly","Test Bench"],
+    "Full Overhaul":["Disassembly","Cleaning","Repair Module B","Final QA"]
+  };
+  S.opDur={
+    "Inspection":1,"Borescope":1,"Calibration":1,
+    "Disassembly":3,"Cleaning":2,"NDT":2,"Parts Ordering":2,
+    "Repair Module A":4,"Repair Module B":5,"Reassembly":3,"Test Bench":2,"Final QA":1
+  };
+
+  S.shops=S.mdLists.Shop.slice();
+  const locs=S.mdLists.Location, allOps=S.mdLists["Operation Type"];
+  S.shopCapabilities={};
+  S.shops.forEach((shop,i)=>{
+    const count=4+(i%7); // 4..10
+    const allowed=Array.from(new Set(allOps)).sort(()=>Math.random()-0.5).slice(0,count);
+    const defaultCapacity=1+(i%3); const location=locs[i%locs.length];
+    const today=new Date();
+    const exceptions=[{start:fmtDate(addDays(today,21)),end:fmtDate(addDays(today,35)),capacity:Math.max(1,defaultCapacity-1)}];
+    S.shopCapabilities[shop]={allowedOps:allowed.sort(), defaultCapacity, location, exceptions};
+  });
+}
+
+/*** --- SEED TRANSACTIONS --- ***/
+function seedTransactions(){
+  const today=new Date(); const reqs=[];
+  for(let i=1;i<=10;i++){
+    const id="R"+pad(i,3);
+    const customer=randPick(S.mdLists.Customer);
+    const engine=randPick(S.mdLists["Engine Model"]);
+    const shop=S.mdLists.Shop[(i-1)%S.mdLists.Shop.length];
+    const location=S.shopCapabilities[shop].location;
+    const rtype=randPick(S.mdLists["Request Type"]);
+    const urgency=randPick(S.mdLists.Urgency);
+    const status=randPick(S.mdLists.Status);
+    const rdate=fmtDate(addDays(today,-(7*i+(i%5))));
+    const ops4=S.requestTypeToOps[rtype]||[];
+    const durSum=ops4.reduce((a,o)=>a+(S.opDur[o]||2),0);
+    const waiting=1+(i%3);
+    const estEnd=fmtDate(addWeeks(new Date(rdate),durSum+waiting));
+    reqs.push({id,customer,engine,location,shop,rtype,urgency,status,rdate,estEnd,notes:""});
+  }
+  S.requests=reqs;
+
+  const ops=[]; let k=1;
+  for(let i=0;i<S.requests.length;i++){
+    const req=S.requests[i]; const count=(i%6);
+    const allowed=S.shopCapabilities[req.shop].allowedOps;
+    for(let j=0;j<count && k<=30;j++){
+      const id="O"+pad(k++,3);
+      const opType=randPick(allowed); const status=randPick(S.mdLists.Status);
+      const start=addDays(new Date(req.rdate),7*(j+1));
+      const duration=S.opDur[opType]||1+(j%5);
+      const finish=addWeeks(start,duration);
+      ops.push({id,reqId:req.id,shop:req.shop,opType,status,start:fmtDate(start),finish:fmtDate(finish),duration});
+    }
+  }
+  while(ops.length<30){
+    const req=randPick(S.requests); const id="O"+pad(k++,3);
+    const opType=randPick(S.shopCapabilities[req.shop].allowedOps); const status=randPick(S.mdLists.Status);
+    const start=addDays(new Date(req.rdate),7*(1+Math.floor(Math.random()*6)));
+    const duration=S.opDur[opType]||1+Math.floor(Math.random()*5);
+    const finish=addWeeks(start,duration);
+    ops.push({id,reqId:req.id,shop:req.shop,opType,status,start:fmtDate(start),finish:fmtDate(finish),duration});
+  }
+  S.operations=ops.slice(0,30);
+}
+
+/*** --- TABS --- ***/
+function initTabs(){
+  $("#tabs").innerHTML=S.tabs.map(t=>`<div class="tab ${t==='FORM_New_Request'?'active':''}" data-screen="${t}">${t}</div>`).join("");
+  $("#tabs").addEventListener("click",e=>{
+    const t=e.target.closest(".tab"); if(!t) return;
+    $$(".tab").forEach(x=>x.classList.remove("active")); t.classList.add("active");
+    $$(".screen").forEach(x=>x.classList.remove("active")); $("#screen-"+t.dataset.screen).classList.add("active");
+    if(t.dataset.screen==="TR_Maint_Requests") renderRequestsTable();
+    if(t.dataset.screen==="OP_Maint_Operations") renderOperationsTable();
+    if(t.dataset.screen==="KPI_Dashboard") renderKPI();
+    if(t.dataset.screen==="MD_Lists"){ renderMDGrid(); renderMappingTable(); renderDurationTable(); renderJSONViewer(); }
+  });
+}
+
+/*** --- DROPDOWNS --- ***/
+function populateDropdowns(){
+  const fill=(sel,list,blank=false)=>{ const el=$(sel); if(!el) return; const arr=S.mdLists[list]||[]; el.innerHTML=(blank?`<option value=""></option>`:"")+arr.map(v=>`<option>${v}</option>`).join(""); };
+  fill("#nr_customer","Customer",true); fill("#nr_engine","Engine Model",true); fill("#nr_location","Location",true);
+  fill("#nr_shop","Shop",true); fill("#nr_rtype","Request Type",true); fill("#nr_urgency","Urgency",true); fill("#nr_status","Status",true);
+  fill("#cap_shop","Shop",true); fill("#cap_optype","Operation Type",true);
+  $("#op_req").innerHTML=`<option value=""></option>`+S.requests.map(r=>`<option>${r.id}</option>`).join("");
+  fill("#op_shop","Shop",true); fill("#op_status","Status",true); fill("#helper_shop","Shop",false);
+  $("#nr_rdate").value=fmtDate(new Date()); $("#cap_date").value=fmtDate(new Date()); $("#op_start").value=fmtDate(new Date());
+}
+
+/*** --- HELPERS --- ***/
+function renderReqTypeHelper(){
+  const box=$("#helper_reqtype_ops");
+  box.innerHTML=Object.entries(S.requestTypeToOps).map(([rt,ops])=>`<span class="pill" title="${ops.join(', ')}">${rt}: ${ops.join(", ")}</span>`).join(" ") || `<span class="note">No mapping set.</span>`;
+}
+function renderShopHelper(shop){
+  shop=shop||$("#helper_shop").value||S.mdLists.Shop[0]; $("#helper_shop").value=shop;
+  const cap=S.shopCapabilities[shop];
+  $("#helper_shop_ops").innerHTML=(cap?.allowedOps||[]).map(o=>`<span class="pill">${o}</span>`).join(" ")||`<span class="note">No op types.</span>`;
+  $("#helper_shop_capacity").innerHTML=cap?`Default capacity: <b>${cap.defaultCapacity}</b> • Location: <b>${cap.location}</b><br>${(cap.exceptions||[]).map(e=>`${e.start}→${e.end}: cap ${e.capacity}`).join("; ")||"No exceptions"}`:"";
+}
+
+/*** --- CAPACITY LOOKUP --- ***/
+function capacityFor(shop,dateStr){
+  const cap=S.shopCapabilities[shop]; if(!cap) return {capacity:0,used:0,free:0};
+  let c=cap.defaultCapacity; for(const ex of (cap.exceptions||[])) if(dateStr>=ex.start && dateStr<=ex.end) c=ex.capacity;
+  const wk=weekKey(new Date(dateStr)); let used=0;
+  for(const op of S.operations){ if(op.shop!==shop) continue; const sW=weekKey(new Date(op.start)), fW=weekKey(new Date(op.finish)); if(wk>=sW && wk<=fW) used++; }
+  return {capacity:c, used, free:Math.max(0,c-used)};
+}
+function onCapLookup(){
+  const date=$("#cap_date").value, shop=$("#cap_shop").value, optype=$("#cap_optype").value;
+  if(!date||!shop){ $("#cap_result").innerText="Pick at least Date and Shop."; return; }
+  const res=capacityFor(shop,date); const cls=res.free>0?'ok':(res.used<res.capacity?'warn':'bad');
+  $("#cap_result").innerHTML=`On ${date} • Shop <b>${shop}</b>${optype?` • Op <b>${optype}</b>`:""}<br>Capacity: <b>${res.capacity}</b> • Used: <b>${res.used}</b> • Free: <b class="${cls}">${res.free}</b>`;
+}
+
+/*** --- FORMS --- ***/
+function nextRequestId(){ return "R"+pad(S.requests.reduce((m,r)=>Math.max(m,+r.id.slice(1)),0)+1,3); }
+function nextOpId(){ return "O"+pad(S.operations.reduce((m,o)=>Math.max(m,+o.id.slice(1)),0)+1,3); }
+function recalcEstEnd(){
+  const rt=$("#nr_rtype").value, rd=$("#nr_rdate").value; if(!rt||!rd){ $("#nr_estEnd").value=""; return; }
+  const ops=S.requestTypeToOps[rt]||[]; const sum=ops.reduce((a,o)=>a+(S.opDur[o]||2),0); const waiting=1+(ops.length%3);
+  $("#nr_estEnd").value=fmtDate(addWeeks(new Date(rd),sum+waiting));
+}
+function onCreateRequest(){
+  const id=nextRequestId(), customer=$("#nr_customer").value, engine=$("#nr_engine").value, location=$("#nr_location").value, shop=$("#nr_shop").value, rtype=$("#nr_rtype").value, urgency=$("#nr_urgency").value, status=$("#nr_status").value;
+  const rdate=$("#nr_rdate").value||fmtDate(new Date()); recalcEstEnd(); const estEnd=$("#nr_estEnd").value||fmtDate(addWeeks(new Date(rdate),4));
+  if(!customer||!engine||!location||!shop||!rtype||!urgency||!status){ alert("Please fill all required fields (yellow)."); return; }
+  S.requests.push({id,customer,engine,location,shop,rtype,urgency,status,rdate,estEnd,notes:$("#nr_notes").value||""});
+  $("#nr_reqId").value=id; $("#op_req").innerHTML=`<option value=""></option>`+S.requests.map(r=>`<option>${r.id}</option>`).join(""); renderRequestsTable(); renderJSONViewer(); alert(`Request ${id} created.`);
+}
+function onOpShopChanged(){
+  const shop=$("#op_shop").value, sel=$("#op_type");
+  const ops=shop?(S.shopCapabilities[shop]?.allowedOps||[]):[];
+  sel.innerHTML=`<option value=""></option>`+ops.map(o=>`<option>${o}</option>`).join("");
+}
+function onOpTypeChanged(){
+  const t=$("#op_type").value; if(t){ const d=S.opDur[t]||1; $("#op_dur").value=String(Math.min(5,Math.max(1,d))); onOpStartDurChanged(); }
+}
+function onOpStartDurChanged(){
+  const start=$("#op_start").value, dur=parseInt($("#op_dur").value||"0",10); if(start&&dur>0) $("#op_finish").value=fmtDate(addWeeks(new Date(start),dur));
+}
+function onSaveOperation(){
+  const reqId=$("#op_req").value, shop=$("#op_shop").value, opType=$("#op_type").value, status=$("#op_status").value;
+  const start=$("#op_start").value, dur=parseInt($("#op_dur").value||"0",10), finish=$("#op_finish").value;
+  if(!reqId||!shop||!opType||!status){ alert("Please fill all required fields (yellow)."); return; }
+  const id=$("#op_id").value||nextOpId(); const existing=S.operations.find(o=>o.id===id);
+  const payload={id,reqId,shop,opType,status,start,finish,duration:dur|| (S.opDur[opType]||1)};
+  if(existing) Object.assign(existing,payload); else { S.operations.push(payload); $("#op_id").value=id; }
+  renderOperationsTable(); if($("#screen-KPI_Dashboard").classList.contains("active")) renderKPI(); renderJSONViewer(); alert(`Operation ${id} saved.`);
+}
+function onDeleteOperation(){
+  const id=$("#op_id").value; if(!id){ alert("No Operation ID selected."); return; }
+  const idx=S.operations.findIndex(o=>o.id===id); if(idx>=0 && confirm(`Delete Operation ${id}?`)){ S.operations.splice(idx,1); $("#op_id").value=""; renderOperationsTable(); if($("#screen-KPI_Dashboard").classList.contains("active")) renderKPI(); renderJSONViewer(); }
+}
+
+/*** --- TABLES --- ***/
+function renderRequestsTable(filterId){
+  const q=(filterId!==undefined)?(filterId||""):($("#req_search").value||"").trim().toUpperCase();
+  const rows=S.requests.filter(r=>!q||r.id.toUpperCase().includes(q)).map(r=>{
+    const opsCount=S.operations.filter(o=>o.reqId===r.id).length;
+    return `<tr>
+      <td><span class="link" data-jump="ops" data-id="${r.id}">${r.id}</span></td>
+      <td>${r.customer}</td><td>${r.engine}</td><td>${r.location}</td><td>${r.shop}</td><td>${r.rtype}</td>
+      <td>${r.urgency}</td><td>${r.status}</td><td class="nowrap">${r.rdate}</td><td class="nowrap">${r.estEnd}</td>
+      <td><span class="link" data-jump="ops" data-id="${r.id}" title="View operations for ${r.id}">${opsCount}</span></td>
+    </tr>`;
+  }).join("");
+  $("#tbl_requests tbody").innerHTML=rows||`<tr><td colspan="11" class="cell">No rows</td></tr>`;
+  $("#tbl_requests tbody").onclick=e=>{
+    const a=e.target.closest("[data-jump]"); if(!a) return;
+    const id=a.dataset.id;
+    $$(".tab").forEach(x=>x.classList.remove("active")); $$(`.tab[data-screen="OP_Maint_Operations"]`)[0].classList.add("active");
+    $$(".screen").forEach(x=>x.classList.remove("active")); $("#screen-OP_Maint_Operations").classList.add("active");
+    $("#op_search").value=id; renderOperationsTable(id);
+  };
+}
+function renderOperationsTable(filterTerm){
+  const q=(filterTerm!==undefined)?(filterTerm||""):($("#op_search").value||"").trim().toUpperCase();
+  $("#tbl_operations tbody").innerHTML=S.operations
+    .filter(o=>!q||o.id.toUpperCase().includes(q)||o.reqId.toUpperCase().includes(q))
+    .map(o=>`<tr>
+      <td><span class="link" data-op="${o.id}">${o.id}</span></td>
+      <td><span class="link" data-jump="req" data-id="${o.reqId}">${o.reqId}</span></td>
+      <td>${o.shop}</td><td>${o.opType}</td><td>${o.status}</td><td class="nowrap">${o.start||""}</td><td class="nowrap">${o.finish||""}</td><td>${o.duration||""}</td>
+    </tr>`).join("") || `<tr><td colspan="8" class="cell">No rows</td></tr>`;
+  $("#tbl_operations tbody").onclick=e=>{
+    const jump=e.target.closest("[data-jump]"); if(jump){
+      const id=jump.dataset.id;
+      $$(".tab").forEach(x=>x.classList.remove("active")); $$(`.tab[data-screen="TR_Maint_Requests"]`)[0].classList.add("active");
+      $$(".screen").forEach(x=>x.classList.remove("active")); $("#screen-TR_Maint_Requests").classList.add("active");
+      $("#req_search").value=id; renderRequestsTable(id); return;
+    }
+    const opLink=e.target.closest("[data-op]"); if(opLink){
+      const id=opLink.dataset.op, op=S.operations.find(x=>x.id===id); if(!op) return;
+      $$(".tab").forEach(x=>x.classList.remove("active")); $$(`.tab[data-screen="FORM_Edit_Operations"]`)[0].classList.add("active");
+      $$(".screen").forEach(x=>x.classList.remove("active")); $("#screen-FORM_Edit_Operations").classList.add("active");
+      $("#op_id").value=op.id; $("#op_req").value=op.reqId; $("#op_shop").value=op.shop; onOpShopChanged(); $("#op_type").value=op.opType;
+      $("#op_status").value=op.status; $("#op_start").value=op.start||""; $("#op_dur").value=op.duration||1; onOpStartDurChanged();
+      $("#helper_shop").value=op.shop; renderShopHelper(op.shop);
+    }
+  };
+}
+
+/*** --- MD LISTS (TEXT COLUMNS) --- ***/
+function renderMDGrid(){
+  const cols=["Urgency","Status","Shop","Location","Operation Type","Engine Model","Customer","Request Type"];
+  $("#md_grid").innerHTML=cols.map(name=>{
+    const values=(S.mdLists[name]||[]).join("\n");
+    return `<div class="md-col"><h4>${name}</h4><textarea data-md="${name}">${values}</textarea></div>`;
+  }).join("");
+}
+
+/*** --- MAPPING TABLE --- ***/
+function makeOpSelect(value){
+  const ops=S.mdLists["Operation Type"]||[];
+  return `<select>${ops.map(o=>`<option ${o===value?'selected':''}>${o}</option>`).join("")}</select>`;
+}
+function renderMappingTable(){
+  const tbody=$("#map_table tbody"); const rtypes=S.mdLists["Request Type"]||[]; const map=S.requestTypeToOps;
+  tbody.innerHTML=rtypes.map(rt=>{
+    const ops=(map[rt]||[]).slice(0,4); while(ops.length<4) ops.push((S.mdLists["Operation Type"]||[])[ops.length]||"");
+    return `<tr data-rt="${rt}">
+      <td>${rt}</td>
+      <td>${makeOpSelect(ops[0])}</td><td>${makeOpSelect(ops[1])}</td><td>${makeOpSelect(ops[2])}</td><td>${makeOpSelect(ops[3])}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="5" class="cell">No Request Types</td></tr>`;
+}
+function readMappingTable(){
+  const result={}; let invalid=false;
+  $$("#map_table tbody tr").forEach(tr=>{
+    const rt=tr.dataset.rt; const selects=Array.from(tr.querySelectorAll("select"));
+    const ops=selects.map(s=>s.value).filter(Boolean);
+    const unique=new Set(ops);
+    if(ops.length!==4 || unique.size!==4) invalid=true;
+    result[rt]=Array.from(unique).slice(0,4);
+  });
+  $("#map_warning").style.display=invalid?"block":"none";
+  $("#map_warning").textContent=invalid?"Each Request Type must have 4 unique Operation Types.":"";
+  return result;
+}
+
+/*** --- DURATION TABLE --- ***/
+function renderDurationTable(){
+  const tbody=$("#dur_table tbody"); const ops=S.mdLists["Operation Type"]||[];
+  tbody.innerHTML=ops.map(op=>{
+    const val=S.opDur[op]??2;
+    return `<tr data-op="${op}"><td>${op}</td><td><input type="number" min="1" max="5" value="${val}"></td></tr>`;
+  }).join("") || `<tr><td colspan="2" class="cell">No Operation Types</td></tr>`;
+}
+function readDurationTable(){
+  const m={};
+  $$("#dur_table tbody tr").forEach(tr=>{
+    const op=tr.dataset.op; const v=parseInt(tr.querySelector("input").value,10);
+    m[op]=Math.min(5,Math.max(1,isFinite(v)?v:2));
+  });
+  return m;
+}
+
+/*** --- KPI & HEATMAP --- ***/
+function renderKPI(){
+  const urg=S.requests.filter(r=>r.urgency==="Urgent");
+  const ontime=urg.filter(r=>{
+    const ops=S.operations.filter(o=>o.reqId===r.id); if(!ops.length) return false;
+    const maxF=ops.reduce((m,o)=>Math.max(m,new Date(o.finish||o.start||r.rdate).getTime()),0);
+    return maxF && fmtDate(new Date(maxF))<=r.estEnd;
+  });
+  const pct=urg.length?Math.round(100*ontime.length/urg.length):0;
+  $("#urgent_value").textContent=urg.length?`${pct}%`:"—";
+  $("#urgent_value").className="value "+(pct>=90?"ok":pct>=70?"warn":"bad");
+  $("#urgent_meta").textContent=`Urgent requests: ${ontime.length}/${urg.length} on-time`;
+
+  const weeks=[]; const base=new Date(); const monday=addDays(base,-((base.getDay()+6)%7)); for(let i=0;i<8;i++) weeks.push(weekKey(addWeeks(monday,i)));
+  const rows=[]; S.shops.forEach(shop=>rows.push({location:S.shopCapabilities[shop]?.location||"-", shop}));
+  rows.sort((a,b)=>a.location===b.location?a.shop.localeCompare(b.shop):a.location.localeCompare(b.location));
+  const usage={};
+  for(const op of S.operations){
+    const s=new Date(op.start||op.finish), f=new Date(op.finish||op.start);
+    weeks.forEach(w=>{
+      const [y,wstr]=w.split("-W"); const week=parseInt(wstr,10);
+      const jan4=new Date(Date.UTC(parseInt(y,10),0,4)); const thursday=addDays(jan4,(week-1)*7);
+      const ws=addDays(thursday,-3), we=addDays(ws,6);
+      if(s<=we && f>=ws){ const key=op.shop+"|"+w; usage[key]=(usage[key]||0)+1; }
+    });
+  }
+  let html="<thead><tr><th>Location</th><th>Shop</th>"+weeks.map(w=>`<th class="nowrap">${w}</th>`).join("")+"</tr></thead><tbody>";
+  rows.forEach(r=>{
+    html+=`<tr><td>${r.location}</td><td>${r.shop}</td>`;
+    const cap=S.shopCapabilities[r.shop]?.defaultCapacity||1;
+    weeks.forEach(w=>{
+      const u=usage[r.shop+"|"+w]||0; const p=Math.round(100*u/cap); let bg="#cfead1"; if(p>=100) bg="#f7c2c2"; else if(p>=50) bg="#fff0b3";
+      html+=`<td class="cell" style="background:${bg}" title="Used ${u}/${cap}">${p}%</td>`;
+    });
+    html+="</tr>";
+  });
+  html+="</tbody>"; $("#tbl_heatmap").innerHTML=html;
+}
+
+/*** --- JSON VIEWER --- ***/
+function buildJSONSections(){
+  return [
+    ["mdLists", S.mdLists],
+    ["requestTypeToOps", S.requestTypeToOps],
+    ["opDur", S.opDur],
+    ["shopCapabilities", S.shopCapabilities],
+    ["requests", S.requests],
+    ["operations", S.operations],
+  ];
+}
+function renderJSONViewer(){
+  const cont=$("#jsonViewer"); const sections=buildJSONSections();
+  cont.innerHTML=sections.map(([name,obj])=>`<details ${name==="mdLists"?"open":""}><summary>${name}</summary><pre>${escapeHtml(JSON.stringify(obj,null,2))}</pre></details>`).join("");
+}
+function escapeHtml(s){ return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])) }
+function copyJSON(){
+  const data=JSON.stringify(Object.fromEntries(buildJSONSections()),null,2);
+  navigator.clipboard?.writeText(data).then(()=>alert("Copied JSON to clipboard."),()=>alert("Copy failed."));
+}
+function downloadJSON(){
+  const data=JSON.stringify(Object.fromEntries(buildJSONSections()),null,2);
+  const blob=new Blob([data],{type:"application/json"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="maestro_export.json"; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/*** --- APPLY MD CHANGES --- ***/
+function applyMDChanges(){
+  // 1) Lists from text areas
+  $$("#md_grid textarea").forEach(t=>{
+    const name=t.dataset.md; const vals=t.value.split("\n").map(v=>v.trim()).filter(Boolean); S.mdLists[name]=vals;
+  });
+  // 2) Mapping & Duration from tables
+  const newMap=readMappingTable(); const newDur=readDurationTable();
+  S.requestTypeToOps=newMap; S.opDur=newDur;
+
+  // 3) Rebuild shop capabilities safely (preserve where possible)
+  const locs=S.mdLists.Location, allOps=S.mdLists["Operation Type"]; S.shops=S.mdLists.Shop.slice();
+  const newCaps={};
+  S.shops.forEach((shop,i)=>{
+    const prev=S.shopCapabilities[shop]||{allowedOps:[], defaultCapacity:1+(i%3), location:locs[i%locs.length], exceptions:[]};
+    const allowed=(prev.allowedOps||[]).filter(o=>allOps.includes(o));
+    const fallback=allOps.slice(0, 4+(i%7));
+    newCaps[shop]={allowedOps:(allowed.length?allowed:fallback), defaultCapacity:prev.defaultCapacity||1, location:prev.location||locs[i%locs.length], exceptions:prev.exceptions||[]};
+  });
+  S.shopCapabilities=newCaps;
+
+  // 4) Refresh UI & dependent data
+  populateDropdowns(); renderReqTypeHelper(); renderShopHelper(); renderRequestsTable(); renderOperationsTable(); renderKPI(); renderJSONViewer();
+  alert("Master Data applied.");
+}
+
+/*** --- IMPORT / EXPORT --- ***/
+function doExport(){
+  const payload={mdLists:S.mdLists, requestTypeToOps:S.requestTypeToOps, opDur:S.opDur, shopCapabilities:S.shopCapabilities, requests:S.requests, operations:S.operations};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="maestro_export.json"; a.click(); URL.revokeObjectURL(a.href);
+}
+function doImport(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      if(!data.mdLists||!data.requests||!data.operations) throw new Error("Missing mdLists/requests/operations.");
+      S.mdLists=data.mdLists; S.requestTypeToOps=data.requestTypeToOps||S.requestTypeToOps; S.opDur=data.opDur||S.opDur; S.shopCapabilities=data.shopCapabilities||S.shopCapabilities; S.requests=data.requests; S.operations=data.operations;
+      populateDropdowns(); renderReqTypeHelper(); renderShopHelper(); renderMDGrid(); renderMappingTable(); renderDurationTable(); renderRequestsTable(); renderOperationsTable(); renderKPI(); renderJSONViewer();
+      alert("Import successful.");
+    }catch(e){ alert("Import failed: "+e.message); }
+  };
+  reader.readAsText(file);
+}
+
+/*** --- INIT --- ***/
+function bindEvents(){
+  $("#btnCreateRequest").onclick=onCreateRequest; $("#btnCalcEstEnd").onclick=recalcEstEnd; $("#nr_rtype").onchange=recalcEstEnd; $("#nr_rdate").onchange=recalcEstEnd;
+  $("#btnCapLookup").onclick=onCapLookup;
+  $("#op_shop").onchange=()=>{ onOpShopChanged(); $("#helper_shop").value=$("#op_shop").value||S.mdLists.Shop[0]; renderShopHelper($("#helper_shop").value); };
+  $("#op_type").onchange=onOpTypeChanged; $("#op_start").onchange=onOpStartDurChanged; $("#op_dur").onchange=onOpStartDurChanged;
+  $("#btnSaveOperation").onclick=onSaveOperation; $("#btnDeleteOperation").onclick=onDeleteOperation;
+  $("#helper_shop").onchange=()=>renderShopHelper($("#helper_shop").value);
+  $("#req_search").oninput=()=>renderRequestsTable(); $("#req_clear").onclick=()=>{ $("#req_search").value=""; renderRequestsTable(); }
+  $("#op_search").oninput=()=>renderOperationsTable(); $("#op_clear").onclick=()=>{ $("#op_search").value=""; renderOperationsTable(); }
+  $("#btnApplyMD").onclick=applyMDChanges;
+  $("#btnExport").onclick=doExport; $("#importFile").onchange=e=>{ if(e.target.files[0]) doImport(e.target.files[0]); };
+  $("#jsonCopy").onclick=copyJSON; $("#jsonDownload").onclick=downloadJSON;
+}
+function init(){
+  seedMasterData(); seedTransactions(); initTabs(); populateDropdowns(); renderReqTypeHelper(); renderShopHelper(); renderRequestsTable(); renderOperationsTable(); renderMDGrid(); renderMappingTable(); renderDurationTable(); renderKPI(); renderJSONViewer(); bindEvents();
+  $("#nr_reqId").value="(next: "+nextRequestId()+")";
+  $("#cap_shop").value=S.mdLists.Shop[0]; $("#cap_optype").value=S.mdLists["Operation Type"][0];
+}
+document.addEventListener("DOMContentLoaded",init);
+</script>
+</body>
+</html>
