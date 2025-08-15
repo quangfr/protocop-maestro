@@ -22,7 +22,7 @@
 - prototype.html : exemple de prototype MAESTRO à télécharger et à ouvrir dans un navigateur
 
 
-## 🤖 Astuces
+** 🤖 Astuces **
 
 - 🔍 Prototyper petit d’abord
 - ✏️ Demander à GPT de poser des questions pour préciser ton prompt
