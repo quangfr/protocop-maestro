@@ -1,58 +1,58 @@
-## Detailed Functionality Overview
+## Aperçu détaillé des fonctionnalités
 
 ### Architecture
-- **Single‑file, offline prototype** — `prototype.html` bundles HTML, CSS, and Vanilla JS to run entirely in the browser with no external dependencies.
-- **Central state object (`S`)** — Keeps master data lists (`mdLists`), mappings from request types to required operations, default operation durations, shop capabilities, and runtime data for requests & operations.
+- **Prototype autonome en un seul fichier** — `prototype.html` regroupe HTML, CSS et JavaScript Vanilla pour fonctionner entièrement dans le navigateur sans dépendance externe.
+- **Objet d'état central (`S`)** — Contient les listes de données maîtres (`mdLists`), les correspondances entre types de demandes et opérations requises, les durées d'opérations par défaut, les capacités des ateliers et les données dynamiques pour les demandes et opérations.
 
-### Data Model & Seeding
-- **Master data (seedMasterData)**  
-  - Preloads lists for Urgency, Status, Shop, Location, Operation Type, Engine Model, Customer, and Request Type.  
-  - Builds `requestTypeToOps` mapping (each request type → four mandatory operation types).  
-  - Stores default durations (`opDur`) and per-shop capabilities (allowed operations, default capacity, location, capacity exceptions).
+### Modèle de données et remplissage initial
+- **Données de référence (seedMasterData)**
+  - Précharge les listes Urgence, Statut, Atelier, Lieu, Type d'opération, Modèle de moteur, Client et Type de demande.
+  - Construit la correspondance `requestTypeToOps` (chaque type de demande → quatre types d'opérations obligatoires).
+  - Stocke les durées par défaut (`opDur`) et les capacités par atelier (opérations autorisées, capacité par défaut, localisation, exceptions de capacité).
 
-- **Transactional data (seedTransactions)**  
-  - Generates 10 sample requests with calculated estimated end dates based on required operations.  
-  - Creates 30 sample operations linked to requests, respecting shop capabilities and random scheduling.
+- **Données transactionnelles (seedTransactions)**
+  - Génère 10 demandes d'exemple avec calcul des dates de fin estimées en fonction des opérations requises.
+  - Crée 30 opérations d'exemple liées aux demandes, en respectant les capacités des ateliers et un planning aléatoire.
 
-### UI Screens
-1. **New Request Form**  
-   - Auto‑assigns request IDs.  
-   - Dynamic dropdowns from master data.  
-   - Calculates estimated end date from required operations.  
-   - Helper pane showing required operations and a “capacity lookup” to check availability by date, shop, and operation type.
+### Écrans de l'UI
+1. **Formulaire Nouvelle Demande**
+   - Attribue automatiquement les identifiants de demande.
+   - Listes déroulantes dynamiques basées sur les données maîtres.
+   - Calcule la date de fin estimée à partir des opérations requises.
+   - Volet d'aide indiquant les opérations requises et une « recherche de capacité » pour vérifier la disponibilité par date, atelier et type d'opération.
 
-2. **Edit Operations Form**  
-   - Auto‑assigns operation IDs.  
-   - Filters operation types by chosen shop.  
-   - Auto-computes finish date from start date and duration.  
-   - Helper pane listing allowed operations per shop and default capacity.
+2. **Formulaire d'édition d'opérations**
+   - Attribue automatiquement les identifiants d'opération.
+   - Filtre les types d'opération en fonction de l'atelier choisi.
+   - Calcule automatiquement la date de fin à partir de la date de début et de la durée.
+   - Volet d'aide listant les opérations autorisées par atelier et la capacité par défaut.
 
-3. **Requests Table**  
-   - Searchable by Request ID.  
-   - Displays linked operations count; clicking IDs navigates to filtered views.
+3. **Tableau des demandes**
+   - Recherche par identifiant de demande.
+   - Affiche le nombre d'opérations liées ; clic sur les identifiants pour naviguer vers des vues filtrées.
 
-4. **Operations Table**  
-   - Searchable by Operation or Request ID.  
-   - Clicking IDs navigates to related request table or pre-filled edit form.
+4. **Tableau des opérations**
+   - Recherche par identifiant d'opération ou de demande.
+   - Clic sur les identifiants pour naviguer vers le tableau des demandes ou le formulaire d'édition prérempli.
 
-5. **Master Data Editor**  
-   - Text columns for each master list.  
-   - Editable mapping: Request Type ↔ four Operation Types (enforces uniqueness).  
-   - Editable default durations per operation type.  
-   - “Apply MD Changes” recalculates dependent data and refreshes UI.  
-   - Read-only JSON viewer with copy/download.
+5. **Éditeur de données maîtres**
+   - Colonnes de texte pour chaque liste maîtresse.
+   - Mapping éditable : Type de demande ↔ quatre types d'opérations (unicité garantie).
+   - Durées par défaut éditables pour chaque type d'opération.
+   - « Appliquer les modifications MD » recalculant les données dépendantes et rafraîchissant l'interface.
+   - Visualiseur JSON en lecture seule avec copie/téléchargement.
 
-6. **KPI Dashboard**  
-   - Calculates on-time percentage for urgent requests.  
-   - Weekly capacity heatmap (Location × Shop) for the next 8 weeks with color-coded utilization.
+6. **Tableau de bord KPI**
+   - Calcule le pourcentage de demandes urgentes livrées à temps.
+   - Carte de chaleur de capacité hebdomadaire (Lieu × Atelier) pour les 8 semaines à venir avec code couleur selon l'utilisation.
 
-### Utility & Persistence Features
-- Auto-generated IDs (`nextRequestId`, `nextOpId`).
-- Date formatting and ISO-week calculations for capacity logic.
-- JSON import/export of the entire state.
-- Event bindings handle form actions, table filtering, and master data updates.
+### Fonctionnalités utilitaires et de persistance
+- Identifiants générés automatiquement (`nextRequestId`, `nextOpId`).
+- Formatage des dates et calcul des semaines ISO pour la logique de capacité.
+- Import/export JSON de l'état complet.
+- Les liaisons d'événements gèrent les actions de formulaire, le filtrage des tableaux et les mises à jour des données maîtres.
 
-## UML Class Diagram (Mermaid)
+## Diagramme de classes UML (Mermaid)
 
 ```mermaid
 classDiagram
@@ -99,16 +99,16 @@ classDiagram
         +Number defaultDuration
     }
 
-    Request "1" --> "many" Operation : contains
-    ShopCapability "1" --> "many" Operation : scheduled at
-    RequestType "1" --> "4" OperationType : requires
-    ShopCapability "1" --> "many" OperationType : allows
+    Request "1" --> "many" Operation : contient
+    ShopCapability "1" --> "many" Operation : planifiée à
+    RequestType "1" --> "4" OperationType : requiert
+    ShopCapability "1" --> "many" OperationType : autorise
 ```
 
-## Repository Functionalities
+## Fonctionnalités du dépôt
 
-- **Project scope** – This repo guides users in building self-contained HTML prototypes with GPT. It provides a questionnaire, an example prompt, and a working prototype file to validate product ideas offline without external dependencies.
-- **MAESTRO prototype** – The included prompt and HTML illustrate a maintenance tool for aircraft engines. It defines domain objects (Requests, Operations, master lists, mappings), data relations, and seeded example records to simulate real scenarios.
-- **User interface & navigation** – The prototype presents multiple screens (New Request form, Operation editor, Requests/Operations tables, Master Data editor, KPI dashboard) accessible via a tab bar. Tables support filtering and cross-navigation through ID links.
-- **Interactive features** – JavaScript functions enable dynamic dropdowns, capacity lookups, auto-calculated dates, and event bindings for creating, editing, and linking maintenance records.
-- **Data persistence utilities** – Users can export and import the entire dataset as JSON directly from the interface, supporting offline usage and easy data sharing.
+- **Périmètre du projet** – Ce dépôt guide les utilisateurs pour construire des prototypes HTML autonomes avec GPT. Il fournit un questionnaire, un exemple de prompt et un fichier prototype fonctionnel pour valider des idées produit hors ligne sans dépendances externes.
+- **Prototype MAESTRO** – Le prompt et le HTML inclus illustrent un outil de maintenance pour moteurs d'avion. Il définit les objets métier (Demandes, Opérations, listes maîtres, mappings), les relations de données et des enregistrements d'exemple préremplis pour simuler des scénarios réels.
+- **Interface utilisateur & navigation** – Le prototype présente plusieurs écrans (formulaire Nouvelle Demande, éditeur d'Opérations, tableaux Demandes/Opérations, éditeur de données maîtres, tableau de bord KPI) accessibles via une barre d'onglets. Les tableaux prennent en charge le filtrage et la navigation croisée via les liens d'ID.
+- **Fonctionnalités interactives** – Les fonctions JavaScript activent les listes déroulantes dynamiques, les recherches de capacité, le calcul automatique des dates et les liaisons d'événements pour créer, éditer et lier des enregistrements de maintenance.
+- **Utilitaires de persistance des données** – Les utilisateurs peuvent exporter et importer l'ensemble des données au format JSON directement depuis l'interface, ce qui permet une utilisation hors ligne et un partage facile des données.
