@@ -70,13 +70,13 @@ function seedMasterData():
 
 function seedTransactions():
   // Génère un carnet de demandes moteur (flotte client)
-  for i in 1..50:
+  for i in 1..10:
     build Request with random master data (Engine Model, Customer, Urgency, Request Type, Request Date)
     estimate end date from required operations (somme durées + attentes inter-ateliers)
     append to S.requests
 
-  // Planifie des opérations moteur jusqu'à 200 entrées en respectant les capacités d'ateliers
-  while S.operations has < 200 entries:
+  // Planifie des opérations moteur jusqu'à 30 entrées en respectant les capacités d'ateliers
+  while S.operations has < 30 entries:
     pick a Request
     choose allowed Operation Type (compatibles shopCapabilities)
     schedule start and duration (respect des créneaux Test Cell pour Test Run)
