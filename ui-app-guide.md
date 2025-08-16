@@ -66,6 +66,7 @@
   - Volumétrie POC : **10 demandes**, **50 opérations**, étalées sur **J+0 → J+55**.
 
 **Diagramme UML** :
+
 ```mermaid
 classDiagram
   class Request {
@@ -143,6 +144,7 @@ classDiagram
   Mappings ..> OpType : définit
   Shop "1" o-- "*" Operation : exécute >
 ```
+
 ## 3) 🖥️ INTERFACE (Fiori-like)
 ❓ Quels écrans et parcours essentiels ?
 ❓ Quelles interactions minimum ?
