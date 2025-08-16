@@ -1,8 +1,7 @@
-## Objectif
-Illustrer la capacité à créer un prototype qui vérifie la donnée venant d'un outil en cours de développement. Contexte : SAP-IBP / Excel Add-in
+# Contexte
+Tester les calculs venant d'un outil en cours de développement à l'aide d'un prototype Excel.
 
-## IA🤖 
-**Astuces💡**
+**Astuces 💡**
 - Demander à GPT de te poser des questions pour préciser ta demande
 - Demander à GPT de te proposer des pistes de simplification
 - Demander à GPT de générer une proposition au préalable
@@ -14,7 +13,7 @@ Illustrer la capacité à créer un prototype qui vérifie la donnée venant d'u
 https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 ```
 
-## Guide 
+# Guide 
 
 ### 1) Contexte (Hypothèses + Mise en forme) ✨
 *Questions à se poser d’abord* 🤔  
