@@ -27,7 +27,7 @@
 ---
 # Questionnaire
 
-## 1️⃣ Identité
+## 1️⃣ Contexte
 
 ❓ *Quel nom afficher dans le bandeau en haut ?*  
 ❓ *Quel style général ?*  
@@ -51,7 +51,7 @@ Elle permet de :
 - **Visualiser** des indicateurs clés de performance (KPI)  
 ---
 
-## 2️⃣ Modèle de données
+## 2️⃣ Modèle
 
 ❓ *Quels sont les objets métiers de l'application ? (ex. Demande, Opération, Ressource, Calendrier…)*  
 ❓ *Pour chaque objet : propriétés, validations, permissions ?*  
@@ -96,7 +96,7 @@ Elles contiennent toutes les valeurs disponibles dans les menus déroulants : ur
 
 ---
 
-## 3️⃣ Navigation et écrans
+## 3️⃣ Interface
 
 ❓ *Quels onglets/écrans veux-tu ?*  
 ❓ *Pour chaque onglet : données, actions, aides ?*  
@@ -140,7 +140,7 @@ Elles contiennent toutes les valeurs disponibles dans les menus déroulants : ur
 
 ---
 
-## 4️⃣ Techniques
+## 4️⃣ Technique
 
 ❓ *Quelles fonctionnalités avancées ?*  
 ❓ *Quelles contraintes techniques ?*
