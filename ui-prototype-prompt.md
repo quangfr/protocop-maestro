@@ -1,4 +1,4 @@
-À copier dans GPT en lui demandant de `créer un prototype HTML standalone avec le contexte suivant`
+À copier dans GPT en lui demandant de `créer un prototype HTML standalone avec les infos suivantes` :
 
 ---
 
