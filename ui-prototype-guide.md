@@ -1,4 +1,4 @@
-## Contexte
+# Contexte
 
 **📌 Objectifs d'un prototype HTML :**
 
@@ -22,7 +22,6 @@
 - 📥 Demander à GPT de re-décrire ton prompt à partir du code ou de tes demandes additionnelles
 - 📋 Plus ton prompt est précis, plus ton prototype sera fidèle mais plus la génération prend du temps
   
----
 # Guide
 
 ## 1️⃣ Contexte
