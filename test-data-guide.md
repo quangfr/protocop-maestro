@@ -9,6 +9,7 @@
 - 🖼️ Démos réalistes (EXIM)
 
 **💡 Démarche IA**
+
 0. 🏃‍♂️ Privilégier un format plus basique (CSV, JSON...) avec le minimum de données
 1. 🔍 Prototyper petit avec des hypothèses de simplification
 2. ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
