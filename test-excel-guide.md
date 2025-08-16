@@ -117,7 +117,8 @@ Rappels ⚠️ : mêmes libellés des deux côtés, même horizon, pas d’Outpu
 - **Seed aléatoire fixée** pour la reproductibilité.
 
 **Connexion au flux IBP (le plus simple)** 🔄  
-- **Entrée (INPUT)** : pousser/ajuster les opérations depuis **Input_Operations** vers IBP.
+
+**Entrée (INPUT)** : pousser/ajuster les opérations depuis **Input_Operations** vers IBP.
 
 - Crée une feuille IBP_INPUT dans le même fichier avec l’Excel Add-in SAP IBP.
 - Choisis la même période (90 j), les mêmes shops et catégories.
@@ -125,7 +126,7 @@ Rappels ⚠️ : mêmes libellés des deux côtés, même horizon, pas d’Outpu
 - Colle tes données (capacité + plan) depuis le classeur, puis Save Data ✅
 - Côté classeur, tu continues d’utiliser Input_Operations comme référence pour les KPI (la capacité de référence reste l’input).
 
-- **Sortie (OUTPUT)** : coller le retour IBP dans **Output_Operations** (même structure).
+**Sortie (OUTPUT)** : coller le retour IBP dans **Output_Operations** (même structure).
 
 - Ajoute l’Excel Add-in SAP IBP dans le même fichier ✅
 - Crée une feuille IBP_OUTPUT avec les mêmes shops, catégories et période (90 j) que ta feuille de test
