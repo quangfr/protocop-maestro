@@ -1,729 +1,810 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MAESTRO — Maintenance Cockpit (Offline)</title>
-<style>
-  :root{
-    --bg:#f6f8fb; --card:#ffffff; --ink:#1f2a44; --muted:#6b7a90;
-    --accent:#0a6ed1; --line:#e3e8f0; --ok:#1f8f4e; --warn:#d29e00; --bad:#c93333;
-    --yellow:#fffacd; --pill:#eef4fb;
-  }
-  *{box-sizing:border-box}
-  body{margin:0; font:14px/1.45 "Segoe UI", Roboto, Arial, sans-serif; color:var(--ink); background:var(--bg)}
-  .appbar{position:sticky; top:0; z-index:50; display:flex; gap:16px; align-items:center; padding:12px 16px; background:#fff; border-bottom:1px solid var(--line)}
-  .app-title{font-weight:700; letter-spacing:.2px}
-  .app-badge{background:var(--pill); color:var(--accent); padding:3px 8px; border-radius:999px; font-size:12px; font-weight:600}
-  .grow{flex:1}
-  .toolbar{display:flex; gap:8px; align-items:center}
-  .btn{background:#fff; border:1px solid var(--line); color:var(--ink); padding:8px 10px; border-radius:8px; cursor:pointer}
-  .btn.primary{background:var(--accent); color:#fff; border-color:var(--accent)}
-  .btn:disabled{opacity:.55; cursor:not-allowed}
-  input[type=file]{display:none}
-  label.file{border:1px dashed var(--accent); color:var(--accent); background:#fff}
-  .mini{font-size:12px; color:var(--muted)}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MAESTRO • Prototype (Fiori-like, Light)</title>
+  <style>
+    :root{
+      --bg:#ffffff;           /* light mode */
+      --card:#ffffff;
+      --muted:#4c637a;
+      --text:#0b1a2b;
+      --accent:#0a6ed1;       /* SAP Fiori blue */
+      --accent-2:#0a6ed1;
+      --warn:#e9730c;
+      --danger:#bb0000;
+      --ok:#107e3e;
+      --border:#e5ebf2;
+      --chip:#f5f8fb;
+      --focus:#ffcc00;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .app{display:flex;flex-direction:column;min-height:100%}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.85));backdrop-filter: blur(6px);border-bottom:1px solid var(--border)}
+    .topbar{display:flex;gap:.75rem;align-items:center;justify-content:space-between;padding:.8rem 1rem}
+    .brand{display:flex;gap:.6rem;align-items:center}
+    .brand h1{margin:0;font-size:16px;font-weight:700;letter-spacing:.4px}
+    .brand .chip{background:var(--chip);padding:.1rem .5rem;border-radius:999px;border:1px solid var(--border);font-size:12px;color:var(--muted)}
+    .search{display:flex;gap:.5rem;align-items:center;max-width:560px;width:100%}
+    .search input{flex:1;padding:.55rem .7rem;border-radius:.6rem;border:1px solid var(--border);background:#ffffff;color:var(--text)}
+    .search button{padding:.55rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#f7fafe;color:var(--text);cursor:pointer}
+    .toolbar{display:flex;gap:.5rem}
+    .toolbar button{padding:.5rem .7rem;border-radius:.6rem;border:1px solid var(--border);background:#f7fafe;color:var(--text);cursor:pointer}
 
-  .tabs{display:flex; gap:4px; padding:8px 8px 0; border-bottom:1px solid var(--line); position:sticky; top:52px; background:var(--bg); z-index:40}
-  .tab{padding:10px 12px; cursor:pointer; border-radius:8px 8px 0 0; border:1px solid transparent; color:var(--muted); font-weight:600}
-  .tab.active{background:#fff; color:var(--ink); border:1px solid var(--line); border-bottom-color:#fff}
-  .screen{display:none; padding:16px} .screen.active{display:block}
+    nav.tabs{display:flex;gap:.25rem;padding:.4rem .5rem;border-bottom:1px solid var(--border)}
+    nav.tabs button{padding:.55rem .8rem;border-radius:.6rem;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer}
+    nav.tabs button.active{color:var(--text);border-color:var(--border);background:#f7fafe}
 
-  .row{display:flex; gap:16px; align-items:stretch}
-  .col{display:flex; flex-direction:column; gap:12px}
-  .w-60{flex:0 0 60%} .w-40{flex:0 0 40%}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px}
-  .card h3{margin:0 0 8px 0; font-size:16px}
-  .card h4{margin:10px 0 6px 0; font-size:13px; color:var(--muted)}
-  .note{font-size:12px; color:var(--muted)}
-  .divider{height:1px; background:var(--line); margin:8px 0}
-  .pill{display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; background:var(--pill); border:1px solid var(--line)}
-  .helper-list{display:flex; flex-wrap:wrap; gap:6px}
+    main{padding:1rem;display:flex;flex-direction:column;gap:1rem}
 
-  .form-grid{display:grid; gap:10px; grid-template-columns:repeat(2, minmax(180px,1fr))}
-  .field{display:flex; flex-direction:column; gap:4px}
-  .field label{font-size:12px; color:var(--muted)}
-  .field input,.field select,.field textarea{border:1px solid var(--line); border-radius:8px; padding:8px; background:#fff; font:inherit; color:inherit}
-  select.required,.required select{background:var(--yellow)}
-  .nowrap{white-space:nowrap}
+    .filters{display:flex;flex-wrap:wrap;gap:.5rem}
+    .filters select,.filters input[type=date]{padding:.45rem .6rem;border-radius:.5rem;border:1px solid var(--border);background:#ffffff;color:var(--text)}
 
-  .table-wrap{overflow:auto; border:1px solid var(--line); border-radius:12px; background:#fff}
-  table{border-collapse:separate; border-spacing:0; width:100%}
-  thead th{position:sticky; top:0; background:#fff; z-index:2; border-bottom:1px solid var(--line); text-align:left; padding:10px; font-size:12px; color:var(--muted); backdrop-filter:blur(4px)}
-  tbody td{border-bottom:1px solid var(--line); padding:9px 10px; vertical-align:top}
-  tbody tr:hover{background:#fcfdff}
-  .link{color:var(--accent); text-decoration:underline; cursor:pointer}
-  .searchbar{display:flex; gap:8px; align-items:center; margin-bottom:10px}
-  .searchbar input{padding:8px; border:1px solid var(--line); border-radius:8px; width:260px}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:.75rem}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:.9rem}
+    .card h3{margin:.1rem 0 .4rem;font-size:13px;color:var(--muted);font-weight:600}
+    .metric{display:flex;align-items:baseline;gap:.5rem}
+    .metric .big{font-size:24px;font-weight:800}
+    .trend.up{color:var(--ok)}
+    .trend.down{color:var(--danger)}
 
-  .kpi{display:flex; gap:16px; align-items:center; background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px}
-  .kpi h2{margin:0; font-size:22px}
-  .kpi .badge{font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid var(--line); background:#eef4fb}
-  .kpi .value{font-size:26px; font-weight:800}
-  .kpi .value.ok{color:var(--ok)} .kpi .value.warn{color:var(--warn)} .kpi .value.bad{color:var(--bad)}
-  .heatmap{overflow:auto; border:1px solid var(--line); border-radius:12px; background:#fff}
-  .heatmap table{min-width:820px}
-  .cell{text-align:center; font-size:12px; padding:6px 8px; border-bottom:1px solid var(--line)}
-  .legend{display:flex; gap:8px; align-items:center; font-size:12px; color:var(--muted)}
-  .swatch{width:16px; height:12px; border:1px solid var(--line); border-radius:3px}
-  .sw-green{background:#cfead1} .sw-yellow{background:#fff0b3} .sw-red{background:#f7c2c2}
+    .grid-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px}
+    .heatmap{border-collapse:collapse;width:max-content}
+    .heatmap th, .heatmap td{white-space:nowrap;border:1px solid var(--border);padding:.35rem .45rem;text-align:center;font-variant-numeric:tabular-nums}
+    .heatmap thead th{position:sticky;top:0;background:#f7fafe;color:var(--muted);font-size:12px}
+    .heatmap tbody th{position:sticky;left:0;background:#f7fafe;color:var(--muted);text-align:left}
+    .cell{min-width:34px}
+    .occ-0{background:#f5f7fa}
+    .occ-ok{background:linear-gradient(180deg,#dff7e8,#c9f0d8)}
+    .occ-warn{background:linear-gradient(180deg,#fff5cc,#ffe49c)}
+    .occ-bad{background:linear-gradient(180deg,#ffe0e0,#ffc6cc)}
+    .cell a{display:block;color:#0a6ed1}
 
-  .md-grid{display:grid; gap:12px; grid-template-columns:repeat(4, minmax(180px,1fr))}
-  .md-col{border:1px solid var(--line); border-radius:12px; background:#fff; padding:10px}
-  .md-col h4{margin:0 0 6px 0}
-  .md-col textarea{width:100%; min-height:160px; border:1px solid var(--line); border-radius:8px; padding:8px; font:inherit}
+    .section{display:none}
+    .section.active{display:block}
 
-  .mini-table{width:100%; border-collapse:separate; border-spacing:0}
-  .mini-table th{position:sticky; top:0; background:#fff; z-index:1; text-align:left; font-size:12px; color:var(--muted); padding:8px; border-bottom:1px solid var(--line)}
-  .mini-table td{padding:6px; border-bottom:1px solid var(--line)}
-  .mini-table select,.mini-table input{width:100%; padding:6px; border:1px solid var(--line); border-radius:8px; background:#fff; font:inherit}
-  .warning{color:var(--bad); font-size:12px}
+    .list{display:grid;gap:.5rem}
+    table.data{border-collapse:collapse;width:100%}
+    table.data th,table.data td{border-bottom:1px solid var(--border);padding:.5rem;text-align:left}
+    table.data th{color:var(--muted);font-weight:600;font-size:12px}
+    table.data tr:hover{background:#f7fbff}
 
-  .json-viewer-header{display:flex; gap:8px; align-items:center; margin-top:6px}
-  .jsonbox{border:1px solid var(--line); border-radius:12px; background:#fff; padding:10px}
-  details summary{cursor:pointer; user-select:none; font-weight:600}
-  pre{margin:6px 0 0 0; overflow:auto; max-height:300px}
-  @media (max-width:980px){ .row{flex-direction:column} .w-60,.w-40{flex:1 1 auto} .form-grid{grid-template-columns:1fr} .md-grid{grid-template-columns:1fr} }
-</style>
+    .badge{display:inline-block;padding:.1rem .45rem;border-radius:999px;border:1px solid var(--border);background:#f7fafe;color:var(--muted);font-size:11px}
+    .row-actions{display:flex;gap:.35rem}
+
+    .drawer{position:fixed;inset:0;display:none;align-items:stretch;justify-content:flex-end;background:rgba(0,0,0,.35)}
+    .drawer.open{display:flex}
+    .panel{width:min(560px,100%);background:var(--card);border-left:1px solid var(--border);padding:1rem;overflow:auto}
+    .panel h2{margin-top:0}
+    .form{display:grid;gap:.6rem}
+    .form label{display:grid;gap:.25rem;font-size:12px;color:var(--muted)}
+    .form input,.form select, .form textarea{padding:.5rem;border-radius:.5rem;border:1px solid var(--border);background:#ffffff;color:var(--text)}
+    .form .row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+    .panel .actions{display:flex;gap:.5rem;margin-top:.75rem}
+    .btn{padding:.5rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:#f7fafe;color:var(--text);cursor:pointer}
+    .btn.primary{background:linear-gradient(180deg,#0a6ed1,#085cab);border-color:#085cab;color:#fff}
+    .btn.danger{background:linear-gradient(180deg,#b01a3a,#8e1730);border-color:#75142a;color:#fff}
+    .btn.ghost{background:transparent}
+
+    .tools{display:flex;gap:.5rem;flex-wrap:wrap}
+
+    .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .5rem;border-radius:999px;background:#f4f8fc;border:1px solid var(--border);color:var(--muted);font-size:12px}
+
+    .help{color:var(--muted);font-size:12px}
+  </style>
 </head>
 <body>
-  <div class="appbar">
-    <span class="app-title">MAESTRO</span>
-    <span class="app-badge">SAP IBP‑style</span>
-    <div class="grow"></div>
-    <div class="toolbar">
-      <button id="btnExport" class="btn">Export JSON</button>
-      <label class="btn file" for="importFile">Import JSON</label>
-      <input id="importFile" type="file" accept="application/json" />
-      <span class="mini">Offline / Vanilla JS</span>
-    </div>
-  </div>
-
-  <div class="tabs" id="tabs"></div>
-
-  <!-- FORM_New_Request -->
-  <div id="screen-FORM_New_Request" class="screen active">
-    <div class="row">
-      <div class="col w-60">
-        <div class="card">
-          <h3>FORM_New_Request</h3>
-          <div class="form-grid">
-            <div class="field"><label>Request ID</label><input id="nr_reqId" type="text" placeholder="Auto-generated" disabled></div>
-            <div class="field required"><label>Customer *</label><select id="nr_customer" class="required"></select></div>
-            <div class="field required"><label>Engine Model *</label><select id="nr_engine" class="required"></select></div>
-            <div class="field required"><label>Location *</label><select id="nr_location" class="required"></select></div>
-            <div class="field required"><label>Shop *</label><select id="nr_shop" class="required"></select></div>
-            <div class="field required"><label>Request Type *</label><select id="nr_rtype" class="required"></select></div>
-            <div class="field required"><label>Urgency *</label><select id="nr_urgency" class="required"></select></div>
-            <div class="field required"><label>Status *</label><select id="nr_status" class="required"></select></div>
-            <div class="field"><label>Request Date</label><input id="nr_rdate" type="date"></div>
-            <div class="field"><label>Estimated End Date (auto)</label><input id="nr_estEnd" type="date" disabled></div>
-            <div class="field" style="grid-column:1/-1"><label>Notes</label><textarea id="nr_notes" rows="3" placeholder="Context, constraints..."></textarea></div>
-          </div>
-          <div class="row" style="margin-top:6px">
-            <button id="btnCreateRequest" class="btn primary">Create Request</button>
-            <button id="btnCalcEstEnd" class="btn">Recalculate Estimated End</button>
-            <span class="note">Estimated end = sum(required ops durations) + waiting time.</span>
-          </div>
-        </div>
+<div class="app">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <span class="chip">MAESTRO</span>
+        <h1>Maintenance moteurs — Prototype</h1>
       </div>
-      <div class="col w-40">
-        <div class="card">
-          <h3>Helper • Required Operations by Request Type</h3>
-          <div id="helper_reqtype_ops" class="helper-list"></div>
-          <div class="divider"></div>
-          <h3>Capacity Lookup</h3>
-          <div class="form-grid">
-            <div class="field"><label>Date</label><input id="cap_date" type="date"></div>
-            <div class="field"><label>Shop</label><select id="cap_shop"></select></div>
-            <div class="field"><label>Operation Type</label><select id="cap_optype"></select></div>
-            <div class="field"><label>&nbsp;</label><button id="btnCapLookup" class="btn">Check Capacity</button></div>
-          </div>
-          <div id="cap_result" class="note"></div>
-        </div>
+      <div class="search" role="search">
+        <input id="searchInput" placeholder="Rechercher par ID (ex: REQ-003 ou OP-014)"/>
+        <button id="searchBtn">Rechercher</button>
+      </div>
+      <div class="toolbar">
+        <button id="exportBtn" title="Exporter les données JSON">Exporter JSON</button>
+        <label class="btn" title="Importer des données JSON">
+          Importer JSON
+          <input id="importInput" type="file" accept="application/json" hidden />
+        </label>
+        <button id="resetBtn" class="btn danger" title="Réinitialiser les données">Reset</button>
       </div>
     </div>
-  </div>
+    <nav class="tabs" aria-label="Navigation">
+      <button data-tab="dashboard" class="active">Dashboard</button>
+      <button data-tab="requests">Requests</button>
+      <button data-tab="operations">Operations</button>
+      <button data-tab="master">Master Data</button>
+      <button data-tab="tools">Outils</button>
+    </nav>
+  </header>
 
-  <!-- FORM_Edit_Operations -->
-  <div id="screen-FORM_Edit_Operations" class="screen">
-    <div class="row">
-      <div class="col w-60">
-        <div class="card">
-          <h3>FORM_Edit_Operations</h3>
-          <div class="form-grid">
-            <div class="field"><label>Operation ID</label><input id="op_id" type="text" placeholder="Auto-generated" disabled></div>
-            <div class="field required"><label>Request ID *</label><select id="op_req" class="required"></select></div>
-            <div class="field required"><label>Shop *</label><select id="op_shop" class="required"></select></div>
-            <div class="field required"><label>Operation Type *</label><select id="op_type" class="required"></select></div>
-            <div class="field required"><label>Status *</label><select id="op_status" class="required"></select></div>
-            <div class="field"><label>Start Date</label><input id="op_start" type="date"></div>
-            <div class="field"><label>Duration (weeks)</label>
-              <select id="op_dur"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
-            </div>
-            <div class="field"><label>Finish Date (auto)</label><input id="op_finish" type="date" disabled></div>
-          </div>
-          <div class="row" style="margin-top:6px">
-            <button id="btnSaveOperation" class="btn primary">Add / Update Operation</button>
-            <button id="btnDeleteOperation" class="btn">Delete Operation</button>
-            <span class="note">Operation Type list is filtered by selected Shop’s capabilities.</span>
+  <main>
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="section active" aria-labelledby="tab1">
+      <div class="filters" id="filters"></div>
+
+      <section class="kpis" id="kpis">
+        <article class="card"><h3>Utilisation globale (8 sem)</h3><div class="metric"><div class="big" id="kpiUtil">–</div><div id="kpiUtilTrend" class="trend"></div></div></article>
+        <article class="card"><h3>% urgences livrées à l'heure</h3><div class="metric"><div class="big" id="kpiAOG">–</div></div></article>
+        <article class="card"><h3>Backlog / Retards</h3><div class="metric"><div class="big" id="kpiBacklog">–</div></div></article>
+        <article class="card"><h3>ETA moyen demandes actives</h3><div class="metric"><div class="big" id="kpiETA">–</div></div></article>
+      </section>
+
+      <section class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;margin-bottom:.6rem">
+          <h3 style="margin:0;color:var(--muted)">Heatmap d'occupation — Shops × Jours (8 semaines)</h3>
+          <div class="tools">
+            <span class="pill">✅ 0–85%</span>
+            <span class="pill">⚠️ 85–100%</span>
+            <span class="pill">🟥 &gt;100%</span>
+            <button id="gotoToday" class="btn ghost">Aller à aujourd'hui</button>
           </div>
         </div>
-      </div>
-      <div class="col w-40">
-        <div class="card">
-          <h3>Helper • Allowed Operation Types by Shop</h3>
-          <div class="field"><label>Shop</label><select id="helper_shop"></select></div>
-          <div id="helper_shop_ops" class="helper-list"></div>
-          <div class="divider"></div>
-          <div id="helper_shop_capacity" class="note"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div class="grid-wrap" id="heatWrap"><table id="heatmap" class="heatmap" aria-label="Heatmap"></table></div>
+        <p class="help">Astuce : clique une cellule pour ouvrir l'onglet <em>Operations</em> filtré (shop + jour).</p>
+      </section>
+    </section>
 
-  <!-- TR_Maint_Requests -->
-  <div id="screen-TR_Maint_Requests" class="screen">
-    <div class="card">
-      <h3>TR_Maint_Requests</h3>
-      <div class="searchbar">
-        <input id="req_search" placeholder="Search by Request ID (e.g., R003)" />
-        <button id="req_clear" class="btn">Clear</button>
-        <span class="note">Click a Request ID or Ops # to jump to Operations filtered on it.</span>
-      </div>
-      <div class="table-wrap">
-        <table id="tbl_requests">
+    <!-- REQUESTS -->
+    <section id="tab-requests" class="section">
+      <div class="list card">
+        <table class="data" id="tblRequests">
           <thead><tr>
-            <th>Request ID</th><th>Customer</th><th>Engine</th><th>Location</th><th>Shop</th>
-            <th>Type</th><th>Urgency</th><th>Status</th><th>Request Date</th><th>Est. End</th><th>Ops #</th>
+            <th>ID</th><th>Client</th><th>Moteur</th><th>Type</th><th>Urgence</th><th>Statut</th><th>Pays</th><th>Due</th><th>ETA</th>
           </tr></thead>
           <tbody></tbody>
         </table>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- OP_Maint_Operations -->
-  <div id="screen-OP_Maint_Operations" class="screen">
-    <div class="card">
-      <h3>OP_Maint_Operations</h3>
-      <div class="searchbar">
-        <input id="op_search" placeholder="Search by Operation ID (e.g., O012) or Request ID (R005)" />
-        <button id="op_clear" class="btn">Clear</button>
-        <span class="note">Click a Request ID to jump to Requests filtered on it.</span>
-      </div>
-      <div class="table-wrap">
-        <table id="tbl_operations">
+    <!-- OPERATIONS -->
+    <section id="tab-operations" class="section">
+      <div class="list card">
+        <div class="help">Filtre courant : <span id="opFilterDesc">(aucun)</span></div>
+        <table class="data" id="tblOps">
           <thead><tr>
-            <th>Operation ID</th><th>Request ID</th><th>Shop</th><th>Op Type</th><th>Status</th><th>Start</th><th>Finish</th><th>Duration (w)</th>
+            <th>ID</th><th>Request</th><th>Type</th><th>Shop</th><th>Date</th><th>Slots</th><th>Statut</th>
           </tr></thead>
           <tbody></tbody>
         </table>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- MD_Lists -->
-  <div id="screen-MD_Lists" class="screen">
-    <div class="card">
-      <h3>MD_Lists (Master Data)</h3>
-      <div class="note">One column per list (newline‑separated). Below: editable mapping (Request Type → 4 Operation Types) and default durations (weeks) per Operation Type. JSON Viewer at the end.</div>
-      <div class="md-grid" id="md_grid"></div>
-    </div>
+    <!-- MASTER DATA -->
+    <section id="tab-master" class="section">
+      <article class="card">
+        <h3>Shops (10)</h3>
+        <table class="data" id="tblShops"><thead><tr><th>ID</th><th>Ville</th><th>Pays</th><th>Slots/jour</th><th>Types autorisés</th></tr></thead><tbody></tbody></table>
+      </article>
+      <article class="card">
+        <h3>Mappings & Durées</h3>
+        <div class="list">
+          <div><strong>RequestType → Ops</strong><div id="mapReq"></div></div>
+          <div><strong>Durées (slots)</strong><div id="mapDur"></div></div>
+        </div>
+      </article>
+    </section>
 
-    <div class="row">
-      <div class="col w-60">
-        <div class="card">
-          <h3>Request Type ↔ Operation Types (4 required per Request Type)</h3>
-          <div class="warning" id="map_warning" style="display:none"></div>
-          <table class="mini-table" id="map_table">
-            <thead><tr><th>Request Type</th><th>Op #1</th><th>Op #2</th><th>Op #3</th><th>Op #4</th></tr></thead>
-            <tbody></tbody>
-          </table>
+    <!-- TOOLS -->
+    <section id="tab-tools" class="section">
+      <article class="card">
+        <h3>Import / Export JSON</h3>
+        <div class="tools">
+          <button id="doExport" class="btn">Exporter</button>
+          <label class="btn">Importer<input id="doImport" type="file" accept="application/json" hidden></label>
         </div>
-      </div>
-      <div class="col w-40">
-        <div class="card">
-          <h3>Operation Type Default Duration (weeks)</h3>
-          <table class="mini-table" id="dur_table">
-            <thead><tr><th>Operation Type</th><th>Duration (1–5)</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+      </article>
+      <article class="card">
+        <h3>Réinitialisation</h3>
+        <button id="doReset" class="btn danger">Reset data (seed)</button>
+      </article>
+      <article class="card">
+        <h3>Debug</h3>
+        <button id="showJSON" class="btn">Voir JSON</button>
+        <pre id="jsonOut" style="max-height:260px;overflow:auto;background:#f7fafc;border:1px solid var(--border);padding:.6rem;border-radius:10px"></pre>
+      </article>
+    </section>
+  </main>
+</div>
 
-    <div class="card" style="margin-top:12px">
-      <div class="row">
-        <button id="btnApplyMD" class="btn primary">Apply MD Changes</button>
-        <span class="note">Applies lists, mapping & durations, refreshes forms/helpers/tables/KPI & JSON Viewer.</span>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:12px">
-      <h3>JSON Viewer (read‑only)</h3>
-      <div class="json-viewer-header">
-        <button id="jsonCopy" class="btn">Copy</button>
-        <button id="jsonDownload" class="btn">Download</button>
-        <span class="note">Sections are collapsible.</span>
-      </div>
-      <div id="jsonViewer" class="jsonbox">
-        <!-- generated -->
-      </div>
-    </div>
-  </div>
-
-  <!-- KPI_Dashboard -->
-  <div id="screen-KPI_Dashboard" class="screen">
-    <div class="row">
-      <div class="col w-40">
-        <div class="kpi">
-          <div><h2>On‑time % urgent</h2><div class="badge" id="urgent_meta">Urgent requests</div></div>
-          <div class="grow"></div>
-          <div class="value" id="urgent_value">—</div>
-        </div>
-        <div class="card" style="margin-top:12px">
-          <h3>Legend</h3>
-          <div class="legend">
-            <span class="swatch sw-green"></span> &lt; 50% used
-            <span class="swatch sw-yellow"></span> 50–99% used
-            <span class="swatch sw-red"></span> 100%+
-          </div>
-          <div class="note" style="margin-top:6px">Capacity usage = (concurrent operation‑weeks scheduled) / (default capacity) per Shop × Week.</div>
-        </div>
-      </div>
-      <div class="col w-60">
-        <div class="card">
-          <h3>Weekly Capacity Usage Heatmap • Location × Shop</h3>
-          <div class="heatmap"><table id="tbl_heatmap"></table></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- DRAWERS -->
+<div id="drawer" class="drawer" aria-modal="true" role="dialog">
+  <div class="panel" id="drawerPanel"></div>
+</div>
 
 <script>
-/*** --- STATE & UTILS --- ***/
-const S = {
-  mdLists:{}, requestTypeToOps:{}, opDur:{},
-  shops:[], shopCapabilities:{}, requests:[], operations:[],
-  tabs:["FORM_New_Request","FORM_Edit_Operations","TR_Maint_Requests","OP_Maint_Operations","MD_Lists","KPI_Dashboard"],
-};
-const $ = s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const pad=(n,z=2)=>String(n).padStart(z,'0');
-function fmtDate(d){ if(!(d instanceof Date)) d=new Date(d); const tz=new Date(d.getTime()-d.getTimezoneOffset()*60000); return tz.toISOString().slice(0,10) }
-function addDays(d,days){ const x=new Date(d); x.setDate(x.getDate()+days); return x }
-const addWeeks=(d,w)=>addDays(d,w*7);
-function weekKey(d){ const x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())); const dayNum=(x.getUTCDay()+6)%7; x.setUTCDate(x.getUTCDate()-dayNum+3); const firstThursday=new Date(Date.UTC(x.getUTCFullYear(),0,4)); const diff=x-firstThursday; const wk=1+Math.round(diff/(7*24*3600*1000)); return x.getUTCFullYear()+"-W"+pad(wk); }
-const randPick=a=>a[Math.floor(Math.random()*a.length)];
+(function(){
+  const KEY = 'MAESTRO_STATE_V1';
+  const todayISO = new Date().toISOString().slice(0,10);
 
-/*** --- SEED MASTER DATA --- ***/
-function seedMasterData(){
-  S.mdLists={
-    Urgency:["Low","Medium","High","Urgent"],
-    Status:["Open","Ready","In Progress","Done"],
-    Shop:Array.from({length:15},(_,i)=>"S"+pad(i+1)),
-    Location:["Paris","Lyon","Toulouse","Bordeaux","Nantes"],
-    "Operation Type":["Inspection","Disassembly","Cleaning","Borescope","NDT","Parts Ordering","Repair Module A","Repair Module B","Reassembly","Test Bench","Calibration","Final QA"],
-    "Engine Model":["CFM56","LEAP-1A","LEAP-1B","SaM146","Silvercrest"],
-    Customer:["Air France","EasyJet","Qatar Airways","Ryanair","China Airlines"],
-    "Request Type":["Routine Check","Module Overhaul","Full Overhaul"]
-  };
-  S.requestTypeToOps={
-    "Routine Check":["Inspection","Borescope","Calibration","Final QA"],
-    "Module Overhaul":["Disassembly","Repair Module A","Reassembly","Test Bench"],
-    "Full Overhaul":["Disassembly","Cleaning","Repair Module B","Final QA"]
-  };
-  S.opDur={
-    "Inspection":1,"Borescope":1,"Calibration":1,
-    "Disassembly":3,"Cleaning":2,"NDT":2,"Parts Ordering":2,
-    "Repair Module A":4,"Repair Module B":5,"Reassembly":3,"Test Bench":2,"Final QA":1
-  };
-
-  S.shops=S.mdLists.Shop.slice();
-  const locs=S.mdLists.Location, allOps=S.mdLists["Operation Type"];
-  S.shopCapabilities={};
-  S.shops.forEach((shop,i)=>{
-    const count=4+(i%7); // 4..10
-    const allowed=Array.from(new Set(allOps)).sort(()=>Math.random()-0.5).slice(0,count);
-    const defaultCapacity=1+(i%3); const location=locs[i%locs.length];
-    const today=new Date();
-    const exceptions=[{start:fmtDate(addDays(today,21)),end:fmtDate(addDays(today,35)),capacity:Math.max(1,defaultCapacity-1)}];
-    S.shopCapabilities[shop]={allowedOps:allowed.sort(), defaultCapacity, location, exceptions};
-  });
-}
-
-/*** --- SEED TRANSACTIONS --- ***/
-function seedTransactions(){
-  const today=new Date(); const reqs=[];
-  for(let i=1;i<=50;i++){
-    const id="R"+pad(i,3);
-    const customer=randPick(S.mdLists.Customer);
-    const engine=randPick(S.mdLists["Engine Model"]);
-    const shop=S.mdLists.Shop[(i-1)%S.mdLists.Shop.length];
-    const location=S.shopCapabilities[shop].location;
-    const rtype=randPick(S.mdLists["Request Type"]);
-    const urgency=randPick(S.mdLists.Urgency);
-    const status=randPick(S.mdLists.Status);
-    const rdate=fmtDate(addDays(today,-(7*i+(i%5))));
-    const ops4=S.requestTypeToOps[rtype]||[];
-    const durSum=ops4.reduce((a,o)=>a+(S.opDur[o]||2),0);
-    const waiting=1+(i%3);
-    const estEnd=fmtDate(addWeeks(new Date(rdate),durSum+waiting));
-    reqs.push({id,customer,engine,location,shop,rtype,urgency,status,rdate,estEnd,notes:""});
-  }
-  S.requests=reqs;
-
-  const ops=[]; let k=1;
-  for(let i=0;i<S.requests.length;i++){
-    const req=S.requests[i]; const count=(i%6);
-    const allowed=S.shopCapabilities[req.shop].allowedOps;
-    for(let j=0;j<count && k<=200;j++){
-      const id="O"+pad(k++,3);
-      const opType=randPick(allowed); const status=randPick(S.mdLists.Status);
-      const start=addDays(new Date(req.rdate),7*(j+1));
-      const duration=S.opDur[opType]||1+(j%5);
-      const finish=addWeeks(start,duration);
-      ops.push({id,reqId:req.id,shop:req.shop,opType,status,start:fmtDate(start),finish:fmtDate(finish),duration});
-    }
-  }
-  while(ops.length<200){
-    const req=randPick(S.requests); const id="O"+pad(k++,3);
-    const opType=randPick(S.shopCapabilities[req.shop].allowedOps); const status=randPick(S.mdLists.Status);
-    const start=addDays(new Date(req.rdate),7*(1+Math.floor(Math.random()*6)));
-    const duration=S.opDur[opType]||1+Math.floor(Math.random()*5);
-    const finish=addWeeks(start,duration);
-    ops.push({id,reqId:req.id,shop:req.shop,opType,status,start:fmtDate(start),finish:fmtDate(finish),duration});
-  }
-  S.operations=ops.slice(0,200);
-}
-
-/*** --- TABS --- ***/
-function initTabs(){
-  $("#tabs").innerHTML=S.tabs.map(t=>`<div class="tab ${t==='FORM_New_Request'?'active':''}" data-screen="${t}">${t}</div>`).join("");
-  $("#tabs").addEventListener("click",e=>{
-    const t=e.target.closest(".tab"); if(!t) return;
-    $$(".tab").forEach(x=>x.classList.remove("active")); t.classList.add("active");
-    $$(".screen").forEach(x=>x.classList.remove("active")); $("#screen-"+t.dataset.screen).classList.add("active");
-    if(t.dataset.screen==="TR_Maint_Requests") renderRequestsTable();
-    if(t.dataset.screen==="OP_Maint_Operations") renderOperationsTable();
-    if(t.dataset.screen==="KPI_Dashboard") renderKPI();
-    if(t.dataset.screen==="MD_Lists"){ renderMDGrid(); renderMappingTable(); renderDurationTable(); renderJSONViewer(); }
-  });
-}
-
-/*** --- DROPDOWNS --- ***/
-function populateDropdowns(){
-  const fill=(sel,list,blank=false)=>{ const el=$(sel); if(!el) return; const arr=S.mdLists[list]||[]; el.innerHTML=(blank?`<option value=""></option>`:"")+arr.map(v=>`<option>${v}</option>`).join(""); };
-  fill("#nr_customer","Customer",true); fill("#nr_engine","Engine Model",true); fill("#nr_location","Location",true);
-  fill("#nr_shop","Shop",true); fill("#nr_rtype","Request Type",true); fill("#nr_urgency","Urgency",true); fill("#nr_status","Status",true);
-  fill("#cap_shop","Shop",true); fill("#cap_optype","Operation Type",true);
-  $("#op_req").innerHTML=`<option value=""></option>`+S.requests.map(r=>`<option>${r.id}</option>`).join("");
-  fill("#op_shop","Shop",true); fill("#op_status","Status",true); fill("#helper_shop","Shop",false);
-  $("#nr_rdate").value=fmtDate(new Date()); $("#cap_date").value=fmtDate(new Date()); $("#op_start").value=fmtDate(new Date());
-}
-
-/*** --- HELPERS --- ***/
-function renderReqTypeHelper(){
-  const box=$("#helper_reqtype_ops");
-  box.innerHTML=Object.entries(S.requestTypeToOps).map(([rt,ops])=>`<span class="pill" title="${ops.join(', ')}">${rt}: ${ops.join(", ")}</span>`).join(" ") || `<span class="note">No mapping set.</span>`;
-}
-function renderShopHelper(shop){
-  shop=shop||$("#helper_shop").value||S.mdLists.Shop[0]; $("#helper_shop").value=shop;
-  const cap=S.shopCapabilities[shop];
-  $("#helper_shop_ops").innerHTML=(cap?.allowedOps||[]).map(o=>`<span class="pill">${o}</span>`).join(" ")||`<span class="note">No op types.</span>`;
-  $("#helper_shop_capacity").innerHTML=cap?`Default capacity: <b>${cap.defaultCapacity}</b> • Location: <b>${cap.location}</b><br>${(cap.exceptions||[]).map(e=>`${e.start}→${e.end}: cap ${e.capacity}`).join("; ")||"No exceptions"}`:"";
-}
-
-/*** --- CAPACITY LOOKUP --- ***/
-function capacityFor(shop,dateStr){
-  const cap=S.shopCapabilities[shop]; if(!cap) return {capacity:0,used:0,free:0};
-  let c=cap.defaultCapacity; for(const ex of (cap.exceptions||[])) if(dateStr>=ex.start && dateStr<=ex.end) c=ex.capacity;
-  const wk=weekKey(new Date(dateStr)); let used=0;
-  for(const op of S.operations){ if(op.shop!==shop) continue; const sW=weekKey(new Date(op.start)), fW=weekKey(new Date(op.finish)); if(wk>=sW && wk<=fW) used++; }
-  return {capacity:c, used, free:Math.max(0,c-used)};
-}
-function onCapLookup(){
-  const date=$("#cap_date").value, shop=$("#cap_shop").value, optype=$("#cap_optype").value;
-  if(!date||!shop){ $("#cap_result").innerText="Pick at least Date and Shop."; return; }
-  const res=capacityFor(shop,date); const cls=res.free>0?'ok':(res.used<res.capacity?'warn':'bad');
-  $("#cap_result").innerHTML=`On ${date} • Shop <b>${shop}</b>${optype?` • Op <b>${optype}</b>`:""}<br>Capacity: <b>${res.capacity}</b> • Used: <b>${res.used}</b> • Free: <b class="${cls}">${res.free}</b>`;
-}
-
-/*** --- FORMS --- ***/
-function nextRequestId(){ return "R"+pad(S.requests.reduce((m,r)=>Math.max(m,+r.id.slice(1)),0)+1,3); }
-function nextOpId(){ return "O"+pad(S.operations.reduce((m,o)=>Math.max(m,+o.id.slice(1)),0)+1,3); }
-function recalcEstEnd(){
-  const rt=$("#nr_rtype").value, rd=$("#nr_rdate").value; if(!rt||!rd){ $("#nr_estEnd").value=""; return; }
-  const ops=S.requestTypeToOps[rt]||[]; const sum=ops.reduce((a,o)=>a+(S.opDur[o]||2),0); const waiting=1+(ops.length%3);
-  $("#nr_estEnd").value=fmtDate(addWeeks(new Date(rd),sum+waiting));
-}
-function onCreateRequest(){
-  const id=nextRequestId(), customer=$("#nr_customer").value, engine=$("#nr_engine").value, location=$("#nr_location").value, shop=$("#nr_shop").value, rtype=$("#nr_rtype").value, urgency=$("#nr_urgency").value, status=$("#nr_status").value;
-  const rdate=$("#nr_rdate").value||fmtDate(new Date()); recalcEstEnd(); const estEnd=$("#nr_estEnd").value||fmtDate(addWeeks(new Date(rdate),4));
-  if(!customer||!engine||!location||!shop||!rtype||!urgency||!status){ alert("Please fill all required fields (yellow)."); return; }
-  S.requests.push({id,customer,engine,location,shop,rtype,urgency,status,rdate,estEnd,notes:$("#nr_notes").value||""});
-  $("#nr_reqId").value=id; $("#op_req").innerHTML=`<option value=""></option>`+S.requests.map(r=>`<option>${r.id}</option>`).join(""); renderRequestsTable(); renderJSONViewer(); alert(`Request ${id} created.`);
-}
-function onOpShopChanged(){
-  const shop=$("#op_shop").value, sel=$("#op_type");
-  const ops=shop?(S.shopCapabilities[shop]?.allowedOps||[]):[];
-  sel.innerHTML=`<option value=""></option>`+ops.map(o=>`<option>${o}</option>`).join("");
-}
-function onOpTypeChanged(){
-  const t=$("#op_type").value; if(t){ const d=S.opDur[t]||1; $("#op_dur").value=String(Math.min(5,Math.max(1,d))); onOpStartDurChanged(); }
-}
-function onOpStartDurChanged(){
-  const start=$("#op_start").value, dur=parseInt($("#op_dur").value||"0",10); if(start&&dur>0) $("#op_finish").value=fmtDate(addWeeks(new Date(start),dur));
-}
-function onSaveOperation(){
-  const reqId=$("#op_req").value, shop=$("#op_shop").value, opType=$("#op_type").value, status=$("#op_status").value;
-  const start=$("#op_start").value, dur=parseInt($("#op_dur").value||"0",10), finish=$("#op_finish").value;
-  if(!reqId||!shop||!opType||!status){ alert("Please fill all required fields (yellow)."); return; }
-  const id=$("#op_id").value||nextOpId(); const existing=S.operations.find(o=>o.id===id);
-  const payload={id,reqId,shop,opType,status,start,finish,duration:dur|| (S.opDur[opType]||1)};
-  if(existing) Object.assign(existing,payload); else { S.operations.push(payload); $("#op_id").value=id; }
-  renderOperationsTable(); if($("#screen-KPI_Dashboard").classList.contains("active")) renderKPI(); renderJSONViewer(); alert(`Operation ${id} saved.`);
-}
-function onDeleteOperation(){
-  const id=$("#op_id").value; if(!id){ alert("No Operation ID selected."); return; }
-  const idx=S.operations.findIndex(o=>o.id===id); if(idx>=0 && confirm(`Delete Operation ${id}?`)){ S.operations.splice(idx,1); $("#op_id").value=""; renderOperationsTable(); if($("#screen-KPI_Dashboard").classList.contains("active")) renderKPI(); renderJSONViewer(); }
-}
-
-/*** --- TABLES --- ***/
-function renderRequestsTable(filterId){
-  const q=(filterId!==undefined)?(filterId||""):($("#req_search").value||"").trim().toUpperCase();
-  const rows=S.requests.filter(r=>!q||r.id.toUpperCase().includes(q)).map(r=>{
-    const opsCount=S.operations.filter(o=>o.reqId===r.id).length;
-    return `<tr>
-      <td><span class="link" data-jump="ops" data-id="${r.id}">${r.id}</span></td>
-      <td>${r.customer}</td><td>${r.engine}</td><td>${r.location}</td><td>${r.shop}</td><td>${r.rtype}</td>
-      <td>${r.urgency}</td><td>${r.status}</td><td class="nowrap">${r.rdate}</td><td class="nowrap">${r.estEnd}</td>
-      <td><span class="link" data-jump="ops" data-id="${r.id}" title="View operations for ${r.id}">${opsCount}</span></td>
-    </tr>`;
-  }).join("");
-  $("#tbl_requests tbody").innerHTML=rows||`<tr><td colspan="11" class="cell">No rows</td></tr>`;
-  $("#tbl_requests tbody").onclick=e=>{
-    const a=e.target.closest("[data-jump]"); if(!a) return;
-    const id=a.dataset.id;
-    $$(".tab").forEach(x=>x.classList.remove("active")); $$(`.tab[data-screen="OP_Maint_Operations"]`)[0].classList.add("active");
-    $$(".screen").forEach(x=>x.classList.remove("active")); $("#screen-OP_Maint_Operations").classList.add("active");
-    $("#op_search").value=id; renderOperationsTable(id);
-  };
-}
-function renderOperationsTable(filterTerm){
-  const q=(filterTerm!==undefined)?(filterTerm||""):($("#op_search").value||"").trim().toUpperCase();
-  $("#tbl_operations tbody").innerHTML=S.operations
-    .filter(o=>!q||o.id.toUpperCase().includes(q)||o.reqId.toUpperCase().includes(q))
-    .map(o=>`<tr>
-      <td><span class="link" data-op="${o.id}">${o.id}</span></td>
-      <td><span class="link" data-jump="req" data-id="${o.reqId}">${o.reqId}</span></td>
-      <td>${o.shop}</td><td>${o.opType}</td><td>${o.status}</td><td class="nowrap">${o.start||""}</td><td class="nowrap">${o.finish||""}</td><td>${o.duration||""}</td>
-    </tr>`).join("") || `<tr><td colspan="8" class="cell">No rows</td></tr>`;
-  $("#tbl_operations tbody").onclick=e=>{
-    const jump=e.target.closest("[data-jump]"); if(jump){
-      const id=jump.dataset.id;
-      $$(".tab").forEach(x=>x.classList.remove("active")); $$(`.tab[data-screen="TR_Maint_Requests"]`)[0].classList.add("active");
-      $$(".screen").forEach(x=>x.classList.remove("active")); $("#screen-TR_Maint_Requests").classList.add("active");
-      $("#req_search").value=id; renderRequestsTable(id); return;
-    }
-    const opLink=e.target.closest("[data-op]"); if(opLink){
-      const id=opLink.dataset.op, op=S.operations.find(x=>x.id===id); if(!op) return;
-      $$(".tab").forEach(x=>x.classList.remove("active")); $$(`.tab[data-screen="FORM_Edit_Operations"]`)[0].classList.add("active");
-      $$(".screen").forEach(x=>x.classList.remove("active")); $("#screen-FORM_Edit_Operations").classList.add("active");
-      $("#op_id").value=op.id; $("#op_req").value=op.reqId; $("#op_shop").value=op.shop; onOpShopChanged(); $("#op_type").value=op.opType;
-      $("#op_status").value=op.status; $("#op_start").value=op.start||""; $("#op_dur").value=op.duration||1; onOpStartDurChanged();
-      $("#helper_shop").value=op.shop; renderShopHelper(op.shop);
+  // ---------- STATE ----------
+  const S = {
+    mdLists:{}, mappings:{}, shops:[], requests:[], operations:[],
+    ui:{
+      tab:'dashboard',
+      filters:{siteCountry:'', shopId:'', requestType:'', urgency:'', status:'', opType:''},
+      opFilter:{shopId:'', date:''},
+      days: generateDays(56), // 8 semaines
     }
   };
-}
 
-/*** --- MD LISTS (TEXT COLUMNS) --- ***/
-function renderMDGrid(){
-  const cols=["Urgency","Status","Shop","Location","Operation Type","Engine Model","Customer","Request Type"];
-  $("#md_grid").innerHTML=cols.map(name=>{
-    const values=(S.mdLists[name]||[]).join("\n");
-    return `<div class="md-col"><h4>${name}</h4><textarea data-md="${name}">${values}</textarea></div>`;
-  }).join("");
-}
+  // ---------- INIT ----------
+  init();
 
-/*** --- MAPPING TABLE --- ***/
-function makeOpSelect(value){
-  const ops=S.mdLists["Operation Type"]||[];
-  return `<select>${ops.map(o=>`<option ${o===value?'selected':''}>${o}</option>`).join("")}</select>`;
-}
-function renderMappingTable(){
-  const tbody=$("#map_table tbody"); const rtypes=S.mdLists["Request Type"]||[]; const map=S.requestTypeToOps;
-  tbody.innerHTML=rtypes.map(rt=>{
-    const ops=(map[rt]||[]).slice(0,4); while(ops.length<4) ops.push((S.mdLists["Operation Type"]||[])[ops.length]||"");
-    return `<tr data-rt="${rt}">
-      <td>${rt}</td>
-      <td>${makeOpSelect(ops[0])}</td><td>${makeOpSelect(ops[1])}</td><td>${makeOpSelect(ops[2])}</td><td>${makeOpSelect(ops[3])}</td>
-    </tr>`;
-  }).join("") || `<tr><td colspan="5" class="cell">No Request Types</td></tr>`;
-}
-function readMappingTable(){
-  const result={}; let invalid=false;
-  $$("#map_table tbody tr").forEach(tr=>{
-    const rt=tr.dataset.rt; const selects=Array.from(tr.querySelectorAll("select"));
-    const ops=selects.map(s=>s.value).filter(Boolean);
-    const unique=new Set(ops);
-    if(ops.length!==4 || unique.size!==4) invalid=true;
-    result[rt]=Array.from(unique).slice(0,4);
-  });
-  $("#map_warning").style.display=invalid?"block":"none";
-  $("#map_warning").textContent=invalid?"Each Request Type must have 4 unique Operation Types.":"";
-  return result;
-}
+  function init(){
+    const saved = localStorage.getItem(KEY);
+    if(saved){
+      try{Object.assign(S, JSON.parse(saved));}catch{ }
+      // ensure days are fresh from today
+      S.ui.days = generateDays(56);
+    } else {
+      seedMasterData();
+      seedShops();
+      seedRequestsAndOps();
+      persist();
+    }
 
-/*** --- DURATION TABLE --- ***/
-function renderDurationTable(){
-  const tbody=$("#dur_table tbody"); const ops=S.mdLists["Operation Type"]||[];
-  tbody.innerHTML=ops.map(op=>{
-    const val=S.opDur[op]??2;
-    return `<tr data-op="${op}"><td>${op}</td><td><input type="number" min="1" max="5" value="${val}"></td></tr>`;
-  }).join("") || `<tr><td colspan="2" class="cell">No Operation Types</td></tr>`;
-}
-function readDurationTable(){
-  const m={};
-  $$("#dur_table tbody tr").forEach(tr=>{
-    const op=tr.dataset.op; const v=parseInt(tr.querySelector("input").value,10);
-    m[op]=Math.min(5,Math.max(1,isFinite(v)?v:2));
-  });
-  return m;
-}
+    renderTabs();
+    renderFilters();
+    bindHeader();
 
-/*** --- KPI & HEATMAP --- ***/
-function renderKPI(){
-  const urg=S.requests.filter(r=>r.urgency==="Urgent");
-  const ontime=urg.filter(r=>{
-    const ops=S.operations.filter(o=>o.reqId===r.id); if(!ops.length) return false;
-    const maxF=ops.reduce((m,o)=>Math.max(m,new Date(o.finish||o.start||r.rdate).getTime()),0);
-    return maxF && fmtDate(new Date(maxF))<=r.estEnd;
-  });
-  const pct=urg.length?Math.round(100*ontime.length/urg.length):0;
-  $("#urgent_value").textContent=urg.length?`${pct}%`:"—";
-  $("#urgent_value").className="value "+(pct>=90?"ok":pct>=70?"warn":"bad");
-  $("#urgent_meta").textContent=`Urgent requests: ${ontime.length}/${urg.length} on-time`;
+    renderAll();
+  }
 
-  const weeks=[]; const base=new Date(); const monday=addDays(base,-((base.getDay()+6)%7)); for(let i=0;i<8;i++) weeks.push(weekKey(addWeeks(monday,i)));
-  const rows=[]; S.shops.forEach(shop=>rows.push({location:S.shopCapabilities[shop]?.location||"-", shop}));
-  rows.sort((a,b)=>a.location===b.location?a.shop.localeCompare(b.shop):a.location.localeCompare(b.location));
-  const usage={};
-  for(const op of S.operations){
-    const s=new Date(op.start||op.finish), f=new Date(op.finish||op.start);
-    weeks.forEach(w=>{
-      const [y,wstr]=w.split("-W"); const week=parseInt(wstr,10);
-      const jan4=new Date(Date.UTC(parseInt(y,10),0,4)); const thursday=addDays(jan4,(week-1)*7);
-      const ws=addDays(thursday,-3), we=addDays(ws,6);
-      if(s<=we && f>=ws){ const key=op.shop+"|"+w; usage[key]=(usage[key]||0)+1; }
+  function renderAll(){
+    renderKPIs();
+    renderHeatmap();
+    renderRequests();
+    renderOps();
+    renderMaster();
+  }
+
+  // ---------- SEEDERS ----------
+  function seedMasterData(){
+    S.mdLists.clients = ['Air France','Lufthansa','Ryanaar','easyJet','Turkish Airlines','Qatar Airways','Emirates','American Airlines','Delta Air Lines','United Airlines'];
+    S.mdLists.engineModels = ['CFM56','LEAP-1A','LEAP-1B','GE90','Trent 700'];
+    S.mdLists.requestTypes = ['Overhaul','QuickInspection','DeepRepair'];
+    S.mdLists.urgencies = ['Normal','AOG'];
+    S.mdLists.statuses = ['Ouvert','Prêt','En cours','Terminé'];
+    S.mdLists.siteCountries = ['France','Allemagne','Espagne','Royaume-Uni','Italie'];
+    S.mdLists.opTypes = ['Inspection','Disassembly','Repair','DeepRepair','Cleaning','Assembly','TestRun','NDT','Calibration','Balancing','Painting','Documentation'];
+
+    S.mappings.requestTypeToOps = {
+      'Overhaul':['Disassembly','Repair','Assembly','TestRun'],
+      'QuickInspection':['Inspection','Cleaning','Assembly','TestRun'],
+      'DeepRepair':['Disassembly','DeepRepair','Assembly','TestRun']
+    };
+    S.mappings.opDurations = {
+      'Inspection':1,'Disassembly':2,'Repair':3,'DeepRepair':4,'Cleaning':1,'Assembly':2,'TestRun':2,'NDT':1,'Calibration':1,'Balancing':1,'Painting':2,'Documentation':1
+    };
+  }
+
+  function seedShops(){
+    const shops = [
+      ['FR-LYO','Lyon','France',7,['Inspection','Cleaning','Assembly','Painting','Documentation']],
+      ['FR-TLS','Toulouse','France',8,['Inspection','Disassembly','Repair','DeepRepair','Assembly','TestRun','NDT']],
+      ['DE-HAM','Hambourg','Allemagne',8,['Inspection','Disassembly','Repair','DeepRepair','Assembly','Balancing']],
+      ['DE-FRA','Francfort','Allemagne',7,['TestRun','Calibration','NDT','Assembly']],
+      ['ES-MAD','Madrid','Espagne',6,['Cleaning','Painting','Documentation','Inspection','Assembly']],
+      ['ES-BCN','Barcelone','Espagne',7,['Disassembly','Repair','Balancing','Calibration','Assembly']],
+      ['UK-LON','Londres','Royaume-Uni',7,['TestRun','NDT','Calibration','Assembly','Inspection']],
+      ['UK-MAN','Manchester','Royaume-Uni',7,['Repair','DeepRepair','Balancing','Assembly','TestRun']],
+      ['IT-MIL','Milan','Italie',8,['Disassembly','Repair','DeepRepair','Cleaning','Assembly']],
+      ['IT-TUR','Turin','Italie',6,['Inspection','Assembly','Balancing','Documentation','Painting']]
+    ];
+    S.shops = shops.map(([id,name,siteCountry,slotsPerDay,allowedOpTypes])=>({id,name,siteCountry,slotsPerDay,allowedOpTypes}));
+  }
+
+  function seedRequestsAndOps(){
+    let reqId = 1, opId = 1;
+    const rnd = (n)=>Math.floor(Math.random()*n);
+    const pick = (arr)=>arr[rnd(arr.length)];
+
+    // Create 10 requests
+    for(let i=0;i<10;i++){
+      const id = `REQ-${String(reqId++).padStart(3,'0')}`;
+      const client = S.mdLists.clients[i % S.mdLists.clients.length];
+      const engineModel = S.mdLists.engineModels[i % S.mdLists.engineModels.length];
+      const requestType = pick(S.mdLists.requestTypes);
+      const urgency = Math.random()<0.25 ? 'AOG' : 'Normal';
+      const status = pick(S.mdLists.statuses);
+      const siteCountry = S.mdLists.siteCountries[i % S.mdLists.siteCountries.length];
+      const createdAt = shiftISO(todayISO, -rnd(7));
+      const dueDate = shiftISO(todayISO, rnd(40)+7);
+
+      const req = {id,client,engineModel,requestType,urgency,status,siteCountry,createdAt,dueDate,eta:''};
+      S.requests.push(req);
+
+      // 4 required operations from mapping
+      const ops = S.mappings.requestTypeToOps[requestType];
+      ops.forEach((opType,seq)=>{
+        const shop = pick(shopsSupporting(opType, siteCountry));
+        const plannedDate = shiftISO(todayISO, rnd(50));
+        const durationSlots = S.mappings.opDurations[opType] || 1;
+        const st = pick(S.mdLists.statuses);
+        S.operations.push({id:`OP-${String(opId++).padStart(3,'0')}`, requestId:id, opType, shopId:shop.id, plannedDate, durationSlots, status:st, isRequired:true});
+      });
+    }
+
+    // Add ~10 optional ops across requests to reach ~50
+    const extraTypes = ['NDT','Calibration','Balancing','Documentation','Cleaning'];
+    while(S.operations.length < 50){
+      const req = pick(S.requests);
+      const opType = pick(extraTypes);
+      const shop = pick(shopsSupporting(opType, req.siteCountry));
+      const plannedDate = shiftISO(todayISO, Math.floor(Math.random()*56));
+      const durationSlots = S.mappings.opDurations[opType] || 1;
+      const status = pick(S.mdLists.statuses);
+      S.operations.push({id:`OP-${String(opId++).padStart(3,'0')}`, requestId:req.id, opType, shopId:shop.id, plannedDate, durationSlots, status, isRequired:false});
+    }
+
+    // Compute ETA for each request (max plannedDate of its ops)
+    S.requests.forEach(r=>{ r.eta = computeETA(r.id); });
+  }
+
+  function shopsSupporting(opType, preferredCountry){
+    const arr = S.shops.filter(s=>s.allowedOpTypes.includes(opType));
+    const preferred = arr.filter(s=>s.siteCountry===preferredCountry);
+    return preferred.length?preferred:arr;
+  }
+
+  // ---------- PERSIST ----------
+  function persist(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+
+  // ---------- RENDER: NAV & FILTERS ----------
+  function renderTabs(){
+    document.querySelectorAll('nav.tabs button').forEach(btn=>{
+      btn.onclick = ()=>{
+        document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab; S.ui.tab = tab; persist();
+        document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+        document.getElementById('tab-'+tab).classList.add('active');
+      };
     });
   }
-  let html="<thead><tr><th>Location</th><th>Shop</th>"+weeks.map(w=>`<th class="nowrap">${w}</th>`).join("")+"</tr></thead><tbody>";
-  rows.forEach(r=>{
-    html+=`<tr><td>${r.location}</td><td>${r.shop}</td>`;
-    const cap=S.shopCapabilities[r.shop]?.defaultCapacity||1;
-    weeks.forEach(w=>{
-      const u=usage[r.shop+"|"+w]||0; const p=Math.round(100*u/cap); let bg="#cfead1"; if(p>=100) bg="#f7c2c2"; else if(p>=50) bg="#fff0b3";
-      html+=`<td class="cell" style="background:${bg}" title="Used ${u}/${cap}">${p}%</td>`;
+
+  function renderFilters(){
+    const f = S.ui.filters;
+    const wrap = document.getElementById('filters');
+    wrap.innerHTML = '';
+
+    const makeSel = (label, key, options)=>{
+      const sel = document.createElement('select');
+      sel.title = label; sel.ariaLabel = label; sel.dataset.key = key;
+      sel.innerHTML = `<option value="">${label}</option>` + options.map(o=>`<option ${f[key]===o?'selected':''}>${o}</option>`).join('');
+      sel.onchange = ()=>{ S.ui.filters[key] = sel.value; renderKPIs(); renderHeatmap(); renderRequests(); renderOps(); persist(); };
+      wrap.appendChild(sel);
+    };
+
+    makeSel('Pays', 'siteCountry', S.mdLists.siteCountries);
+    const shopSel = document.createElement('select');
+    shopSel.innerHTML = `<option value="">Shop</option>` + S.shops.map(s=>`<option value="${s.id}" ${f.shopId===s.id?'selected':''}>${s.name} (${s.siteCountry})</option>`).join('');
+    shopSel.onchange = ()=>{ S.ui.filters.shopId = shopSel.value; renderKPIs(); renderHeatmap(); renderOps(); persist(); };
+    wrap.appendChild(shopSel);
+
+    makeSel('Type de demande','requestType',S.mdLists.requestTypes);
+    makeSel('Urgence','urgency',S.mdLists.urgencies);
+    makeSel('Statut','status',S.mdLists.statuses);
+    makeSel('Type d\'opération','opType',S.mdLists.opTypes);
+  }
+
+  function bindHeader(){
+    document.getElementById('gotoToday').onclick = ()=> scrollHeatmapToToday();
+
+    document.getElementById('exportBtn').onclick = exportJSON;
+    document.getElementById('doExport').onclick = exportJSON;
+
+    const importInputs = [document.getElementById('importInput'), document.getElementById('doImport')];
+    importInputs.forEach(inp=> inp.addEventListener('change', handleImport));
+
+    const resetBtns = [document.getElementById('resetBtn'), document.getElementById('doReset')];
+    resetBtns.forEach(b=> b.onclick = resetData);
+
+    document.getElementById('showJSON').onclick = ()=>{
+      document.getElementById('jsonOut').textContent = JSON.stringify(S,null,2);
+    };
+
+    document.getElementById('searchBtn').onclick = searchById;
+    document.getElementById('searchInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') searchById(); });
+  }
+
+  // ---------- RENDER: KPI ----------
+  function renderKPIs(){
+    const ops = filteredOpsForKPIs();
+
+    // Utilisation globale = sum(used slots) / sum(total slots)
+    let used = 0, total = 0;
+    const days = S.ui.days;
+    const shops = filteredShops();
+    for(const s of shops){
+      for(const d of days){
+        const arr = ops.filter(o=>o.shopId===s.id && o.plannedDate===d);
+        const sum = arr.reduce((a,b)=>a+(b.durationSlots||1),0);
+        used += sum; total += s.slotsPerDay;
+      }
+    }
+    const util = total? (100*used/total): 0;
+    setText('kpiUtil', util? util.toFixed(0)+'%':'–');
+    setText('kpiUtilTrend','');
+
+    // % urgences livrées à l'heure
+    const aogDone = S.requests.filter(r=> r.urgency==='AOG' && r.status==='Terminé');
+    const aogOnTime = aogDone.filter(r=> (r.eta||todayISO) <= (r.dueDate||todayISO));
+    setText('kpiAOG', aogDone.length? Math.round(100*aogOnTime.length/aogDone.length)+'%':'–');
+
+    // Backlog / Retards
+    const lateOps = S.operations.filter(o=>{
+      const req = S.requests.find(r=>r.id===o.requestId);
+      if(!req || !req.dueDate || !o.plannedDate) return false;
+      return o.plannedDate>req.dueDate && (o.status!=='Terminé');
     });
-    html+="</tr>";
-  });
-  html+="</tbody>"; $("#tbl_heatmap").innerHTML=html;
-}
+    const backlog = S.operations.filter(o=>!o.plannedDate).length;
+    setText('kpiBacklog', `${backlog} / ${lateOps.length}`);
 
-/*** --- JSON VIEWER --- ***/
-function buildJSONSections(){
-  return [
-    ["mdLists", S.mdLists],
-    ["requestTypeToOps", S.requestTypeToOps],
-    ["opDur", S.opDur],
-    ["shopCapabilities", S.shopCapabilities],
-    ["requests", S.requests],
-    ["operations", S.operations],
-  ];
-}
-function renderJSONViewer(){
-  const cont=$("#jsonViewer"); const sections=buildJSONSections();
-  cont.innerHTML=sections.map(([name,obj])=>`<details ${name==="mdLists"?"open":""}><summary>${name}</summary><pre>${escapeHtml(JSON.stringify(obj,null,2))}</pre></details>`).join("");
-}
-function escapeHtml(s){ return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])) }
-function copyJSON(){
-  const data=JSON.stringify(Object.fromEntries(buildJSONSections()),null,2);
-  navigator.clipboard?.writeText(data).then(()=>alert("Copied JSON to clipboard."),()=>alert("Copy failed."));
-}
-function downloadJSON(){
-  const data=JSON.stringify(Object.fromEntries(buildJSONSections()),null,2);
-  const blob=new Blob([data],{type:"application/json"}); const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="maestro_export.json"; a.click(); URL.revokeObjectURL(a.href);
-}
+    // ETA moyen demandes actives
+    const active = S.requests.filter(r=>r.status!=='Terminé');
+    const meanDays = active.length? Math.round(active.map(r=> daysBetween(todayISO, r.eta||todayISO)).reduce((a,b)=>a+b,0)/active.length) : null;
+    setText('kpiETA', meanDays==null? '–' : (meanDays+' j'));
+  }
 
-/*** --- APPLY MD CHANGES --- ***/
-function applyMDChanges(){
-  // 1) Lists from text areas
-  $$("#md_grid textarea").forEach(t=>{
-    const name=t.dataset.md; const vals=t.value.split("\n").map(v=>v.trim()).filter(Boolean); S.mdLists[name]=vals;
-  });
-  // 2) Mapping & Duration from tables
-  const newMap=readMappingTable(); const newDur=readDurationTable();
-  S.requestTypeToOps=newMap; S.opDur=newDur;
+  // ---------- RENDER: HEATMAP ----------
+  function renderHeatmap(){
+    const table = document.getElementById('heatmap');
+    const days = S.ui.days;
+    const shops = filteredShops();
+    const ops = filteredOps();
 
-  // 3) Rebuild shop capabilities safely (preserve where possible)
-  const locs=S.mdLists.Location, allOps=S.mdLists["Operation Type"]; S.shops=S.mdLists.Shop.slice();
-  const newCaps={};
-  S.shops.forEach((shop,i)=>{
-    const prev=S.shopCapabilities[shop]||{allowedOps:[], defaultCapacity:1+(i%3), location:locs[i%locs.length], exceptions:[]};
-    const allowed=(prev.allowedOps||[]).filter(o=>allOps.includes(o));
-    const fallback=allOps.slice(0, 4+(i%7));
-    newCaps[shop]={allowedOps:(allowed.length?allowed:fallback), defaultCapacity:prev.defaultCapacity||1, location:prev.location||locs[i%locs.length], exceptions:prev.exceptions||[]};
-  });
-  S.shopCapabilities=newCaps;
+    let thead = '<thead><tr><th>Shop / Jour</th>' + days.map(d=>`<th>${d.slice(5)}</th>`).join('') + '</tr></thead>';
+    let rows = '';
 
-  // 4) Refresh UI & dependent data
-  populateDropdowns(); renderReqTypeHelper(); renderShopHelper(); renderRequestsTable(); renderOperationsTable(); renderKPI(); renderJSONViewer();
-  alert("Master Data applied.");
-}
+    for(const s of shops){
+      let tds = '';
+      for(const d of days){
+        const arr = ops.filter(o=>o.shopId===s.id && o.plannedDate===d);
+        const slotsUsed = arr.reduce((a,b)=>a+(b.durationSlots||1),0);
+        const pct = s.slotsPerDay? Math.round(100*slotsUsed/s.slotsPerDay) : 0;
+        const cls = pct===0? 'occ-0' : pct<=85? 'occ-ok' : pct<=100? 'occ-warn' : 'occ-bad';
+        const title = `${s.name} — ${d}\nCharge: ${slotsUsed}/${s.slotsPerDay} slots (${pct}%)\nOpés: ${arr.length}`;
+        tds += `<td class="cell ${cls}" title="${title}"><a href="#" data-shop="${s.id}" data-date="${d}">${pct||''}</a></td>`;
+      }
+      rows += `<tr><th>${s.name} <span class="badge">${s.siteCountry}</span></th>${tds}</tr>`;
+    }
 
-/*** --- IMPORT / EXPORT --- ***/
-function doExport(){
-  const payload={mdLists:S.mdLists, requestTypeToOps:S.requestTypeToOps, opDur:S.opDur, shopCapabilities:S.shopCapabilities, requests:S.requests, operations:S.operations};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}); const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="maestro_export.json"; a.click(); URL.revokeObjectURL(a.href);
-}
-function doImport(file){
-  const reader=new FileReader();
-  reader.onload=()=>{
-    try{
-      const data=JSON.parse(reader.result);
-      if(!data.mdLists||!data.requests||!data.operations) throw new Error("Missing mdLists/requests/operations.");
-      S.mdLists=data.mdLists; S.requestTypeToOps=data.requestTypeToOps||S.requestTypeToOps; S.opDur=data.opDur||S.opDur; S.shopCapabilities=data.shopCapabilities||S.shopCapabilities; S.requests=data.requests; S.operations=data.operations;
-      populateDropdowns(); renderReqTypeHelper(); renderShopHelper(); renderMDGrid(); renderMappingTable(); renderDurationTable(); renderRequestsTable(); renderOperationsTable(); renderKPI(); renderJSONViewer();
-      alert("Import successful.");
-    }catch(e){ alert("Import failed: "+e.message); }
-  };
-  reader.readAsText(file);
-}
+    table.innerHTML = thead + '<tbody>'+rows+'</tbody>';
 
-/*** --- INIT --- ***/
-function bindEvents(){
-  $("#btnCreateRequest").onclick=onCreateRequest; $("#btnCalcEstEnd").onclick=recalcEstEnd; $("#nr_rtype").onchange=recalcEstEnd; $("#nr_rdate").onchange=recalcEstEnd;
-  $("#btnCapLookup").onclick=onCapLookup;
-  $("#op_shop").onchange=()=>{ onOpShopChanged(); $("#helper_shop").value=$("#op_shop").value||S.mdLists.Shop[0]; renderShopHelper($("#helper_shop").value); };
-  $("#op_type").onchange=onOpTypeChanged; $("#op_start").onchange=onOpStartDurChanged; $("#op_dur").onchange=onOpStartDurChanged;
-  $("#btnSaveOperation").onclick=onSaveOperation; $("#btnDeleteOperation").onclick=onDeleteOperation;
-  $("#helper_shop").onchange=()=>renderShopHelper($("#helper_shop").value);
-  $("#req_search").oninput=()=>renderRequestsTable(); $("#req_clear").onclick=()=>{ $("#req_search").value=""; renderRequestsTable(); }
-  $("#op_search").oninput=()=>renderOperationsTable(); $("#op_clear").onclick=()=>{ $("#op_search").value=""; renderOperationsTable(); }
-  $("#btnApplyMD").onclick=applyMDChanges;
-  $("#btnExport").onclick=doExport; $("#importFile").onchange=e=>{ if(e.target.files[0]) doImport(e.target.files[0]); };
-  $("#jsonCopy").onclick=copyJSON; $("#jsonDownload").onclick=downloadJSON;
-}
-function init(){
-  seedMasterData(); seedTransactions(); initTabs(); populateDropdowns(); renderReqTypeHelper(); renderShopHelper(); renderRequestsTable(); renderOperationsTable(); renderMDGrid(); renderMappingTable(); renderDurationTable(); renderKPI(); renderJSONViewer(); bindEvents();
-  $("#nr_reqId").value="(next: "+nextRequestId()+")";
-  $("#cap_shop").value=S.mdLists.Shop[0]; $("#cap_optype").value=S.mdLists["Operation Type"][0];
-}
-document.addEventListener("DOMContentLoaded",init);
+    // Click handler to open operations tab with filters
+    table.querySelectorAll('a[data-shop]').forEach(a=>{
+      a.onclick = (e)=>{
+        e.preventDefault();
+        const shopId = a.dataset.shop; const date = a.dataset.date;
+        S.ui.opFilter = {shopId,date};
+        persist();
+        // switch tab
+        document.querySelector('nav.tabs button[data-tab="operations"]').click();
+        renderOps();
+      };
+    });
+
+    scrollHeatmapToToday();
+  }
+
+  function scrollHeatmapToToday(){
+    const wrap = document.getElementById('heatWrap');
+    const days = S.ui.days; const idx = days.indexOf(todayISO);
+    if(idx>=0){
+      const ths = document.querySelectorAll('#heatmap thead th');
+      const target = ths[idx+1];
+      if(target){ wrap.scrollLeft = Math.max(0, target.offsetLeft - 120); }
+    }
+  }
+
+  // ---------- RENDER: REQUESTS ----------
+  function renderRequests(){
+    // recompute ETA on the fly
+    S.requests.forEach(r=> r.eta = computeETA(r.id));
+
+    const tb = document.querySelector('#tblRequests tbody');
+    const list = filteredRequests();
+    tb.innerHTML = list.map(r=>{
+      const badge = (t)=>`<span class="badge">${t}</span>`;
+      return `<tr>
+        <td><a href="#" data-open-request="${r.id}">${r.id}</a></td>
+        <td>${r.client}</td>
+        <td>${r.engineModel}</td>
+        <td>${badge(r.requestType)}</td>
+        <td>${badge(r.urgency)}</td>
+        <td>${badge(r.status)}</td>
+        <td>${r.siteCountry}</td>
+        <td>${r.dueDate||''}</td>
+        <td>${r.eta||''}</td>
+      </tr>`;
+    }).join('');
+
+    document.querySelectorAll('[data-open-request]').forEach(a=>{
+      a.onclick = (e)=>{ e.preventDefault(); openRequestDrawer(a.dataset.openRequest); };
+    });
+  }
+
+  // ---------- RENDER: OPERATIONS ----------
+  function renderOps(){
+    const tb = document.querySelector('#tblOps tbody');
+    const {shopId,date} = S.ui.opFilter||{};
+    const desc = [];
+    if(shopId){ const s = S.shops.find(x=>x.id===shopId); if(s) desc.push(s.name); }
+    if(date){ desc.push(date); }
+    document.getElementById('opFilterDesc').textContent = desc.length? desc.join(' • ') : '(aucun)';
+
+    const list = filteredOps();
+    const filtered = list.filter(o=> (!shopId||o.shopId===shopId) && (!date||o.plannedDate===date));
+
+    tb.innerHTML = filtered.map(o=>{
+      const shop = S.shops.find(s=>s.id===o.shopId); const r = S.requests.find(x=>x.id===o.requestId);
+      return `<tr>
+        <td><a href="#" data-open-op="${o.id}">${o.id}</a></td>
+        <td><a href="#" data-open-request="${r.id}">${r.id}</a></td>
+        <td>${o.opType}</td>
+        <td>${shop?shop.name:o.shopId}</td>
+        <td>${o.plannedDate||''}</td>
+        <td>${o.durationSlots||1}</td>
+        <td>${o.status}</td>
+      </tr>`;
+    }).join('');
+
+    document.querySelectorAll('[data-open-op]').forEach(a=> a.onclick = (e)=>{ e.preventDefault(); openOperationDrawer(a.dataset.openOp); });
+    document.querySelectorAll('[data-open-request]').forEach(a=> a.onclick = (e)=>{ e.preventDefault(); openRequestDrawer(a.dataset.openRequest); });
+  }
+
+  // ---------- RENDER: MASTER ----------
+  function renderMaster(){
+    const tb = document.querySelector('#tblShops tbody');
+    tb.innerHTML = S.shops.map(s=> `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.siteCountry}</td><td>${s.slotsPerDay}</td><td>${s.allowedOpTypes.join(', ')}</td></tr>`).join('');
+
+    const mapReq = document.getElementById('mapReq');
+    mapReq.innerHTML = Object.entries(S.mappings.requestTypeToOps).map(([rt,ops])=> `<div class="help"><strong>${rt}</strong>: ${ops.join(' → ')}</div>`).join('');
+
+    const mapDur = document.getElementById('mapDur');
+    mapDur.innerHTML = Object.entries(S.mappings.opDurations).map(([ot,d])=> `<span class="pill">${ot}: ${d}</span>`).join(' ');
+  }
+
+  // ---------- DRAWERS (EDIT FORMS) ----------
+  function openRequestDrawer(id){
+    const r = S.requests.find(x=>x.id===id); if(!r) return;
+    const ops = S.operations.filter(o=>o.requestId===r.id);
+
+    const panel = document.getElementById('drawerPanel');
+    panel.innerHTML = `
+      <h2>Demande ${r.id}</h2>
+      <div class="form">
+        <div class="row">
+          <label>Client<select id="r_client">${opts(S.mdLists.clients,r.client)}</select></label>
+          <label>Modèle<select id="r_engine">${opts(S.mdLists.engineModels,r.engineModel)}</select></label>
+        </div>
+        <div class="row">
+          <label>Type de demande<select id="r_type">${opts(S.mdLists.requestTypes,r.requestType)}</select></label>
+          <label>Urgence<select id="r_urg">${opts(S.mdLists.urgencies,r.urgency)}</select></label>
+        </div>
+        <div class="row">
+          <label>Statut<select id="r_status">${opts(S.mdLists.statuses,r.status)}</select></label>
+          <label>Pays<select id="r_country">${opts(S.mdLists.siteCountries,r.siteCountry)}</select></label>
+        </div>
+        <div class="row">
+          <label>Due date<input type="date" id="r_due" value="${r.dueDate||''}"></label>
+          <label>ETA (calculée)<input type="date" id="r_eta" value="${r.eta||''}" disabled></label>
+        </div>
+        <div>
+          <strong>Opérations (${ops.length})</strong>
+          <ul class="help">${ops.map(o=>`<li><a href="#" data-open-op="${o.id}">${o.id}</a> — ${o.opType} • ${o.plannedDate||'—'} • ${shopName(o.shopId)}</li>`).join('')}</ul>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="regenOps">Régénérer les 4 opérations</button>
+        <button class="btn primary" id="saveReq">Enregistrer</button>
+        <button class="btn ghost" id="closeDrawer">Fermer</button>
+      </div>`;
+
+    openDrawer();
+
+    panel.querySelectorAll('[data-open-op]').forEach(a=> a.onclick = (e)=>{ e.preventDefault(); openOperationDrawer(a.dataset.openOp); });
+
+    document.getElementById('closeDrawer').onclick = closeDrawer;
+    document.getElementById('saveReq').onclick = ()=>{
+      r.client = val('r_client'); r.engineModel = val('r_engine'); r.requestType = val('r_type'); r.urgency = val('r_urg');
+      r.status = val('r_status'); r.siteCountry = val('r_country'); r.dueDate = val('r_due'); r.eta = computeETA(r.id);
+      persist(); renderAll(); closeDrawer();
+    };
+    document.getElementById('regenOps').onclick = ()=>{
+      if(!confirm('Confirmer la régénération des 4 opérations requises pour '+r.requestType+' ? Les opérations requises existantes seront remplacées.')) return;
+      // Remove required ops for this request
+      S.operations = S.operations.filter(o=> !(o.requestId===r.id && o.isRequired));
+      // Recreate 4
+      const ops = S.mappings.requestTypeToOps[r.requestType]||[];
+      ops.forEach(opType=>{
+        const shop = pickOne(shopsSupporting(opType, r.siteCountry));
+        const plannedDate = shiftISO(todayISO, Math.floor(Math.random()*56));
+        const durationSlots = S.mappings.opDurations[opType]||1;
+        const status = pickOne(S.mdLists.statuses);
+        const newId = nextOpId();
+        S.operations.push({id:newId, requestId:r.id, opType, shopId:shop.id, plannedDate, durationSlots, status, isRequired:true});
+      });
+      r.eta = computeETA(r.id);
+      persist(); renderAll(); openRequestDrawer(r.id); // refresh panel
+    };
+  }
+
+  function openOperationDrawer(id){
+    const o = S.operations.find(x=>x.id===id); if(!o) return;
+    const r = S.requests.find(x=>x.id===o.requestId);
+    const allowedShops = S.shops.filter(s=> s.allowedOpTypes.includes(o.opType));
+
+    const panel = document.getElementById('drawerPanel');
+    panel.innerHTML = `
+      <h2>Opération ${o.id}</h2>
+      <div class="form">
+        <div class="row">
+          <label>Request<input value="${r.id}" disabled></label>
+          <label>Type d'opération<input value="${o.opType}" disabled></label>
+        </div>
+        <div class="row">
+          <label>Shop<select id="o_shop">${allowedShops.map(s=>`<option value="${s.id}" ${s.id===o.shopId?'selected':''}>${s.name} (${s.siteCountry})</option>`).join('')}</select></label>
+          <label>Date planifiée<input type="date" id="o_date" value="${o.plannedDate||''}"></label>
+        </div>
+        <div class="row">
+          <label>Durée (slots)<input type="number" min="1" max="24" id="o_slots" value="${o.durationSlots||1}"></label>
+          <label>Statut<select id="o_status">${opts(S.mdLists.statuses,o.status)}</select></label>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="saveOp">Enregistrer</button>
+        <button class="btn ghost" id="closeDrawer">Fermer</button>
+      </div>`;
+
+    openDrawer();
+    document.getElementById('closeDrawer').onclick = closeDrawer;
+    document.getElementById('saveOp').onclick = ()=>{
+      const newShop = val('o_shop');
+      const newDate = val('o_date');
+      const newSlots = Math.max(1, parseInt(val('o_slots')||'1',10));
+      const newStatus = val('o_status');
+
+      // Validate capacity warning
+      const s = S.shops.find(x=>x.id===newShop);
+      const sameDayOps = S.operations.filter(x=> x.id!==o.id && x.shopId===newShop && x.plannedDate===newDate);
+      const usedSlots = sameDayOps.reduce((a,b)=>a+(b.durationSlots||1),0);
+      if(usedSlots + newSlots > s.slotsPerDay){
+        if(!confirm(`Attention: surcharge ${usedSlots+newSlots}/${s.slotsPerDay} slots. Continuer ?`)) return;
+      }
+
+      o.shopId = newShop; o.plannedDate = newDate; o.durationSlots = newSlots; o.status = newStatus;
+      // update ETA of parent
+      const req = S.requests.find(x=>x.id===o.requestId); if(req){ req.eta = computeETA(req.id); }
+
+      persist(); renderAll(); closeDrawer();
+    };
+  }
+
+  function openDrawer(){ document.getElementById('drawer').classList.add('open'); }
+  function closeDrawer(){ document.getElementById('drawer').classList.remove('open'); }
+
+  // ---------- SEARCH ----------
+  function searchById(){
+    const q = document.getElementById('searchInput').value.trim().toUpperCase();
+    if(!q) return;
+    if(q.startsWith('REQ-')){
+      const r = S.requests.find(x=>x.id===q); if(r){ openRequestDrawer(r.id); return; }
+    }
+    if(q.startsWith('OP-')){
+      const o = S.operations.find(x=>x.id===q); if(o){ openOperationDrawer(o.id); return; }
+    }
+    alert('Aucun élément avec cet ID.');
+  }
+
+  // ---------- IMPORT / EXPORT / RESET ----------
+  function exportJSON(){
+    const blob = new Blob([JSON.stringify(S,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'maestro-data.json'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+
+  function handleImport(e){
+    const file = e.target.files[0]; if(!file) return;
+    const fr = new FileReader();
+    fr.onload = ()=>{
+      try{
+        const data = JSON.parse(fr.result);
+        // minimal validation
+        if(!data || !Array.isArray(data.requests) || !Array.isArray(data.operations) || !Array.isArray(data.shops)) throw new Error('JSON invalide');
+        Object.assign(S, data);
+        // refresh rolling horizon days from today
+        S.ui.days = generateDays(56);
+        persist(); renderAll(); alert('Import réussi.');
+      }catch(err){ alert('Échec import: '+err.message); }
+    };
+    fr.readAsText(file);
+    e.target.value = '';
+  }
+
+  function resetData(){
+    if(!confirm('Réinitialiser les données (seed) ?')) return;
+    localStorage.removeItem(KEY);
+    location.reload();
+  }
+
+  // ---------- HELPERS ----------
+  function setText(id, v){ const el = document.getElementById(id); if(el) el.textContent = v; }
+  function val(id){ return (document.getElementById(id)||{}).value; }
+  function opts(arr, selected){ return arr.map(x=>`<option ${x===selected?'selected':''}>${x}</option>`).join(''); }
+  function shopName(id){ const s = S.shops.find(x=>x.id===id); return s? s.name: id; }
+  function pickOne(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function shiftISO(iso, deltaDays){ const d = new Date(iso); d.setDate(d.getDate()+deltaDays); return d.toISOString().slice(0,10); }
+  function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+
+  function generateDays(n){
+    const days=[]; const d=new Date(); d.setHours(12,0,0,0); // avoid tz edge
+    for(let i=0;i<n;i++){ const dd=new Date(d); dd.setDate(d.getDate()+i); days.push(dd.toISOString().slice(0,10)); }
+    return days;
+  }
+
+  function filteredShops(){
+    const f = S.ui.filters; let arr = S.shops.slice();
+    if(f.siteCountry) arr = arr.filter(s=>s.siteCountry===f.siteCountry);
+    if(f.shopId) arr = arr.filter(s=>s.id===f.shopId);
+    return arr;
+  }
+
+  function filteredRequests(){
+    const f = S.ui.filters; let arr = S.requests.slice();
+    if(f.siteCountry) arr = arr.filter(r=>r.siteCountry===f.siteCountry);
+    if(f.requestType) arr = arr.filter(r=>r.requestType===f.requestType);
+    if(f.urgency) arr = arr.filter(r=>r.urgency===f.urgency);
+    if(f.status) arr = arr.filter(r=>r.status===f.status);
+    return arr;
+  }
+
+  function filteredOps(){
+    const f = S.ui.filters; let arr = S.operations.slice();
+    if(f.siteCountry) arr = arr.filter(o=>{ const r = S.requests.find(x=>x.id===o.requestId); return r && r.siteCountry===f.siteCountry; });
+    if(f.shopId) arr = arr.filter(o=>o.shopId===f.shopId);
+    if(f.requestType) arr = arr.filter(o=>{ const r = S.requests.find(x=>x.id===o.requestId); return r && r.requestType===f.requestType; });
+    if(f.urgency) arr = arr.filter(o=>{ const r = S.requests.find(x=>x.id===o.requestId); return r && r.urgency===f.urgency; });
+    if(f.status) arr = arr.filter(o=>o.status===f.status);
+    if(f.opType) arr = arr.filter(o=>o.opType===f.opType);
+    return arr;
+  }
+
+  function filteredOpsForKPIs(){
+    // KPIs ignore opType filter to represent global capacity picture, but honor site & shop & status
+    const f = S.ui.filters; let arr = S.operations.slice();
+    if(f.siteCountry) arr = arr.filter(o=>{ const r = S.requests.find(x=>x.id===o.requestId); return r && r.siteCountry===f.siteCountry; });
+    if(f.shopId) arr = arr.filter(o=>o.shopId===f.shopId);
+    if(f.status) arr = arr.filter(o=>o.status===f.status);
+    return arr;
+  }
+
+  function computeETA(requestId){
+    const ops = S.operations.filter(o=>o.requestId===requestId);
+    if(!ops.length) return '';
+    // ETA approximée = max(plannedDate) des opérations
+    const maxDate = ops.filter(o=>o.plannedDate).reduce((max,o)=> max>o.plannedDate?max:o.plannedDate, ops[0].plannedDate);
+    return maxDate || '';
+  }
+
+  function nextOpId(){
+    const nums = S.operations.map(o=>parseInt((o.id||'').split('-')[1]||'0',10)).filter(n=>!isNaN(n));
+    const next = (nums.length? Math.max(...nums):0) + 1;
+    return `OP-${String(next).padStart(3,'0')}`;
+  }
+})();
 </script>
 </body>
 </html>
-
