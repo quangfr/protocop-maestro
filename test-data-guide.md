@@ -1,8 +1,8 @@
 # Contexte
-**📌 Objectifs d'un prototype Excel :**
+**📌 Objectifs d'un prototype CSV / Excel :**
 
 - ✅ Valider la logique de calculs sur un périmètre réduit
-- 📥 Importer CSV de la donnée fictive en masse
+- 📥 Importer de la donnée fictive en masse
 
 **🛠 Usages concrets :**
 - ✍️ Spécifications / Critères d'acceptance 
