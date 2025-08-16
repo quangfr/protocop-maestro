@@ -1,5 +1,5 @@
 # Contexte
-**📌 Objectifs d'un prototype CSV / Excel :**
+**📌 Objectifs d'un prototype Excel :**
 
 - ✅ Valider la logique de calculs sur un périmètre réduit
 - 📥 Importer de la donnée fictive en masse
@@ -10,12 +10,14 @@
 - 🖼️ Démos réalistes (EXIM)
 
 **💡 Démarche IA**
+0. 🏃‍♂️ Privilégier un format plus léger dans la mesure du possible (CSV, JSON...) 
 1. 🔍 Prototyper petit avec des hypothèses de simplification
 2. ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
 3. 🆘 Demander à GPT de te proposer des pistes d'amélioration ou de simplification
 4. 🔄 Mettre le plus de demandes possibles dans ton prompt avant régénération
 5. 📥 Amender le prompt jusqu'à ce qu'il te convient avec de générer le prototype
 6. 📋 Quand tu es satisfait, demande à GPT de te refournir le prompt pour reprendre ailleurs
+7. 🔶 Demander à GPT le diagramme UML pour documenter
 
 **🤖 Lien à la conversation IA**
 ```
