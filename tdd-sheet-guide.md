@@ -76,8 +76,6 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - Quelles feuilles minimales pour saisir/recoller et lire les KPI ?  
 - Comment signaler visuellement les différences cellule par cellule ?
 - Comment garantir le calcul “input vs output” au bon grain ?
-- Comment rendre la comparaison avec SAP-IBP immédiate ?
-
 
 **Feuilles du classeur** 📒  
 - **Parameters** : `START_DATE = 2025-09-01`, `HORIZON_DAYS = 90`.  
@@ -98,7 +96,21 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - **Util_Output% (G2)** : `=IFERROR(E2/C2,0)`  
 - **Écart% (H2)** : `=G2 - F2`
 
-**Flux IBP (le plus simple)** 🔄  
+
+Rappels ⚠️ : mêmes libellés des deux côtés, même horizon, pas d’Output_CapacityDays; les différences cellule passent en jaune dans Output_Operations
+
+### 4) Technique 🛠️
+*Questions à se poser d’abord* 🧪  
+- Comment garantir la reproductibilité et la compatibilité Excel Desktop ?
+- Comment rendre la connexion avec le flux SAP-IBP immédiate ?
+- Quelles contraintes côté données aléatoires ?
+
+**Génération & compatibilité** 🧰  
+- Générer un fichier **Excel Desktop** (graphiques colonnes visibles dans Excel, non garanti pour Google Sheets).  
+- Bibliothèques recommandées si script : **openpyxl** ou **xlsxwriter** (Python).  
+- **Seed aléatoire fixée** pour la reproductibilité.
+
+**Connexion au flux IBP (le plus simple)** 🔄  
 - **Entrée (INPUT)** : pousser/ajuster les opérations depuis **Input_Operations** vers IBP.
 
 - Crée une feuille IBP_INPUT dans le même fichier avec l’Excel Add-in SAP IBP.
@@ -114,18 +126,6 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - Dans l’add-in, affiche la KF de plan/réel, puis Refresh
 - Copie-colle ce résultat dans Output_Operations (même structure que Input_Operations)
 - KPI_Check et KPI_Dashboard se mettent à jour tout seuls : Util_Input% vs Util_Output% et Écart%
-
-Rappels ⚠️ : mêmes libellés des deux côtés, même horizon, pas d’Output_CapacityDays; les différences cellule passent en jaune dans Output_Operations
-
-### 4) Technique 🛠️
-*Questions à se poser d’abord* 🧪  
-- Comment garantir la reproductibilité et la compatibilité Excel Desktop ?  
-- Quelles contraintes côté données aléatoires ?
-
-**Génération & compatibilité** 🧰  
-- Générer un fichier **Excel Desktop** (graphiques colonnes visibles dans Excel, non garanti pour Google Sheets).  
-- Bibliothèques recommandées si script : **openpyxl** ou **xlsxwriter** (Python).  
-- **Seed aléatoire fixée** pour la reproductibilité.
 
 **Livrable attendu** 📁  
 - Classeur unique **MAESTRO_FillRate_Simplified.xlsx** avec toutes les feuilles, formules, formats et **5 graphiques** prêts.  
