@@ -71,39 +71,39 @@
 
 classDiagram
   class Request {
-    +string id
-    +string client
-    +string engineModel
-    +RequestType requestType
-    +Urgency urgency
-    +Status status
-    +string siteCountry
-    +date createdAt
-    +date dueDate
-    +date eta
+    +id : string
+    +client : string
+    +engineModel : string
+    +requestType : RequestType
+    +urgency : Urgency
+    +status : Status
+    +siteCountry : string
+    +createdAt : string
+    +dueDate : string
+    +eta : string
   }
 
   class Operation {
-    +string id
-    +string requestId
-    +OpType opType
-    +string shopId
-    +date plannedDate
-    +int durationSlots
-    +Status status
+    +id : string
+    +requestId : string
+    +opType : OpType
+    +shopId : string
+    +plannedDate : string
+    +durationSlots : int
+    +status : Status
   }
 
   class Shop {
-    +string id
-    +string name  // city
-    +string siteCountry
-    +int slotsPerDay
-    +OpType[] allowedOpTypes
+    +id : string
+    +name : string %% city
+    +siteCountry : string
+    +slotsPerDay : int
+    +allowedOpTypes : OpType[] 
   }
 
   class Mappings {
-    +Map<RequestType, OpType[4]> requestTypeToOps
-    +Map<OpType, int> opDurations
+    +requestTypeToOps : Dict %% ex: RequestType -> OpType[4]
+    +opDurations : Dict  %% ex: OpType -> int (slots)
   }
 
   enum RequestType {
@@ -139,11 +139,11 @@ classDiagram
     Documentation
   }
 
-  Request "1" -- "4..*" Operation : contient >
-  Operation "*" --> "1" Shop : planifiée_dans >
-  Mappings ..> RequestType : définit
-  Mappings ..> OpType : définit
-  Shop "1" o-- "*" Operation : exécute >
+  Request "1" -- "4..*" Operation : contient
+  Operation "*" --> "1" Shop : planifiee_dans
+  Shop "1" o-- "*" Operation : execute
+  Mappings ..> RequestType : definit
+  Mappings ..> OpType : definit
 
 ```
 
