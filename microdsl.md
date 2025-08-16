@@ -1,3 +1,4 @@
+```
 F: MAESTRO — Maintenance moteur (micro-DSL)
 
 B:
@@ -64,5 +65,7 @@ S: Navigation croisée Requests ↔ Operations
   G: Tables Requests & Operations affichées
   W: Click(RequestID="R-123" | Ops#="4")
   T: Onglet Operations ouvert & filtré sur RequestID="R-123"
+
+```
   W: Click(OperationID="OP-9")
   T: Formulaire d’édition chargé avec OP-9
