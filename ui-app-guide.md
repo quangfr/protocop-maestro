@@ -68,6 +68,7 @@
 **Diagramme UML** :
 
 ```mermaid
+
 classDiagram
   class Request {
     +string id
@@ -143,6 +144,7 @@ classDiagram
   Mappings ..> RequestType : définit
   Mappings ..> OpType : définit
   Shop "1" o-- "*" Operation : exécute >
+
 ```
 
 ## 3) 🖥️ INTERFACE (Fiori-like)
