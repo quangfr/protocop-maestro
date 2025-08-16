@@ -14,6 +14,7 @@
 - 🖼️ Démos réalistes (UI/UX)
 
 **💡 Démarche IA**
+
 0. 🏃‍♂️ Privilégier peu de logique métier (données statiques), un style minimaliste avec le minimum de données
 1. 🔍 Prototyper petit avec des hypothèses de simplification
 2. ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
