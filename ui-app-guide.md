@@ -1,6 +1,6 @@
 # Contexte
 
-**📌 Objectifs d'un prototype HTML :**
+**📌 Objectifs d'un prototype applicatif HTML :**
 
 - 💡 Proposer et valider une vision produit
 - 🗂️ Aider à structurer une feuille de route et à prioriser les fonctionnalités à haute valeur ajoutée
