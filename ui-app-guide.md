@@ -25,195 +25,175 @@
   
 # Prompt
 
-## 1️⃣ Contexte
+## 1) 🎯 CONTEXTE
+❓ À quoi sert ce prototype ?
+❓ Qui l’utilise et dans quel but immédiat ?
+❓ Quels critères de succès pour la démo ?
 
-❓ *Quel nom afficher dans le bandeau en haut ?*  
-❓ *Quel style général ?*  
-❓ *En une phrase, à quoi sert cet outil ?*
-❓ *Quelles sont les hypothèses de simplification ?*
+- Objectif : suivre l’**occupation des shops** (ateliers) et le **respect des délais** (dont urgences AOG) sur **8 semaines**.
+- Utilisateurs : **planificateurs Safran** (suivi, micro-replanification, vérification capacité).
+- Succès POC : **heatmap** exploitable (shops × jours), **recherche par ID**, navigation par **liens cliquables**, **édition inline** avec **persistance locale**, **import/export JSON**.
 
-**Nom de l’application** : **MAESTRO**  
-**Style visuel** : interface claire et moderne, inspirée de SAP IBP :  
-- Organisation en **cartes et onglets**  
-- En-têtes toujours visibles  
-- **Couleurs codées** pour représenter les capacités (vert, jaune, rouge)  
-- Boutons arrondis pour un rendu plus agréable  
+## 2) 🗂️ MODÈLE DE DONNÉES
+❓ Quels objets métier minimum ?
+❓ Quelles relations/règles clés ?
+❓ Quels jeux de données de départ ?
 
-**Objectif** :  
-MAESTRO est une application locale, qui fonctionne entièrement dans un fichier HTML sans connexion Internet.  
-Elle permet de :  
-- **Créer et modifier** des demandes de maintenance moteur  
-- **Suivre** les opérations associées  
-- **Vérifier** les capacités des ateliers (shops)  
-- **Visualiser** des indicateurs clés de performance (KPI)  
+**Structure de données** :
 
-**Hypothèses** :  
-- 🎯 Demande = 1 moteur, plusieurs types supportés
-- 🧩 Pack fixe de 4 opérations par type (aucune variante ni sous-op)
-- ⏱️ Durées fixes par opération; ETA = somme des durées (sans attente capacité)
-- 🏭 Capacité par atelier en “créneaux/jour” (pas d’heures, pas d’équipes)
-- ✅ Compatibilité stricte atelier ↔ opération (pas d’exception)
-- 🔁 Séquencement simple des 4 opérations (pas de parallélisation, pas de buffers)
-- 🚦 Statuts simplifiés: Demande (Planned/Delivered), Opération (Planned/In Progress/Done)
-- 🧱 Règles de contrôle: shop incompatible, opération non requise, capacité pleine, ensemble exact des 4
-- ♻️ Suppression d’une opération = créneau capacité ré-ouvert immédiatement (pas de replanif auto)
-- 📊 KPI unique: On-Time % sur AOG (livré ≤ ETA)
-- 🔎 Navigation croisée simple Demandes ↔ Opérations (pas de recherche avancée)
-- 🔐 Rôle unique “Planner”; données locales en mémoire; référentiels statiques
+- **Request (Demande)** : `id`, `client`, `engineModel`, `requestType` (3), `urgency` (Normal/AOG), `status` (Ouvert/Prêt/En cours/Terminé), `siteCountry`, `dueDate`, `eta`, `createdAt`.
+- **Operation** : `id`, `requestId`, `opType` (12), `shopId`, `plannedDate`, `durationSlots`, `status`.
+- **Shop** : `id`, `name` (ville), `siteCountry` (pays), `allowedOpTypes` (subset des 12), `slotsPerDay`.
+- **Mappings** :
+  - `requestTypeToOps` (3 × 4) :  
+    - Overhaul → Disassembly, Repair, Assembly, TestRun  
+    - QuickInspection → Inspection, Cleaning, Assembly, TestRun  
+    - DeepRepair → Disassembly, DeepRepair, Assembly, TestRun
+  - `opDurations` (par `opType`, en *slots*).
+**Règles** :
+  - 1 Request ⇒ **4 Operations** selon `requestType`.
+  - `shopId` doit **supporter** `opType`.
+  - **Occupation shop-jour** (%) = `Σ slots planifiés / slotsPerDay`.
+  - **% urgences à l’heure** = `#AOG Done à temps / #AOG Done`.
 
-## 2️⃣ Modèle de données
+**Données réalistes** :
+  - Clients (10) : Air France, Lufthansa, Ryanair, easyJet, Turkish Airlines, Qatar Airways, Emirates, American Airlines, Delta, United.
+  - EngineModels (5) : CFM56, LEAP-1A, LEAP-1B, GE90, Trent 700.
+  - Sites/Pays (5) : France, Allemagne, Espagne, Royaume-Uni, Italie.
+  - Shops (10 = 2 par pays) : Toulouse, Lyon, Hambourg, Francfort, Madrid, Barcelone, Londres, Manchester, Milan, Turin.  
+    - Chaque shop : `slotsPerDay` (6–9), `allowedOpTypes` (2–4 familles).
+  - OpTypes (12) : Inspection, Disassembly, Repair, DeepRepair, Cleaning, Assembly, TestRun, NDT, Calibration, Balancing, Painting, Documentation.
+  - Volumétrie POC : **10 demandes**, **50 opérations**, étalées sur **J+0 → J+55**.
 
-❓ *Quels sont les objets métiers de l'application ? (ex. Demande, Opération, Ressource, Calendrier…)*  
-❓ *Pour chaque objet : propriétés, validations, permissions ?*  
-❓ *Relations entre objets : cardinalités, contraintes (suppression en cascade, restrictions, compatibilités, relations obligatoires, limites quantitatives, contraintes temporelles, unicité, synchronisation d’état)*  
-❓ *Quelles données en exemple ?*
-❓ *Quelle est la structure de données UML ?*
-
-**Demande (Request)**  
-C’est la fiche de départ : un client demande la maintenance d’un moteur.  
-- Contenu : numéro unique, client, type de moteur, localisation, atelier choisi, type de demande, niveau d’urgence, statut, date de création, date de fin estimée, notes éventuelles  
-- Règles : certains champs sont obligatoires (client, moteur, atelier, etc.). La date de fin est calculée automatiquement.  
-- Particularité : chaque type de demande nécessite exactement 4 opérations obligatoires.  
-
-**Opération (Operation)**  
-Une demande est toujours composée de plusieurs opérations.  
-- Contenu : numéro unique, lien avec une demande, atelier concerné, type d’opération, statut, date de début, durée prévue (1 à 5 semaines), date de fin  
-- Règles : certains champs obligatoires. La date de fin se calcule seule.  
-- Particularité : une opération doit être autorisée dans l’atelier choisi.  
-
-**Listes maîtres (référentiels)**  
-Elles contiennent toutes les valeurs disponibles dans les menus déroulants : urgences, statuts, ateliers, localisations, types d’opérations, modèles moteurs, clients, types de demandes.  
-
-**Mappings & règles**  
-- Chaque type de demande doit correspondre à 4 opérations distinctes  
-- Chaque type d’opération a une durée par défaut (1 à 5 semaines)  
-- Chaque atelier (shop) a une capacité par défaut, une localisation et peut avoir des exceptions  
-
-**Relations entre données**  
-- Une demande → plusieurs opérations  
-- Un atelier → plusieurs types d’opérations autorisés  
-- Un type de demande → exactement 4 opérations  
-
-**Données d’exemple**  
-À l’ouverture, l’application se remplit avec des données fictives :  
-- 4 urgences, 4 statuts  
-- 10 ateliers, 5 localisations  
-- 12 types d’opérations  
-- 5 modèles de moteur, 5 clients  
-- 3 types de demandes (chacun avec 4 opérations)  
-- 10 demandes et 30 opérations générées au hasard
-
-**Synthèse UML**
-```mermaid
+**Diagramme UML** :
+````mermaid
 classDiagram
-    class Request {
-        +String id
-        +String customer
-        +String engine
-        +String location
-        +String shop
-        +String requestType
-        +String urgency
-        +String status
-        +Date requestDate
-        +Date estEnd
-        +String notes
-    }
+  class Request {
+    +string id
+    +string client
+    +string engineModel
+    +RequestType requestType
+    +Urgency urgency
+    +Status status
+    +string siteCountry
+    +date createdAt
+    +date dueDate
+    +date eta
+  }
 
-    class Operation {
-        +String id
-        +String reqId
-        +String shop
-        +String opType
-        +String status
-        +Date start
-        +Date finish
-        +Number duration
-    }
+  class Operation {
+    +string id
+    +string requestId
+    +OpType opType
+    +string shopId
+    +date plannedDate
+    +int durationSlots
+    +Status status
+  }
 
-    class ShopCapability {
-        +String shop
-        +String location
-        +Number defaultCapacity
-        +List<Exception> exceptions
-        +List<String> allowedOps
-    }
+  class Shop {
+    +string id
+    +string name  // city
+    +string siteCountry
+    +int slotsPerDay
+    +OpType[] allowedOpTypes
+  }
 
-    class RequestType {
-        +String name
-        +List<String> requiredOps (4)
-    }
+  class Mappings {
+    +Map<RequestType, OpType[4]> requestTypeToOps
+    +Map<OpType, int> opDurations
+  }
 
-    class OperationType {
-        +String name
-        +Number defaultDuration
-    }
+  enum RequestType {
+    Overhaul
+    QuickInspection
+    DeepRepair
+  }
 
-    Request "1" --> "many" Operation : contient
-    ShopCapability "1" --> "many" Operation : planifiée à
-    RequestType "1" --> "4" OperationType : requiert
-    ShopCapability "1" --> "many" OperationType : autorise
+  enum Urgency {
+    Normal
+    AOG
+  }
+
+  enum Status {
+    Ouvert
+    Pret
+    EnCours
+    Termine
+  }
+
+  enum OpType {
+    Inspection
+    Disassembly
+    Repair
+    DeepRepair
+    Cleaning
+    Assembly
+    TestRun
+    NDT
+    Calibration
+    Balancing
+    Painting
+    Documentation
+  }
+
+  Request "1" -- "4..*" Operation : contient >
+  Operation "*" --> "1" Shop : planifiée_dans >
+  Mappings ..> RequestType : définit
+  Mappings ..> OpType : définit
+  Shop "1" o-- "*" Operation : exécute >
 ```
+## 3) 🖥️ INTERFACE (Fiori-like)
+❓ Quels écrans et parcours essentiels ?
+❓ Quelles interactions minimum ?
+❓ Comment présenter KPI et données pour agir vite ?
 
-## 3️⃣ Interface
+- **Barre de recherche (ID)** : tape Request# ou Operation# → résultat **cliquable** → ouvre la fiche.
+- **Filtres rapides** : période (fixe 8 semaines), **Site (pays)**, **Shop (ville)**, **Type de demande (3)**, **Urgence (2)**, **Statut**, **Type d’opération (12)**.
+- **Bandeau KPI (cartes)** :
+  - **Utilisation globale (8 sem)** (%)
+  - **% urgences livrées à l’heure**
+  - **Backlog/Retards** (opés non planifiées / dépassées)
+  - **ETA moyen** des demandes actives
+- **Heatmap Shops × Jours (8 semaines)** :
+  - Lignes : 10 shops | Colonnes : J+0 → J+55
+  - Cellule = `% d’occupation` (✅ 0–85% • ⚠️ 85–100% • 🟥 >100%)
+  - Tooltip : date, shop, capacité, charge (slots), nb opés, %
+  - **Clic cellule** ⇒ ouvre l’onglet *Operations* **préfiltré** (shop + jour)
+- **Listes** :
+  - *Requests* : lignes compactes avec **Request# cliquable**, badges (type, urgence, statut), due/eta.
+  - *Operations* : **Operation# cliquable**, shop, date, type, statut, durée (slots).
+- **Fiches** :
+  - **Demande** : propriétés éditables + liste de ses **4 opérations** (liens).
+  - **Opération** : **shop** (sélecteur filtré par compatibilité), **date**, **durée**, **statut** (éditables).
+- **Parcours démo (90s)** :
+  1) Filtre **France → Lyon** → heatmap montre 🟥 S+2 (mercredi).  
+  2) Clic cellule 🟥 → *Operations* filtré → éditer l’opé (shop/date) → **auto-save**.  
+  3) KPI **Utilisation** & **% urgences à l’heure** s’améliorent.  
+  4) **Exporter JSON** → **Reset** → **Importer JSON** pour restaurer.
 
-❓ *Quels onglets/écrans veux-tu ?*  
-❓ *Pour chaque onglet : données, actions, aides ?*  
-❓ *Comment naviguer entre les onglets ?*  
-❓ *Comportement entre écrans ?*
+## 4) 🧱 TECHNIQUE
+❓ Comment structurer simplement (standalone) ?
+❓ Quelles features techniques livrer dès le POC ?
+❓ Comment persister et échanger les données ?
 
-**Nouvelle demande**  
-- Formulaire simple pour saisir une demande (champs obligatoires en jaune)  
-- Panneau d’aide : montre automatiquement les 4 opérations requises par type de demande + vérification de capacité d’un atelier à une date donnée  
-- Actions : créer une demande, recalculer la date de fin  
+- **Mono-fichier** : `prototype.html` (HTML/CSS/**Vanilla JS**, zéro dépendance).
+- **State central `S`** : `mdLists`, `mappings`, `shops`, `requests`, `operations`, `ui`.
+- **Rendu** : fonctions `render*()` (KPI, Heatmap, Tables, Fiches, Search).
+- **Édition & Persistance** : mise à jour **in-UI** + **localStorage** (`MAESTRO_STATE_V1`), bouton **Reset data**.
+- **Import/Export JSON** :  
+  - Export : télécharge `maestro-data.json` (contenu de `S`).  
+  - Import : upload → remplace l’état + re-render.  
+- **Validations** : compatibilité shop/opType, alerte >100% occupation (confirmable), régénération des 4 opés si `requestType` change (avec confirmation).
+- **Perf cible** : fluide jusqu’à **~500 opérations** ; DOM simple (sans lib).
+- **Accessibilité** : focus visible, contrastes, tooltips ARIA.
 
-**Éditer opérations**  
-- Formulaire pour créer ou modifier une opération liée à une demande  
-- Panneau d’aide : indique quelles opérations sont autorisées dans l’atelier choisi  
-- Actions : sauvegarder ou supprimer l’opération  
-
-**Demandes**  
-- Tableau de toutes les demandes  
-- Chaque numéro de demande est cliquable → ouvre les opérations liées  
-
-**Opérations**  
-- Tableau de toutes les opérations  
-- Numéro d’opération cliquable → ouvre l’édition de cette opération  
-- Numéro de demande cliquable → ouvre la fiche demande correspondante  
-
-**Listes maîtres**  
-- Tableaux éditables pour ajouter/modifier les valeurs de référence  
-- Mapping obligatoire : chaque type de demande doit être lié à 4 opérations distinctes  
-- Table de durée par type d’opération  
-- Actions : appliquer les changements, voir les données au format JSON (export/copie possible)  
-
-**Tableau de bord (KPI)**  
-- Pourcentage de demandes urgentes livrées dans les temps  
-- Carte de chaleur (heatmap) des capacités hebdomadaires (par localisation et atelier, sur 8 semaines)  
-
-**Navigation**  
-- Onglets visibles en permanence en haut de l’écran  
-- Clic sur un ID → ouvre automatiquement l’écran concerné avec un filtre appliqué  
-
-## 4️⃣ Technique
-
-❓ *Quelles fonctionnalités avancées ?*  
-❓ *Quelles contraintes techniques ?*
-
-**Fonctionnalités intégrées**  
-- Tout tient dans un seul fichier HTML (aucune installation, aucun serveur)  
-- Données d’exemple créées automatiquement au démarrage  
-- Menus déroulants dynamiques (les opérations proposées dépendent de l’atelier choisi)  
-- Calculs automatiques : dates de fin, capacité disponible, KPI  
-- Tableaux filtrables et recherche instantanée  
-- Import / export de toutes les données en JSON  
-- Visionneuse JSON pratique : repliable, copiable, téléchargeable  
-- Tableaux avec en-têtes fixes et survol des lignes  
-- Tableau de bord mis à jour en temps réel  
-- Affichage adapté mobile (les sections se mettent en pile)  
-
-**Limitations techniques**  
-- Pas de sauvegarde automatique (il faut exporter/importer les données pour garder l’historique)  
-- Pas de connexion serveur (tout se fait dans ton navigateur)  
-- Les capacités sont toujours calculées par semaine entière (norme ISO)  
-- Si les règles de mapping ou de durée ne sont pas respectées, un avertissement s’affiche 
+### 📦 Livrables (8)
+1) `prototype.html` **standalone** (HTML/CSS/JS).  
+2) **Seed réaliste** : 10 demandes, 50 opérations, 10 shops, mappings 3×4, 12 opTypes, 5 pays.  
+3) **Heatmap interactive** 8 semaines (shops × jours).  
+4) **Bandeau KPI** (utilisation, % urgences à l’heure, backlog, ETA).  
+5) **Recherche par ID** + navigation via liens cliquables.  
+6) **Fiches éditables** (demande/opération) avec validations.  
+7) **Auto-save** session + **Reset**.  
+8) **Import/Export JSON**.
