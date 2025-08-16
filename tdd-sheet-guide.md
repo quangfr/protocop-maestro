@@ -1,4 +1,4 @@
-## Contexte
+## Objectif
 Illustrer la capacité à créer un prototype qui vérifie la donnée venant d'un outil en cours de développement. Contexte : SAP-IBP / Excel Add-in
 
 ## IA🤖 
