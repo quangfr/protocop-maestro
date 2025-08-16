@@ -13,16 +13,16 @@
 - 📊 Illustration avec des données réalistes 
 - 👥 Tests utilisateurs (UI/UX)
 
-**🤖 Astuces**
+**💡 Démarche IA**
+1. 🔍 Prototyper petit avec des hypothèses de simplification
+2. ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
+3. 🆘 Demander à GPT de te proposer des pistes d'amélioration ou de simplification
+4. 🔄 Mettre le plus de demandes possibles dans ton prompt avant régénération
+5. 📥 Amender le prompt jusqu'à ce qu'il te convient avec de générer le prototype
+6. 📋 Quand tu es satisfait, demande à GPT de te refournir le prompt pour reprendre ailleurs
 
-- 🔍 Prototyper petit d’abord
-- ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
-- 🆘 Demander à GPT de te proposer des pistes d'améliorations
-- 🔄 Mettre le plus de demandes possibles dans ton prompt avant régénération
-- 📥 Demander à GPT de re-décrire ton prompt à partir du code ou de tes demandes additionnelles
-- 📋 Plus ton prompt est précis, plus ton prototype sera fidèle mais plus la génération prend du temps
   
-# Guide
+# Prompt
 
 ## 1️⃣ Contexte
 
