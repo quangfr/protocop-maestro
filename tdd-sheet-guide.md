@@ -1,4 +1,15 @@
-## Conversation IA 🤖 : 
+## Contexte
+Illustrer la capacité à vérifier la justesse des données calculées venant d'un outil externe comme SAP-IBP. Dans notre cas il s'agit du taux d'occupation des centres de maintenance des moteurs d'avion. Le choix d'Excel est lié à l'utilisation d'Excel Add-in. On utilise ChatGPT pour générer un prototype de la feuille de calcul de vérification.
+
+## IA🤖 
+**Astuces💡**
+- Demander à GPT de te poser des questions pour préciser ta demande
+- Demander à GPT de te proposer des pistes de simplification
+- Demander à GPT de générer une proposition au préalable
+- Amende la proposition jusqu'a ce qu'elle te convient avec de générer le prototype
+- Quand tu es satisfait du prototype, demande à GPT de te fournir le prompt pour reprendre ailleurs le prototype
+
+**Lien à la conversation 🔗**
 ```
 https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 ```
