@@ -61,7 +61,7 @@ Elle permet de :
 - 🔎 Navigation croisée simple Demandes ↔ Opérations (pas de recherche avancée)
 - 🔐 Rôle unique “Planner”; données locales en mémoire; référentiels statiques
 
-## 2️⃣ Modèle
+## 2️⃣ Modèle de données
 
 ❓ *Quels sont les objets métiers de l'application ? (ex. Demande, Opération, Ressource, Calendrier…)*  
 ❓ *Pour chaque objet : propriétés, validations, permissions ?*  
