@@ -1,7 +1,5 @@
 À copier dans GPT en lui demandant de `créer un prototype HTML standalone avec les infos suivantes` :
 
----
-
 # 1️⃣ Identité  
 
 **Nom de l’application** : **MAESTRO**  
@@ -18,8 +16,6 @@ Elle permet de :
 - **Suivre** les opérations associées  
 - **Vérifier** les capacités des ateliers (shops)  
 - **Visualiser** des indicateurs clés de performance (KPI)  
-
----
 
 # 2️⃣ Modèle de données  
 
@@ -112,8 +108,6 @@ classDiagram
     ShopCapability "1" --> "many" OperationType : autorise
 ```
 
----
-
 # 3️⃣ Navigation et écrans  
 
 ## Les onglets principaux  
@@ -152,8 +146,6 @@ classDiagram
 ## Navigation  
 - Onglets visibles en permanence en haut de l’écran  
 - Clic sur un ID → ouvre automatiquement l’écran concerné, avec un filtre déjà appliqué  
-
----
 
 # 4️⃣ Techniques  
 
