@@ -201,6 +201,6 @@ classDiagram
 4) **Bandeau KPI** (utilisation, % urgences à l’heure, backlog, ETA).  
 5) **Recherche par ID** + navigation via liens cliquables.  
 6) **Fiches éditables** (demande/opération) avec validations.  
-7) **Auto-save** Master Data per object + **Reset**.  
+7) **Auto-save** session + **Reset**.  
 8) **Import/Export JSON**.
 9) Interface à la **SAP-IBP Fiori**. Thème clair.
