@@ -27,7 +27,7 @@ Illustrer la capacité à vérifier la justesse des données calculées venant d
 - Demander à GPT de te poser des questions pour préciser ta demande
 - Demander à GPT de te proposer des pistes de simplification
 - Demander à GPT de générer une proposition au préalable
-- Amende la proposition jusqu'a ce qu'elle te convient avec de générer le prototype
+- Amender la proposition jusqu'a ce qu'elle te convient avec de générer le prototype
 - Quand tu es satisfait du prototype, demande à GPT de te fournir le prompt pour reprendre ailleurs le prototype
 
 **Lien à la conversation 🔗**
