@@ -49,11 +49,32 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - Graphiques en **colonnes groupées**, axe Y **0–100%**.
 
 ### 2) Modèle (Liste de références + Formules + TDD) 🧠
-*Questions à se poser d’abord* 📝  
-- Quelles listes de référence minimales et sans IDs ?  
+*Questions à se poser d’abord* 📝 
+- Quelles listes de référence minimales et sans IDs ?
 - Quelles sont les règles de génération de la donnée ?
+- Quelle est la structure de données 
 - Comment on valide par des tests unitaires simples ?
 
+
+**Listes de références (noms lisibles, pas d’IDs)** 📇  
+- **Shops** : Lyon, Toulouse, Nantes, Bordeaux, Marseille.  
+- **Catégories** : Inspection, Disassembly, Repair, Assembly, TestRun.  
+- **Types** : texte libre au format **“{Catégorie} Type n”** (ex. “Inspection Type 1”).
+
+**KPI (tous en %)** 📈  
+- `Input_CapacityDays = SlotsPerDay(Shop×Cat) × 90`  
+- `Input_PlanDays = Σ durées des opérations Input (Shop×Cat)`  
+- `Output_PlanDays = Σ durées des opérations Output (Shop×Cat)`  
+- `Util_Input% = Input_PlanDays / Input_CapacityDays`  
+- `Util_Output% = Output_PlanDays / Input_CapacityDays`  
+- `Écart% = Util_Output% – Util_Input%`
+
+**Règles de génération (résumé)** 📦  
+- **Shop_Slots** : 2–3 catégories par shop, `SlotsPerDay ∈ [2..6]`, **chaque catégorie** présente dans **≥2 shops**.  
+- **Input_Operations** : `Id` = OP001…OP100 ; `Type` = “{Catégorie} Type n” (n ∈ [1..4]) ; `Durée (jours)` ∈ [5..90] ; `Start Date` uniforme, avec **fin ≤ START_DATE + 89 j** ; `Shop` éligible à la `Catégorie`.  
+- **Output_Operations** : copie d’Input + **~1% d’écarts** (Durée **ou** Start Date, ±1..±3 j) **sans sortir de l’horizon** ; **mise en évidence JAUNE** via XLOOKUP sur `Id`.
+
+**Diagramme UML**  
 ```mermaid
 classDiagram
     class Parameters {
@@ -126,24 +147,6 @@ classDiagram
     Shop_Slots ..> Parameters : HORIZON_DAYS
 ```
 
-
-**Listes de références (noms lisibles, pas d’IDs)** 📇  
-- **Shops** : Lyon, Toulouse, Nantes, Bordeaux, Marseille.  
-- **Catégories** : Inspection, Disassembly, Repair, Assembly, TestRun.  
-- **Types** : texte libre au format **“{Catégorie} Type n”** (ex. “Inspection Type 1”).
-
-**KPI (tous en %)** 📈  
-- `Input_CapacityDays = SlotsPerDay(Shop×Cat) × 90`  
-- `Input_PlanDays = Σ durées des opérations Input (Shop×Cat)`  
-- `Output_PlanDays = Σ durées des opérations Output (Shop×Cat)`  
-- `Util_Input% = Input_PlanDays / Input_CapacityDays`  
-- `Util_Output% = Output_PlanDays / Input_CapacityDays`  
-- `Écart% = Util_Output% – Util_Input%`
-
-**Règles de génération (résumé)** 📦  
-- **Shop_Slots** : 2–3 catégories par shop, `SlotsPerDay ∈ [2..6]`, **chaque catégorie** présente dans **≥2 shops**.  
-- **Input_Operations** : `Id` = OP001…OP100 ; `Type` = “{Catégorie} Type n” (n ∈ [1..4]) ; `Durée (jours)` ∈ [5..90] ; `Start Date` uniforme, avec **fin ≤ START_DATE + 89 j** ; `Shop` éligible à la `Catégorie`.  
-- **Output_Operations** : copie d’Input + **~1% d’écarts** (Durée **ou** Start Date, ±1..±3 j) **sans sortir de l’horizon** ; **mise en évidence JAUNE** via XLOOKUP sur `Id`.
 
 **TDD / critères d’acceptation** ✅  
 - **CA1** : `SlotsPerDay=4`, horizon 90 → **Input_CapacityDays=360**.  
