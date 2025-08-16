@@ -96,33 +96,37 @@ classDiagram
     +name : string %% city
     +siteCountry : string
     +slotsPerDay : int
-    +allowedOpTypes : OpType[] 
+    +allowedOpTypes : OpType[]
   }
 
   class Mappings {
-    +requestTypeToOps : Dict %% ex: RequestType -> OpType[4]
-    +opDurations : Dict  %% ex: OpType -> int (slots)
+    +requestTypeToOps : Dict %% RequestType -> OpType[4]
+    +opDurations : Dict  %% OpType -> int (slots)
   }
 
-  enum RequestType {
-    Overhaul 
-    QuickInspection 
-    DeepRepair  
+  class RequestType {
+    <<enumeration>>
+    Overhaul
+    QuickInspection
+    DeepRepair
   }
 
-  enum Urgency {
+  class Urgency {
+    <<enumeration>>
     Normal
     AOG
   }
 
-  enum Status {
+  class Status {
+    <<enumeration>>
     Ouvert
     Pret
     EnCours
     Termine
   }
 
-  enum OpType {
+  class OpType {
+    <<enumeration>>
     Inspection
     Disassembly
     Repair
