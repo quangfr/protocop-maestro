@@ -15,12 +15,6 @@
 - 📊 Illustration avec des données réalistes 
 - 👥 Tests utilisateurs (UI/UX)
 
-**📥 Fichiers :**
-- readme.md : questionnaire à répondre pour préparer le prompt
-- prompt.md : exemple de prompt complet MAESTRO (à mettre dans GPT pour générer le prototype)
-- prototype.html : exemple de prototype MAESTRO généré à partir du prompt (à télécharger et à ouvrir dans un navigateur)
-
-
 **🤖 Astuces**
 
 - 🔍 Prototyper petit d’abord
@@ -31,6 +25,7 @@
 - 📋 Plus ton prompt est précis, plus ton prototype sera fidèle mais plus la génération prend du temps
   
 ---
+# Questionnaire
 
 ## 1️⃣ Identité
 
