@@ -40,8 +40,6 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - Entêtes en gras, volets gelés sous la 1ʳᵉ ligne.  
 - Graphiques en **colonnes groupées**, axe Y **0–100%**.
 
----
-
 # 2) Modèle (Liste de références + Formules + TDD) 🧠
 *Questions à se poser d’abord* 📝  
 - Quelles listes de référence minimales et sans IDs ?  
@@ -72,8 +70,6 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - **CA3** : si **Output_PlanDays = Input_PlanDays** → **Écart%=0** (vert).  
 - **CA4** : si **Output_PlanDays > Input_PlanDays** → **Écart%>0** (rouge).  
 - **CA5** : toute cellule différente entre **Output_Operations** et **Input_Operations** (par `Id`) est **jaune**.
-
----
 
 # 3) Interface 🖥️
 *Questions à se poser d’abord* 💬  
@@ -120,8 +116,6 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - KPI_Check et KPI_Dashboard se mettent à jour tout seuls : Util_Input% vs Util_Output% et Écart%
 
 Rappels ⚠️ : mêmes libellés des deux côtés, même horizon, pas d’Output_CapacityDays; les différences cellule passent en jaune dans Output_Operations
-
----
 
 # 4) Technique 🛠️
 *Questions à se poser d’abord* 🧪  
