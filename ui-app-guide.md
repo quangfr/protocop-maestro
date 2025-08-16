@@ -39,7 +39,7 @@
 ❓ Quelles relations/règles clés ?
 ❓ Quels jeux de données de départ ?
 
-**Structure de données** :
+**Structure de données**:
 
 - **Request (Demande)** : `id`, `client`, `engineModel`, `requestType` (3), `urgency` (Normal/AOG), `status` (Ouvert/Prêt/En cours/Terminé), `siteCountry`, `dueDate`, `eta`, `createdAt`.
 - **Operation** : `id`, `requestId`, `opType` (12), `shopId`, `plannedDate`, `durationSlots`, `status`.
