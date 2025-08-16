@@ -1,28 +1,799 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MAESTRO – Concise Prototype</title><style>body{margin:0;font:14px system-ui,Segoe UI,Roboto,Helvetica,Arial;background:#f6f7fb;color:#111}header{position:sticky;top:0;background:#fff;border-bottom:1px solid #e5e7eb;padding:8px 12px}h1{font-size:14px;margin:0}nav{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}button.tab{border:1px solid #e5e7eb;background:#fff;border-radius:999px;padding:6px 10px;cursor:pointer}button.tab.act{background:#111;color:#fff;border-color:#111}main{padding:12px;max-width:1100px;margin:auto}section{display:none}section.act{display:block}label{font-size:12px;color:#555}input,select,textarea{width:100%;padding:6px 8px;border:1px solid #e5e7eb;border-radius:8px}textarea{min-height:72px}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #e5e7eb;padding:6px;text-align:left;font-size:13px}th{position:sticky;top:0;background:#fafafa;color:#666}a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}.row{display:flex;gap:8px;flex-wrap:wrap}.col{flex:1 1 220px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px;margin-bottom:12px}.muted{color:#666;font-size:12px}.chip{display:inline-block;background:#eef2ff;border:1px solid #e0e7ff;border-radius:999px;padding:3px 8px;font-size:12px;margin-right:4px}.heat{display:grid;gap:6px}.cells{display:grid;gap:2px}.c{min-height:22px;border:1px solid #e5e7eb;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}.g{background:#ecfdf5}.y{background:#fffbeb}.r{background:#fef2f2}.actions{display:flex;gap:6px;flex-wrap:wrap}</style></head><body><header><h1>MAESTRO – Concise Prototype <span id="kpiChip" class="chip">KPI …</span></h1><nav id="tabs"></nav></header><main>
-<section id="FORM_New_Request" class="act"><div class="card"><div class="row"><div class="col"><label>Customer</label><select id="rqCustomer"></select></div><div class="col"><label>Engine</label><select id="rqEngine"></select></div><div class="col"><label>Request Type</label><select id="rqType"></select></div><div class="col"><label>Urgency</label><select id="rqUrgency"></select></div><div class="col"><label>Status</label><select id="rqStatus"></select></div><div class="col"><label>Shop</label><select id="rqShop"></select></div><div class="col"><label>Location</label><select id="rqLocation"></select></div><div class="col"><label>Date</label><input type="date" id="rqDate"></div><div class="col"><label>Estimated End</label><input type="date" id="rqEstEnd" readonly></div></div><label>Notes</label><textarea id="rqNotes"></textarea><div class="actions"><button id="btnCreateReq">Create Request</button></div><div class="muted">Estimated End = sum(default op durations for type) + buffer.</div></div><div class="card"><b>Required Ops per Request Type</b><div id="reqTypeHelper" style="margin-top:6px"></div></div><div class="card"><b>Capacity Lookup</b><div class="row" style="margin-top:6px"><div class="col"><label>Shop</label><select id="capShop"></select></div><div class="col"><label>Date</label><input type="date" id="capDate"></div><div class="col"><label>Operation Type</label><select id="capOp"></select></div><div class="col" style="align-self:end"><button id="btnCapLookup">Lookup</button></div></div><div id="capResult" class="muted" style="margin-top:6px"></div></div></section>
-<section id="FORM_Edit_Operations"><div class="card"><div class="row"><div class="col"><label>Op ID</label><input id="opId" readonly placeholder="(auto)"></div><div class="col"><label>Request</label><select id="opReq"></select></div><div class="col"><label>Status</label><select id="opStatus"></select></div><div class="col"><label>Shop</label><select id="opShop"></select></div><div class="col"><label>Op Type</label><select id="opType"></select></div><div class="col"><label>Start</label><input type="date" id="opStart"></div><div class="col"><label>Dur (h)</label><input type="number" id="opDur" min="1" step="1"></div><div class="col"><label>Finish</label><input type="date" id="opFinish" readonly></div></div><div class="actions"><button id="btnSaveOp">Save</button><button id="btnDeleteOp">Delete</button><span id="opMode" class="chip">New</span></div><div class="muted">Op types filtered by shop. Duration preloads from defaults.</div></div><div class="card"><b>Shop Capability</b><div id="shopHelper" style="margin-top:6px"></div></div></section>
-<section id="TR_Maint_Requests"><div class="card"><div class="actions"><input id="rqSearch" placeholder="Search…"></div><div class="muted">Click <b>ID</b> or <b>Ops #</b> to navigate.</div><div style="overflow:auto;max-height:60vh"><table><thead><tr><th>ID</th><th>Customer</th><th>Engine</th><th>Type</th><th>Urg</th><th>Status</th><th>Shop</th><th>Loc</th><th>Req Date</th><th>Est End</th><th>Ops #</th></tr></thead><tbody id="rqTable"></tbody></table></div></div></section>
-<section id="OP_Maint_Operations"><div class="card"><div class="actions"><input id="opSearch" placeholder="Filter op/shop/status"><input id="opFilterReq" type="number" placeholder="Request ID" style="width:140px"></div><div class="muted">Click <b>Op ID</b> to edit, <b>Request</b> to filter.</div><div style="overflow:auto;max-height:60vh"><table><thead><tr><th>Op ID</th><th>Request</th><th>Shop</th><th>Op Type</th><th>Start</th><th>Dur</th><th>Finish</th><th>Status</th></tr></thead><tbody id="opTable"></tbody></table></div></div></section>
-<section id="MD_Lists"><div class="card"><div class="actions"><button id="btnApplyMD">Apply Changes</button><button id="btnResetMD">Reset</button><button id="btnCopyJSON">Copy JSON</button><button id="btnDownloadJSON">Download</button><label><input type="file" id="fileImport" accept="application/json" hidden><span class="chip" style="cursor:pointer" id="btnImport">Import JSON</span></label></div><div class="row" id="mdGrid"></div><div class="card"><b>Mapping: Request Type → 4 Ops</b><div id="mappingTable" style="margin-top:6px"></div></div><div class="card"><b>Default Duration (h)</b><div id="durationTable" style="margin-top:6px"></div></div><div class="card"><b>JSON Viewer</b><div id="jsonViewer" style="margin-top:6px"></div></div></div></section>
-<section id="KPI_Dashboard"><div class="card"><b>On‑time % (Urgent)</b><div id="kpiUrgent" style="font-size:36px;font-weight:800;margin:6px 0">—%</div><div class="muted">Urgent = High/Critical. On‑time if max op finish ≤ Est End.</div></div><div class="card"><b>Capacity Heatmap (8 weeks)</b><div id="heatmap" style="margin-top:6px"></div></div></section>
-</main><script>const S={mdLists:{},requestTypeToOps:{},opDur:{},shops:[],shopCapabilities:{},requests:[],operations:[],tabs:["FORM_New_Request","FORM_Edit_Operations","TR_Maint_Requests","OP_Maint_Operations","MD_Lists","KPI_Dashboard"],seq:{req:1000,op:5000}};const F=(d)=>new Date(d).toISOString().slice(0,10),TD=()=>F(new Date()),AD=(d,n)=>{const t=new Date(d);t.setDate(t.getDate()+n);return F(t)},AH=(d,h)=>{const t=new Date(d);t.setHours(t.getHours()+h);return F(t)},R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a,P=a=>a[Math.floor(Math.random()*a.length)],U=a=>[...new Set(a)];function tabNav(){const n=document.getElementById('tabs');n.innerHTML='';S.tabs.forEach(id=>{const b=document.createElement('button');b.className='tab'+(document.getElementById(id).classList.contains('act')?' act':'');b.textContent=id.replace(/_/g,' ');b.onclick=()=>sw(id);n.appendChild(b)})}function sw(id){document.querySelectorAll('section').forEach(s=>s.classList.remove('act'));document.getElementById(id).classList.add('act');document.querySelectorAll('button.tab').forEach(t=>t.classList.toggle('act',t.textContent.trim()===id.replace(/_/g,' ')))}function fill(id,arr){const s=document.getElementById(id);if(!s)return;s.innerHTML='';arr.forEach(x=>{const o=document.createElement('option');o.value=o.textContent=x;s.appendChild(o)})}
-function seedMasterData(){S.mdLists={Urgency:["Low","Normal","High","Critical"],Status:["Planned","In Progress","Done","Blocked"],Shop:["Alpha","Bravo","Charlie","Delta","Echo","Foxtrot","Golf","Hotel"],Location:["Paris","Lyon","Hamburg","Madrid","Turin"],"Operation Type":["Disassembly","Cleaning","Inspection","Repair","Reassembly","Test Bench","Software Update","Calibration","Module Swap","Welding","Painting","Quality Check"],"Engine Model":["AeroX-200","AeroX-300","SkyJet-9","Falcon-21","Orion-7"],Customer:["Air France","Lufthansa","Iberia","EasyJet","Ryanair","KLM"],"Request Type":["Inspection","Repair","Overhaul","Upgrade","Diagnostics"]};S.shops=[...S.mdLists.Shop];const ops=S.mdLists["Operation Type"];S.requestTypeToOps={};S.mdLists["Request Type"].forEach(rt=>{let s=[];while(s.length<4){const o=P(ops);if(!s.includes(o))s.push(o)}S.requestTypeToOps[rt]=s});S.opDur={};ops.forEach(o=>S.opDur[o]=R(3,16));S.shopCapabilities={};S.shops.forEach(s=>{const allowed=U(Array(R(3,6)).fill(0).map(()=>P(ops)));const loc=P(S.mdLists.Location);const exc={};for(let i=0;i<6;i++){exc[AD(TD(),R(0,30))]=R(3,12)}S.shopCapabilities[s]={location:loc,defaultCap:R(6,12),allowedOps:allowed,exceptions:exc}})}
-function seedTransactions(){S.requests=[];S.operations=[];S.seq={req:1000,op:5000};for(let i=0;i<50;i++){const cust=P(S.mdLists.Customer),eng=P(S.mdLists["Engine Model"]),type=P(S.mdLists["Request Type"]),urg=P(S.mdLists.Urgency),st=P(S.mdLists.Status),shop=P(S.shops),loc=S.shopCapabilities[shop].location,date=AD(TD(),-R(0,60)),est=estEnd(type,date),id=++S.seq.req;S.requests.push({id,customer:cust,engine:eng,type:Rt(type),urgency:urg,status:st,shop,location:loc,date,estEnd:est,notes:"Seed"})}while(S.operations.length<200){const rq=P(S.requests),ops=U([...S.requestTypeToOps[rq.type],...pickSome(S.mdLists["Operation Type"],R(0,1))]),ot=P(ops),shop=P(S.shops.filter(sh=>S.shopCapabilities[sh].allowedOps.includes(ot))||[rq.shop]),start=AD(rq.date,R(0,20)),dur=S.opDur[ot]||R(2,12),finish=AH(start,dur),st=P(S.mdLists.Status),id=++S.seq.op;S.operations.push({id,requestId:rq.id,shop,opType:ot,start,dur,finish,status:st})}}function pickSome(a,n){const b=[...a],o=[];for(let i=0;i<n&&b.length;i++){const ix=R(0,b.length-1);o.push(b[ix]);b.splice(ix,1)}return o}
-function renderReqTypeHelper(){const host=document.getElementById('reqTypeHelper');host.innerHTML='';S.mdLists["Request Type"].forEach(rt=>{const d=document.createElement('div');d.className='muted';d.innerHTML=`<b>${rt}</b> — ${S.requestTypeToOps[rt].map(o=>`<span class=\"chip\">${o}</span>`).join(' ')}`;host.appendChild(d)})}
-function renderShopHelper(sel){const host=document.getElementById('shopHelper');const s=sel||document.getElementById('opShop')?.value||S.shops[0];const c=S.shopCapabilities[s];if(!c){host.textContent='No data';return}host.innerHTML=`<div class="muted">Location: <b>${c.location}</b> · Default cap/day: <b>${c.defaultCap}</b></div><div style="margin-top:4px">${c.allowedOps.map(o=>`<span class=chip>${o}</span>`).join(' ')}</div>`}
-function capFor(shop,date){const c=S.shopCapabilities[shop];if(!c)return{capacity:0,used:0,free:0};const cap=c.exceptions[date]??c.defaultCap;const used=S.operations.filter(o=>o.shop===shop&&o.start===date).length;return{capacity:cap,used,free:Math.max(cap-used,0)}}function onCapLookup(){const s=document.getElementById('capShop').value,d=document.getElementById('capDate').value||TD(),o=document.getElementById('capOp').value,{capacity,used,free}=capFor(s,d);document.getElementById('capResult').innerHTML=`<b>${d}</b> @ <b>${s}</b> (${o}): cap <b>${capacity}</b>, used <b>${used}</b>, free <b>${free}</b>`}
-function estEnd(rt,dt){if(!rt||!dt)return'';let h=0;S.requestTypeToOps[rt].forEach(o=>h+=(S.opDur[o]||8));return AH(dt,h+24)}function recalc(){document.getElementById('rqEstEnd').value=estEnd(document.getElementById('rqType').value,document.getElementById('rqDate').value)}function must(x){for(const[k,v]of Object.entries(x))if(!v){alert('Missing: '+k);return false}return true}
-function onCreateRequest(){const r={customer:V('rqCustomer'),engine:V('rqEngine'),type:V('rqType'),urgency:V('rqUrgency'),status:V('rqStatus'),shop:V('rqShop'),location:V('rqLocation'),date:V('rqDate'),estEnd:V('rqEstEnd'),notes:(V('rqNotes')||'').trim()};if(!must(r))return;r.id=++S.seq.req;S.requests.push(r);fills();rendReq();rendJSON();updKPI();alert('Request #'+r.id+' created')}function V(id){return document.getElementById(id).value}
-function onShop(){const s=V('opShop');const a=S.shopCapabilities[s]?.allowedOps||S.mdLists["Operation Type"];fill('opType',a);renderShopHelper(s)}function onType(){const t=V('opType');document.getElementById('opDur').value=S.opDur[t]||8;onStartDur()}function onStartDur(){const st=V('opStart'),d=parseInt(V('opDur')||'0',10);document.getElementById('opFinish').value=(st&&d>0)?AH(st,d):''}
-function onSaveOp(){const id=V('opId');const p={requestId:parseInt(V('opReq'),10),status:V('opStatus'),shop:V('opShop'),opType:V('opType'),start:V('opStart'),dur:parseInt(V('opDur')||'0',10),finish:V('opFinish')};if(!must(p))return;if(id){const i=S.operations.findIndex(o=>String(o.id)===String(id));if(i>=0)S.operations[i]={id:S.operations[i].id,...p}}else{const nid=++S.seq.op;S.operations.push({id:nid,...p});document.getElementById('opId').value=nid}rendOps();rendJSON();updKPI();document.getElementById('opMode').textContent=id?'Updated':'Created'}function onDelOp(){const id=V('opId');if(!id)return alert('Nothing to delete');const i=S.operations.findIndex(o=>String(o.id)===String(id));if(i>=0){S.operations.splice(i,1);rendOps();rendJSON();updKPI();alert('Deleted #'+id)}else alert('Not found')}function loadOp(id){const o=S.operations.find(x=>String(x.id)===String(id));if(!o)return;['opId','opReq','opStatus','opShop','opType','opStart','opDur','opFinish'].forEach(()=>{});document.getElementById('opId').value=o.id;document.getElementById('opReq').value=o.requestId;document.getElementById('opStatus').value=o.status;document.getElementById('opShop').value=o.shop;onShop();document.getElementById('opType').value=o.opType;onType();document.getElementById('opStart').value=o.start;document.getElementById('opDur').value=o.dur;onStartDur();sw('FORM_Edit_Operations');document.getElementById('opMode').textContent='Edit'}
-function rendReq(){const term=(document.getElementById('rqSearch')?.value||'').toLowerCase();const tb=document.getElementById('rqTable');tb.innerHTML='';S.requests.filter(r=>{const s=`${r.customer} ${r.engine} ${r.type} ${r.status} ${r.urgency}`.toLowerCase();return !term||s.includes(term)}).sort((a,b)=>b.id-a.id).forEach(r=>{const n=S.operations.filter(o=>o.requestId===r.id).length;const tr=document.createElement('tr');tr.innerHTML=`<td><a href="#" data-rid="${r.id}">${r.id}</a></td><td>${r.customer}</td><td>${r.engine}</td><td>${r.type}</td><td>${r.urgency}</td><td>${r.status}</td><td>${r.shop}</td><td>${r.location}</td><td>${r.date}</td><td>${r.estEnd}</td><td><a href="#" data-rid="${r.id}">${n}</a></td>`;tb.appendChild(tr)});tb.querySelectorAll('a[data-rid]').forEach(a=>a.onclick=(e)=>{e.preventDefault();toOpsByReq(a.getAttribute('data-rid'))})}
-function toOpsByReq(id){document.getElementById('opFilterReq').value=id;sw('OP_Maint_Operations');rendOps();location.hash=`#tab=OP_Maint_Operations&req=${encodeURIComponent(id)}`}
-function rendOps(){const t=(document.getElementById('opSearch')?.value||'').toLowerCase();const rf=parseInt(document.getElementById('opFilterReq')?.value||'0',10);const tb=document.getElementById('opTable');tb.innerHTML='';S.operations.filter(o=>{const s=`${o.opType} ${o.shop} ${o.status}`.toLowerCase();if(t&&!s.includes(t))return false;return !rf||o.requestId===rf}).sort((a,b)=>b.id-a.id).forEach(o=>{const tr=document.createElement('tr');tr.innerHTML=`<td><a href="#" data-oid="${o.id}">${o.id}</a></td><td><a href="#" data-rid="${o.requestId}">${o.requestId}</a></td><td>${o.shop}</td><td>${o.opType}</td><td>${o.start}</td><td>${o.dur}</td><td>${o.finish}</td><td>${o.status}</td>`;tb.appendChild(tr)});tb.querySelectorAll('a[data-oid]').forEach(a=>a.onclick=(e)=>{e.preventDefault();loadOp(a.getAttribute('data-oid'))});tb.querySelectorAll('a[data-rid]').forEach(a=>a.onclick=(e)=>{e.preventDefault();toOpsByReq(a.getAttribute('data-rid'))})}
-function rendMD(){const host=document.getElementById('mdGrid');host.innerHTML='';Object.entries(S.mdLists).forEach(([n,items])=>{const d=document.createElement('div');d.className='col';d.innerHTML=`<div class="card"><b>${n}</b><textarea id="md_${cid(n)}">${items.join('\n')}</textarea></div>`;host.appendChild(d)})}function rendMap(){const host=document.getElementById('mappingTable');host.innerHTML='';const ops=S.mdLists["Operation Type"];const t=document.createElement('table');t.innerHTML='<thead><tr><th>Request Type</th><th>Op 1</th><th>Op 2</th><th>Op 3</th><th>Op 4</th></tr></thead>';const b=document.createElement('tbody');S.mdLists["Request Type"].forEach(rt=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${rt}</td>`;for(let i=0;i<4;i++){const s=document.createElement('select');s.id=`map_${cid(rt)}_${i}`;ops.forEach(o=>{const op=document.createElement('option');op.value=op.textContent=o;s.appendChild(op)});s.value=S.requestTypeToOps[rt][i]||ops[0];const td=document.createElement('td');td.appendChild(s);tr.appendChild(td)}b.appendChild(tr)});t.appendChild(b);host.appendChild(t)}function rendDur(){const host=document.getElementById('durationTable');host.innerHTML='';const t=document.createElement('table');t.innerHTML='<thead><tr><th>Operation Type</th><th>Default (h)</th></tr></thead>';const b=document.createElement('tbody');S.mdLists["Operation Type"].forEach(o=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${o}</td><td><input type=number id="dur_${cid(o)}" min=1 step=1 value="${S.opDur[o]||8}"></td>`;b.appendChild(tr)});t.appendChild(b);host.appendChild(t)}
-function cid(s){return s.replace(/\s+/g,'_').replace(/[^\w_\-]/g,'')}function applyMD(){const nl={};Object.keys(S.mdLists).forEach(n=>{const ta=document.getElementById('md_'+cid(n));nl[n]=U(ta.value.split(/\n+/).map(x=>x.trim()).filter(Boolean))});S.mdLists=nl;S.shops=[...S.mdLists.Shop];const nm={};S.mdLists["Request Type"].forEach(rt=>{const a=[];for(let i=0;i<4;i++){const s=document.getElementById(`map_${cid(rt)}_${i}`);if(s)a.push(s.value)}while(a.length<4)a.push(P(S.mdLists["Operation Type"]));nm[rt]=U(a).slice(0,4);while(nm[rt].length<4){const o=P(S.mdLists["Operation Type"]);if(!nm[rt].includes(o))nm[rt].push(o)}});S.requestTypeToOps=nm;const nd={};S.mdLists["Operation Type"].forEach(o=>{const v=parseInt(document.getElementById('dur_'+cid(o))?.value||'8',10);nd[o]=Math.max(1,Math.min(v||8,96))});S.opDur=nd;const prev={...S.shopCapabilities};S.shopCapabilities={};S.shops.forEach(s=>{const k=prev[s];const allowed=k?k.allowedOps.filter(o=>S.mdLists["Operation Type"].includes(o)):U(Array(R(3,6)).fill(0).map(()=>P(S.mdLists["Operation Type"])));S.shopCapabilities[s]={location:k?.location||P(S.mdLists.Location),defaultCap:k?.defaultCap||R(6,12),allowedOps:allowed.length?allowed:pickSome(S.mdLists["Operation Type"],4),exceptions:k?.exceptions||{}}});fills();renderReqTypeHelper();renderShopHelper();rendReq();rendOps();rendMap();rendDur();kpi();rendJSON();updKPI();alert('Master data updated')}
-function kpi(){const urg=S.requests.filter(r=>['High','Critical'].includes(r.urgency));let ok=0,tot=0;urg.forEach(r=>{const ops=S.operations.filter(o=>o.requestId===r.id);if(!ops.length)return;tot++;const max=ops.reduce((m,o)=>o.finish>m?o.finish:m,'1970-01-01');if(max<=r.estEnd)ok++});const p=tot?Math.round(ok/tot*100):0;document.getElementById('kpiUrgent').textContent=p+'%';const host=document.getElementById('heatmap');host.innerHTML='';const shopsByLoc={};Object.entries(S.shopCapabilities).forEach(([s,c])=>{(shopsByLoc[c.location]??=[]).push(s)});const start=TD();const weeks=8;Object.entries(shopsByLoc).forEach(([loc,shops])=>{const wrap=document.createElement('div');wrap.className='heat';wrap.innerHTML=`<div class=muted><b>${loc}</b> (${shops.length} shops)</div>`;shops.forEach(s=>{const row=document.createElement('div');row.className='cells';row.style.gridTemplateColumns=`repeat(${weeks},1fr)`;for(let w=0;w<weeks;w++){const wk=AD(start,w*7);const util=utilW(s,wk);const cls=util<.6?'g':util<.9?'y':'r';const cell=document.createElement('div');cell.className='c '+cls;cell.title=`${s} · week ${wk}: ${(util*100).toFixed(0)}%`;cell.textContent=(util*100).toFixed(0)+'%';row.appendChild(cell)}wrap.appendChild(document.createElement('div')).textContent=s;wrap.appendChild(row)});host.appendChild(wrap)})}function utilW(shop,wk){const c=S.shopCapabilities[shop];if(!c)return 0;const cap=c.defaultCap*5;let used=0;S.operations.forEach(o=>{if(o.shop===shop&&o.start>=wk&&o.start<=AD(wk,6))used++});return cap?Math.min(used/cap,1.2):0}function updKPI(){const urg=S.requests.filter(r=>['High','Critical'].includes(r.urgency));let ok=0,tot=0;urg.forEach(r=>{const ops=S.operations.filter(o=>o.requestId===r.id);if(!ops.length)return;tot++;const m=ops.reduce((x,o)=>o.finish>x?o.finish:x,'1970-01-01');if(m<=r.estEnd)ok++});const p=tot?Math.round(ok/tot*100):0;document.getElementById('kpiChip').textContent='KPI Urgent '+p+'%'}
-function jsonSections(){return{mdLists:S.mdLists,requestTypeToOps:S.requestTypeToOps,opDur:S.opDur,shops:S.shops,shopCapabilities:S.shopCapabilities,requests:S.requests,operations:S.operations,seq:S.seq}}function rendJSON(){const host=document.getElementById('jsonViewer');host.innerHTML='';Object.entries(jsonSections()).forEach(([k,v])=>{const d=document.createElement('details');const s=document.createElement('summary');s.textContent=k;const pre=document.createElement('pre');pre.textContent=JSON.stringify(v,null,2);d.append(s,pre);host.appendChild(d)})}function copyJSON(){navigator.clipboard.writeText(JSON.stringify(jsonSections(),null,2)).then(()=>alert('Copied'))}function dlJSON(){const blob=new Blob([JSON.stringify(jsonSections(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='maestro_state_'+TD()+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}function doImport(f){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);["mdLists","requestTypeToOps","opDur","shops","shopCapabilities","requests","operations","seq"].forEach(k=>{if(!(k in d))throw new Error('Missing '+k)});Object.assign(S,d);tabNav();fills();renderReqTypeHelper();renderShopHelper();rendReq();rendOps();rendMD();rendMap();rendDur();kpi();rendJSON();updKPI();alert('Import OK')}catch(e){alert('Invalid JSON: '+e.message)}};r.readAsText(f)}
-function fills(){fill('rqCustomer',S.mdLists.Customer);fill('rqEngine',S.mdLists["Engine Model"]);fill('rqType',S.mdLists["Request Type"]);fill('rqUrgency',S.mdLists.Urgency);fill('rqStatus',S.mdLists.Status);fill('rqShop',S.mdLists.Shop);fill('rqLocation',S.mdLists.Location);fill('capShop',S.mdLists.Shop);fill('capOp',S.mdLists["Operation Type"]);fill('opReq',S.requests.map(r=>r.id).sort((a,b)=>a-b));fill('opStatus',S.mdLists.Status);fill('opShop',S.mdLists.Shop);onShop();onType()}function bind(){document.getElementById('btnCreateReq').onclick=onCreateRequest;document.getElementById('rqType').onchange=recalc;document.getElementById('rqDate').onchange=recalc;document.getElementById('btnCapLookup').onclick=onCapLookup;document.getElementById('btnSaveOp').onclick=onSaveOp;document.getElementById('btnDeleteOp').onclick=onDelOp;document.getElementById('opShop').onchange=onShop;document.getElementById('opType').onchange=onType;document.getElementById('opStart').onchange=onStartDur;document.getElementById('opDur').oninput=onStartDur;document.getElementById('rqSearch').oninput=rendReq;document.getElementById('opSearch').oninput=rendOps;document.getElementById('opFilterReq').oninput=rendOps;document.getElementById('btnApplyMD').onclick=applyMD;document.getElementById('btnResetMD').onclick=()=>{seedMasterData();seedTransactions();fills();renderReqTypeHelper();renderShopHelper();rendReq();rendOps();rendMD();rendMap();rendDur();kpi();rendJSON();updKPI();alert('Re-seeded')};document.getElementById('btnCopyJSON').onclick=copyJSON;document.getElementById('btnDownloadJSON').onclick=dlJSON;document.getElementById('btnImport').onclick=()=>document.getElementById('fileImport').click();document.getElementById('fileImport').onchange=e=>{if(e.target.files[0])doImport(e.target.files[0])}}
-function applyHash(){const p=new URLSearchParams((location.hash||'').replace(/^#/,''));const t=p.get('tab');if(t&&document.getElementById(t))sw(t);const r=p.get('req');if(r&&document.getElementById('opFilterReq')){document.getElementById('opFilterReq').value=parseInt(r,10)||'';if(t==='OP_Maint_Operations'||document.getElementById('OP_Maint_Operations').classList.contains('act'))rendOps()}}
-function Rt(x){return x}function init(){seedMasterData();seedTransactions();tabNav();fills();renderReqTypeHelper();renderShopHelper();rendReq();rendOps();rendMD();rendMap();rendDur();kpi();rendJSON();bind();document.getElementById('rqDate').value=TD();recalc();updKPI();applyHash();addEventListener('hashchange',applyHash)}document.addEventListener('DOMContentLoaded',init);
-</script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MAESTRO – Aircraft Engine Maintenance (Prototype)</title>
+  <style>
+    :root{
+      --bg:#f7f7fb; --card:#ffffff; --ink:#1f2937; --muted:#6b7280; --accent:#2563eb;
+      --accent-2:#10b981; --warn:#f59e0b; --danger:#ef4444; --border:#e5e7eb;
+      --chip:#f1f5f9; --sticky:#f8fafc; --req:#fde68a; --opt:#bfdbfe;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#fff,rgba(255,255,255,.96));border-bottom:1px solid var(--border)}
+    .bar{max-width:1200px;margin:auto;display:flex;align-items:center;gap:16px;padding:14px 20px}
+    .logo{font-weight:800;letter-spacing:.5px}
+    .logo small{font-weight:600;color:var(--muted)}
+    nav.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+    nav.tabs button{appearance:none;border:1px solid var(--border);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;color:var(--ink)}
+    nav.tabs button.active{border-color:var(--accent);color:#fff;background:var(--accent)}
+    main{max-width:1200px;margin:18px auto;padding:0 20px 40px}
+    .grid{display:grid;gap:16px}
+    .two-cols{grid-template-columns:1.4fr .9fr}
+    @media (max-width: 980px){.two-cols{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 4px 10px rgba(0,0,0,.04);padding:16px}
+    h1,h2{margin:0 0 10px}
+    h2{font-size:18px}
+    h3{margin:16px 0 8px;font-size:15px;color:var(--muted)}
+    .row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+    .row .col-2{grid-column:span 2}
+    .row .col-3{grid-column:span 3}
+    .row .col-6{grid-column:span 6}
+    label{font-size:12px;color:var(--muted)}
+    input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--ink)}
+    input[readonly]{background:#fafafa}
+    .req{background:var(--req)}
+    .opt{background:var(--opt)}
+    .btn{appearance:none;border:1px solid var(--border);background:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btn.ghost{background:transparent}
+    .btn.success{background:var(--accent-2);border-color:var(--accent-2);color:#fff}
+    .btn.warn{background:var(--warn);border-color:var(--warn);color:#111}
+    .btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+    .btnbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .helper{font-size:13px;line-height:1.35}
+    .chips{display:flex;flex-wrap:wrap;gap:6px}
+    .chip{background:var(--chip);border:1px solid var(--border);padding:6px 10px;border-radius:999px;font-size:12px}
+    .muted{color:var(--muted)}
+    .tab{display:none}
+    .tab.active{display:block}
+
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    thead th{position:sticky;top:0;background:var(--sticky);border-bottom:1px solid var(--border);font-size:12px;text-align:left;padding:10px}
+    tbody td{border-bottom:1px dashed var(--border);padding:10px;vertical-align:top;font-size:13px}
+    tbody tr:hover{background:#fafafa}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
+    .pill.aog{background:#fef3c7;border-color:#f59e0b}
+    .pill.routine{background:#e0f2fe;border-color:#38bdf8}
+    .link{color:var(--accent);cursor:pointer;text-decoration:underline}
+
+    .progress{height:10px;background:#eef2ff;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+    .progress>span{display:block;height:100%;background:var(--accent)}
+    .heatmap{display:grid;grid-template-columns:repeat(14,20px);gap:4px}
+    .cell{width:20px;height:20px;border-radius:4px;border:1px solid var(--border);background:#e5e7eb}
+
+    pre.json{max-height:320px;overflow:auto;background:#0b1021;color:#e6edf3;padding:12px;border-radius:12px;border:1px solid #111827}
+    code.k{color:#60a5fa}
+    .toolbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin:8px 0}
+
+    .note{font-size:12px;color:var(--muted)}
+    .heatmapRow{display:flex;align-items:center;gap:8px;margin-top:6px;margin-bottom:6px}
+    .heatmapRow .label{width:160px;font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="logo">MAESTRO <small>• Aircraft Engine Maintenance</small></div>
+      <nav class="tabs" id="tabs"></nav>
+    </div>
+  </header>
+  <main>
+    <!-- New Request -->
+    <section id="tab-FORM_New_Request" class="tab active">
+      <div class="grid two-cols">
+        <div class="card">
+          <h2>Nouvelle Demande</h2>
+          <div class="note">Champs obligatoires en jaune, optionnels en bleu.</div>
+          <form id="newReqForm">
+            <div class="row">
+              <div class="col-2">
+                <label>Modèle moteur *</label>
+                <select id="reqEngineModel" class="req" required></select>
+              </div>
+              <div class="col-2">
+                <label>N° de série moteur *</label>
+                <input id="reqEngineSerial" class="req" placeholder="ex. CFM56-7B SN 123456" required />
+              </div>
+              <div class="col-2">
+                <label>Client *</label>
+                <select id="reqCustomer" class="req" required></select>
+              </div>
+              <div class="col-2">
+                <label>Urgence *</label>
+                <select id="reqUrgency" class="req" required></select>
+              </div>
+              <div class="col-2">
+                <label>Type de demande *</label>
+                <select id="reqType" class="req" required></select>
+              </div>
+              <div class="col-2">
+                <label>Date de demande *</label>
+                <input type="date" id="reqDate" class="req" required />
+              </div>
+              <div class="col-2">
+                <label>Date de fin estimée (ETA)</label>
+                <input type="date" id="reqEstEnd" readonly />
+              </div>
+              <div class="col-6">
+                <label>Notes</label>
+                <input id="reqNotes" class="opt" placeholder="Contexte client, symptômes, contraintes Test Cell, etc." />
+              </div>
+            </div>
+            <div class="btnbar">
+              <button type="submit" class="btn primary">Créer la demande</button>
+              <button type="button" class="btn ghost" id="btnRecalcEta">Recalculer l'ETA</button>
+            </div>
+          </form>
+        </div>
+        <div class="card">
+          <h2>Assistant</h2>
+          <h3>Opérations requises par type de demande</h3>
+          <div id="reqTypeHelper" class="helper"></div>
+          <h3>Capacity Lookup</h3>
+          <div class="row">
+            <div class="col-2">
+              <label>Atelier</label>
+              <select id="capShop"></select>
+            </div>
+            <div class="col-2">
+              <label>Type d'opération</label>
+              <select id="capOpType"></select>
+            </div>
+            <div class="col-2">
+              <label>Date</label>
+              <input type="date" id="capDate" />
+            </div>
+            <div class="col-2" style="align-self:end">
+              <button id="capCheck" class="btn">Vérifier</button>
+            </div>
+          </div>
+          <div id="capResult" class="helper" style="margin-top:8px"></div>
+          <h3>Guide Ateliers</h3>
+          <div id="shopHelper" class="helper"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Edit Operations -->
+    <section id="tab-FORM_Edit_Operations" class="tab">
+      <div class="grid two-cols">
+        <div class="card">
+          <h2>Édition d'opérations</h2>
+          <form id="opForm">
+            <div class="row">
+              <div class="col-2">
+                <label>Mode</label>
+                <input id="opMode" value="Nouveau" readonly />
+              </div>
+              <div class="col-2">
+                <label>ID Opération</label>
+                <input id="opId" readonly />
+              </div>
+              <div class="col-2">
+                <label>Demande (ID) *</label>
+                <select id="opReqId" class="req" required></select>
+              </div>
+              <div class="col-2">
+                <label>Atelier *</label>
+                <select id="opShop" class="req" required></select>
+              </div>
+              <div class="col-2">
+                <label>Type d'opération *</label>
+                <select id="opType" class="req" required></select>
+              </div>
+              <div class="col-2">
+                <label>Début *</label>
+                <input type="date" id="opStart" class="req" required />
+              </div>
+              <div class="col-2">
+                <label>Durée (jours) *</label>
+                <input type="number" id="opDur" class="req" min="1" value="1" required />
+              </div>
+              <div class="col-2">
+                <label>Fin</label>
+                <input type="date" id="opEnd" readonly />
+              </div>
+              <div class="col-2">
+                <label>Statut</label>
+                <select id="opStatus"></select>
+              </div>
+            </div>
+            <div class="btnbar">
+              <button type="submit" class="btn success">Enregistrer</button>
+              <button type="button" id="opDelete" class="btn danger" disabled>Supprimer</button>
+              <button type="button" id="opReset" class="btn ghost">Réinitialiser</button>
+              <button type="button" id="opAutoSlot" class="btn warn">Auto-planifier</button>
+            </div>
+            <div class="note" id="opMsg"></div>
+          </form>
+        </div>
+        <div class="card">
+          <h2>Aide Atelier</h2>
+          <div id="opShopHelper" class="helper"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Requests Table -->
+    <section id="tab-TR_Maint_Requests" class="tab">
+      <div class="card">
+        <h2>Demandes de maintenance</h2>
+        <div class="row" style="margin:8px 0 4px">
+          <div class="col-2"><label>Filtrer Client</label><select id="fltCustomer"></select></div>
+          <div class="col-2"><label>Filtrer Urgence</label><select id="fltUrgency"></select></div>
+          <div class="col-2"><label>Filtrer Type</label><select id="fltReqType"></select></div>
+          <div class="col-2" style="align-self:end"><button id="btnClearFilters" class="btn ghost">Réinitialiser</button></div>
+        </div>
+        <div style="overflow:auto;max-height:520px">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Modèle</th>
+                <th>Serial</th>
+                <th>Client</th>
+                <th>Urgence</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>ETA</th>
+                <th>Ops #</th>
+              </tr>
+            </thead>
+            <tbody id="requestsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Operations Table -->
+    <section id="tab-OP_Maint_Operations" class="tab">
+      <div class="card">
+        <h2>Opérations planifiées</h2>
+        <div class="row" style="margin:8px 0 4px">
+          <div class="col-2"><label>Filtrer Demande</label><select id="fltOpReq"></select></div>
+          <div class="col-2"><label>Filtrer Atelier</label><select id="fltOpShop"></select></div>
+          <div class="col-2"><label>Filtrer Type</label><select id="fltOpType"></select></div>
+          <div class="col-2" style="align-self:end"><button id="btnClearOpFilters" class="btn ghost">Réinitialiser</button></div>
+        </div>
+        <div style="overflow:auto;max-height:520px">
+          <table>
+            <thead>
+              <tr>
+                <th>Op ID</th>
+                <th>Demande</th>
+                <th>Atelier</th>
+                <th>Type</th>
+                <th>Début</th>
+                <th>Durée</th>
+                <th>Fin</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody id="operationsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Master Data & JSON -->
+    <section id="tab-MD_Lists" class="tab">
+      <div class="grid">
+        <div class="card">
+          <h2>Listes maîtres</h2>
+          <div id="mdGrid" class="grid" style="grid-template-columns:repeat(4,1fr)"></div>
+          <div class="btnbar"><button id="applyMD" class="btn primary">Appliquer les changements</button></div>
+        </div>
+        <div class="card">
+          <h2>Mapping Type de demande → 4 opérations</h2>
+          <div style="overflow:auto;max-height:260px">
+            <table>
+              <thead><tr><th>Type de demande</th><th>Opérations (ordre)</th></tr></thead>
+              <tbody id="mapTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Durées standard (jours)</h2>
+          <div style="overflow:auto;max-height:260px">
+            <table>
+              <thead><tr><th>Type d'opération</th><th>Durée</th></tr></thead>
+              <tbody id="durTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <h2>JSON Viewer</h2>
+          <div class="toolbar">
+            <button class="btn" id="jsonCopy">Copier</button>
+            <button class="btn" id="jsonDownload">Télécharger</button>
+          </div>
+          <pre class="json" id="jsonOut"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPI Dashboard -->
+    <section id="tab-KPI_Dashboard" class="tab">
+      <div class="grid">
+        <div class="card">
+          <h2>Ponctualité AOG</h2>
+          <div id="kpiAOG" class="helper"></div>
+          <div class="progress" style="margin-top:8px"><span id="kpiAOGBar" style="width:0%"></span></div>
+        </div>
+        <div class="card">
+          <h2>Charge par atelier (14 jours)</h2>
+          <div id="kpiShopSummary" class="helper"></div>
+          <div id="shopHeatContainer"></div>
+        </div>
+        <div class="card">
+          <h2>Diagnostics</h2>
+          <div class="btnbar"><button id="btnSelfTest" class="btn">Lancer les tests</button></div>
+          <div id="selfTest" class="helper"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  const S = {
+    mdLists:{}, requestTypeToOps:{}, opDur:{}, shops:[], shopCapabilities:{},
+    requests:[], operations:[], bookings:{}, tabs:["FORM_New_Request","FORM_Edit_Operations","TR_Maint_Requests","OP_Maint_Operations","MD_Lists","KPI_Dashboard"]
+  };
+
+  // ---------- Utilities ----------
+  const $ = sel => document.querySelector(sel);
+  const el = (tag, attrs={}, children=[])=>{const n=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>{if(k=="class") n.className=v; else if(k=="html") n.innerHTML=v; else n.setAttribute(k,v)});children.forEach(c=>n.appendChild(c));return n};
+  const fmt = d=> new Date(d).toISOString().slice(0,10);
+  const addDays = (d,days)=>{const nd=new Date(d);nd.setDate(nd.getDate()+days);return nd};
+  const rangeDays=(start, dur)=>{const out=[]; for(let i=0;i<dur;i++) out.push(fmt(addDays(start,i))); return out};
+  const rnd = (arr)=> arr[Math.floor(Math.random()*arr.length)];
+  const idGen = (p, n)=> p + String(n).padStart(3,'0');
+
+  // ---------- Seed Data ----------
+  function seedMasterData(){
+    S.mdLists = {
+      Urgency:["AOG (Aircraft On Ground)","Routine"],
+      Status:["Planned","In Progress","Completed"],
+      Shop:["Engine Shop","Cleaning Shop","Test Cell"],
+      Location:["Hangar 1","Hangar 2","Test Facility"],
+      "Operation Type":["Inspection","Disassembly","Repair","Cleaning","Assembly","Test Run"],
+      "Engine Model":["CFM56","LEAP-1A","GE90"],
+      Customer:["Airline A","Airline B","Leasing Company"],
+      "Request Type":["Overhaul","Quick Inspection","Deep Repair"]
+    };
+    S.requestTypeToOps = {
+      "Overhaul":["Disassembly","Repair","Assembly","Test Run"],
+      "Quick Inspection":["Inspection","Cleaning","Assembly","Test Run"],
+      "Deep Repair":["Disassembly","Repair","Assembly","Test Run"]
+    };
+    S.opDur = {"Inspection":2,"Disassembly":3,"Repair":5,"Cleaning":1,"Assembly":4,"Test Run":2};
+    S.shops = ["Engine Shop","Cleaning Shop","Test Cell"];
+    S.shopCapabilities = {
+      "Engine Shop":{ops:["Inspection","Disassembly","Repair","Assembly"], capPerDay:8, location:"Hangar 1", exceptions:[]},
+      "Cleaning Shop":{ops:["Cleaning"], capPerDay:12, location:"Hangar 2", exceptions:[]},
+      "Test Cell":{ops:["Test Run"], capPerDay:3, location:"Test Facility", exceptions:[]}
+    };
+    // seed a couple of Test Cell down days (exceptions)
+    const today = fmt(new Date());
+    S.shopCapabilities["Test Cell"].exceptions = [fmt(addDays(today,3)), fmt(addDays(today,9))];
+  }
+
+  function seedTransactions(){
+    S.requests = []; S.operations = []; S.bookings = {};
+    const models = S.mdLists["Engine Model"], customers = S.mdLists.Customer, urg = S.mdLists.Urgency, rtypes = S.mdLists["Request Type"];
+    let rid = 1, oid = 1;
+
+    for(let i=0;i<10;i++){
+      const model = rnd(models);
+      const serial = `${model} SN ${Math.floor(100000+Math.random()*900000)}`;
+      const customer = Math.random()<0.4?customers[0]:rnd(customers);
+      const urgency = Math.random()<0.35?"AOG (Aircraft On Ground)":"Routine";
+      const rtype = rnd(rtypes);
+      const reqDate = fmt(addDays(new Date(), -Math.floor(Math.random()*28)));
+      const eta = estimateETA(rtype, reqDate);
+      S.requests.push({id:idGen('R',rid++), engineModel:model, engineSerial:serial, customer, urgency, reqType:rtype, reqDate, eta, notes:""});
+    }
+
+    // For each request, schedule its 4 required ops in order, respecting capacity
+    for(const R of S.requests){
+      let lastEnd = new Date(R.reqDate);
+      const ops = S.requestTypeToOps[R.reqType] || [];
+      for(const ot of ops){
+        const shop = findShopForOp(ot);
+        if(!shop) continue;
+        const dur = S.opDur[ot]||1;
+        const start = findStartWithCapacity(shop, lastEnd, dur);
+        const end = addDays(start, dur);
+        const op = {id:idGen('O',oid++), reqId:R.id, shop, opType:ot, start:fmt(start), duration:dur, end:fmt(end), status:"Planned"};
+        book(shop, start, dur);
+        S.operations.push(op);
+        lastEnd = end;
+        if(S.operations.length>=30) break;
+      }
+      if(S.operations.length>=30) break;
+    }
+  }
+
+  // ---------- Capacity & Scheduling ----------
+  function findShopForOp(opType){
+    return S.shops.find(sh => S.shopCapabilities[sh].ops.includes(opType));
+  }
+  function capFor(shop, date){
+    const cap = S.shopCapabilities[shop].capPerDay || 0;
+    const isDown = (S.shopCapabilities[shop].exceptions||[]).includes(date);
+    const used = (((S.bookings[shop]||{})[date])||0);
+    return {cap:isDown?0:cap, used, free: Math.max(0,(isDown?0:cap)-used), down:isDown};
+  }
+  function canFit(shop, startDate, dur){
+    const days = rangeDays(startDate,dur);
+    for(const d of days){ const c = capFor(shop,d); if(c.free<=0) return false; }
+    return true;
+  }
+  function book(shop, startDate, dur){
+    if(!S.bookings[shop]) S.bookings[shop] = {};
+    const days = rangeDays(startDate,dur);
+    for(const d of days){ S.bookings[shop][fmt(d)] = (S.bookings[shop][fmt(d)]||0)+1; }
+  }
+  function unbook(shop, startDate, dur){
+    if(!S.bookings[shop]) return; const days = rangeDays(startDate,dur);
+    for(const d of days){ const k=fmt(d); S.bookings[shop][k] = Math.max(0,(S.bookings[shop][k]||0)-1); }
+  }
+  function findStartWithCapacity(shop, earliest, dur){
+    // search up to 120 days ahead
+    let t = new Date(earliest);
+    for(let i=0;i<120;i++){
+      if(canFit(shop,t,dur)) return t; t = addDays(t,1);
+    }
+    return new Date(earliest);
+  }
+  function estimateETA(reqType, reqDate){
+    const ops = S.requestTypeToOps[reqType]||[]; let total = 0; for(const o of ops) total += (S.opDur[o]||1);
+    // simple buffer if Test Run present
+    if(ops.includes("Test Run")) total += 1;
+    return fmt(addDays(new Date(reqDate), total));
+  }
+
+  // ---------- Rendering ----------
+  function initTabs(){
+    const tabsEl = $('#tabs'); tabsEl.innerHTML = '';
+    S.tabs.forEach(t=>{
+      const btn = el('button',{class:'', html:t.replaceAll('_',' ')}); btn.addEventListener('click',()=>activateTab(t,btn)); tabsEl.appendChild(btn);
+    });
+    // activate first
+    tabsEl.querySelector('button').classList.add('active');
+  }
+  function activateTab(name, btn){
+    document.querySelectorAll('.tab').forEach(s=>s.classList.remove('active'));
+    $('#tab-'+name).classList.add('active');
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    if(btn) btn.classList.add('active'); else {
+      document.querySelectorAll('nav.tabs button').forEach(b=>{ if(b.textContent===name.replaceAll('_',' ')) b.classList.add('active'); });
+    }
+    if(name==='KPI_Dashboard') renderKPI();
+    if(name==='MD_Lists') { renderMDGrid(); renderMappingTable(); renderDurationTable(); renderJSONViewer(); }
+    if(name==='TR_Maint_Requests') renderRequestsTable();
+    if(name==='OP_Maint_Operations') renderOperationsTable();
+  }
+
+  function populateDropdowns(){
+    // New Request
+    fillSelect('#reqEngineModel', S.mdLists["Engine Model"]);
+    fillSelect('#reqCustomer', S.mdLists.Customer);
+    fillSelect('#reqUrgency', S.mdLists.Urgency);
+    fillSelect('#reqType', S.mdLists["Request Type"]);
+    $('#reqDate').value = fmt(new Date());
+
+    // Capacity helper
+    fillSelect('#capShop', S.shops);
+    fillSelect('#capOpType', S.mdLists["Operation Type"]);
+
+    // Op editor
+    fillSelect('#opReqId', S.requests.map(r=>r.id));
+    fillSelect('#opShop', S.shops);
+    fillSelect('#opStatus', S.mdLists.Status);
+    filterOpTypesByShop();
+
+    // Filters
+    fillSelect('#fltCustomer', ['(Tous)'].concat(S.mdLists.Customer));
+    fillSelect('#fltUrgency', ['(Toutes)'].concat(S.mdLists.Urgency));
+    fillSelect('#fltReqType', ['(Tous)'].concat(S.mdLists["Request Type"]));
+
+    fillSelect('#fltOpReq', ['(Toutes)'].concat(S.requests.map(r=>r.id)));
+    fillSelect('#fltOpShop', ['(Tous)'].concat(S.shops));
+    fillSelect('#fltOpType', ['(Tous)'].concat(S.mdLists["Operation Type"]));
+  }
+  function fillSelect(sel, arr){ const s=$(sel); s.innerHTML=''; arr.forEach(v=> s.appendChild(el('option',{value:v, html:v}))); }
+
+  function renderReqTypeHelper(){
+    const box = $('#reqTypeHelper'); box.innerHTML='';
+    Object.entries(S.requestTypeToOps).forEach(([rtype,ops])=>{
+      const line = el('div',{class:'chips'});
+      line.appendChild(el('div',{class:'chip',html:`<strong>${rtype}</strong>`}));
+      ops.forEach(o=> line.appendChild(el('div',{class:'chip',html:o})));
+      box.appendChild(line);
+    });
+  }
+  function renderShopHelper(){
+    const box = $('#shopHelper'); box.innerHTML='';
+    S.shops.forEach(sh=>{
+      const sc = S.shopCapabilities[sh];
+      const wrap = el('div',{class:'helper', html:`<div><strong>${sh}</strong> • ${sc.location} • Cap/jour: <strong>${sc.capPerDay}</strong></div>`});
+      const chips = el('div',{class:'chips'});
+      sc.ops.forEach(o=> chips.appendChild(el('div',{class:'chip',html:o})));
+      wrap.appendChild(chips);
+      if((sc.exceptions||[]).length){
+        wrap.appendChild(el('div',{class:'note',html:`Exceptions: ${(sc.exceptions).join(', ')}`}));
+      }
+      box.appendChild(wrap);
+    });
+  }
+  function onCapLookup(){
+    const shop = $('#capShop').value; const date = $('#capDate').value||fmt(new Date());
+    const op = $('#capOpType').value; const cap = capFor(shop,date);
+    const msg = cap.down? `Atelier <b>${shop}</b> indisponible le ${date} (exception).` : `Capacité ${shop} le ${date}: <b>${cap.free}</b> slots libres / ${cap.cap} (utilisés: ${cap.used}).`;
+    $('#capResult').innerHTML = msg + (op && !S.shopCapabilities[shop].ops.includes(op) ? ` <span class="muted">(${op} non supportée par ${shop})</span>`: '');
+  }
+
+  function renderRequestsTable(){
+    const tbody = $('#requestsTbody'); tbody.innerHTML='';
+    const fC = $('#fltCustomer').value, fU=$('#fltUrgency').value, fT=$('#fltReqType').value;
+    const rows = S.requests.filter(r=> (fC==='(Tous)'||!fC||r.customer===fC) && (fU==='(Toutes)'||!fU||r.urgency===fU) && (fT==='(Tous)'||!fT||r.reqType===fT));
+    for(const r of rows){
+      const opsCount = S.operations.filter(o=>o.reqId===r.id).length;
+      const tr = el('tr',{},[
+        el('td',{html:`<span class="link" data-jump-op="${r.id}">${r.id}</span>`}),
+        el('td',{html:r.engineModel}),
+        el('td',{html:r.engineSerial}),
+        el('td',{html:r.customer}),
+        el('td',{html:`<span class="pill ${r.urgency.startsWith('AOG')?'aog':'routine'}">${r.urgency}</span>`}),
+        el('td',{html:r.reqType}),
+        el('td',{html:r.reqDate}),
+        el('td',{html:r.eta}),
+        el('td',{html:`<span class="link" data-jump-op="${r.id}">${opsCount}</span>`})
+      ]);
+      tbody.appendChild(tr);
+    }
+    // link jumps
+    tbody.querySelectorAll('[data-jump-op]').forEach(a=> a.addEventListener('click', (e)=>{
+      const id = e.target.getAttribute('data-jump-op');
+      $('#fltOpReq').value = id; activateTab('OP_Maint_Operations'); renderOperationsTable();
+    }));
+  }
+
+  function renderOperationsTable(){
+    const tbody = $('#operationsTbody'); tbody.innerHTML='';
+    const fR=$('#fltOpReq').value, fS=$('#fltOpShop').value, fT=$('#fltOpType').value;
+    const rows = S.operations.filter(o=> (fR==='(Toutes)'||!fR||o.reqId===fR) && (fS==='(Tous)'||!fS||o.shop===fS) && (fT==='(Tous)'||!fT||o.opType===fT));
+    for(const o of rows){
+      const tr = el('tr',{},[
+        el('td',{html:`<span class="link" data-edit-op="${o.id}">${o.id}</span>`}),
+        el('td',{html:`<span class="link" data-jump-req="${o.reqId}">${o.reqId}</span>`}),
+        el('td',{html:o.shop}),
+        el('td',{html:o.opType}),
+        el('td',{html:o.start}),
+        el('td',{html:String(o.duration)}),
+        el('td',{html:o.end}),
+        el('td',{html:o.status})
+      ]);
+      tbody.appendChild(tr);
+    }
+    tbody.querySelectorAll('[data-edit-op]').forEach(a=> a.addEventListener('click',(e)=>{
+      const id = e.target.getAttribute('data-edit-op'); const op=S.operations.find(x=>x.id===id); if(!op) return;
+      $('#opMode').value='Édition'; $('#opId').value=op.id; $('#opReqId').value=op.reqId; $('#opShop').value=op.shop; filterOpTypesByShop(); $('#opType').value=op.opType; $('#opStart').value=op.start; $('#opDur').value=op.duration; computeOpEnd(); $('#opStatus').value=op.status; $('#opDelete').disabled=false; $('#opMsg').textContent=''; activateTab('FORM_Edit_Operations'); renderOpShopHelper();
+    }));
+    tbody.querySelectorAll('[data-jump-req]').forEach(a=> a.addEventListener('click',(e)=>{
+      const id = e.target.getAttribute('data-jump-req'); $('#fltCustomer').value='(Tous)'; $('#fltUrgency').value='(Toutes)'; $('#fltReqType').value='(Tous)'; activateTab('TR_Maint_Requests');
+      // highlight row (simple jump)
+      renderRequestsTable();
+    }));
+  }
+
+  function renderMDGrid(){
+    const grid = $('#mdGrid'); grid.innerHTML='';
+    Object.entries(S.mdLists).forEach(([name, list])=>{
+      const ta = el('textarea',{rows:6}); ta.value = list.join('\n');
+      ta.addEventListener('change',()=>{ S.mdLists[name] = ta.value.split('\n').map(x=>x.trim()).filter(Boolean); });
+      const card = el('div',{class:'card'},[ el('h3',{html:name}), ta ]);
+      grid.appendChild(card);
+    });
+  }
+  function renderMappingTable(){
+    const tb = $('#mapTbody'); tb.innerHTML='';
+    Object.entries(S.requestTypeToOps).forEach(([k,arr])=>{
+      const tr = el('tr',{},[ el('td',{html:k}), el('td',{html:arr.join(' → ')}) ]); tb.appendChild(tr);
+    });
+  }
+  function renderDurationTable(){
+    const tb = $('#durTbody'); tb.innerHTML='';
+    Object.entries(S.opDur).forEach(([k,v])=>{
+      const inp = el('input',{type:'number', value:String(v), min:'1', style:'width:100px'});
+      inp.addEventListener('change',()=>{ S.opDur[k] = Math.max(1, parseInt(inp.value||'1',10)); $('#reqType').dispatchEvent(new Event('change')); renderKPI(); });
+      const tr = el('tr',{},[ el('td',{html:k}), el('td',{},[inp]) ]); tb.appendChild(tr);
+    });
+  }
+  function renderJSONViewer(){
+    const replacer = (k,v)=> v; // flat data only
+    $('#jsonOut').textContent = JSON.stringify(S, replacer, 2);
+  }
+
+  function renderKPI(){
+    // On-time % for AOG: a request is on-time if last operation end <= ETA
+    const aogReqs = S.requests.filter(r=> r.urgency.startsWith('AOG'));
+    let ontime = 0, total = 0;
+    for(const r of aogReqs){
+      const ops = S.operations.filter(o=>o.reqId===r.id);
+      if(!ops.length) continue; total++;
+      const lastEnd = ops.map(o=>o.end).sort().slice(-1)[0];
+      if(lastEnd && lastEnd <= r.eta) ontime++;
+    }
+    const pct = total?Math.round(100*ontime/total):0;
+    $('#kpiAOG').innerHTML = `AOG on-time: <b>${pct}%</b> (${ontime}/${total})`;
+    $('#kpiAOGBar').style.width = pct+'%';
+
+    // Per-shop load heatmaps for next 14 days
+    const today = new Date();
+    const cont = $('#shopHeatContainer');
+    cont.innerHTML = '';
+    const summary = [];
+    S.shops.forEach(shop=>{
+      const ratios = [];
+      const row = el('div',{class:'heatmapRow'});
+      const hm = el('div',{class:'heatmap'});
+      for(let i=0;i<14;i++){
+        const d = fmt(addDays(today,i));
+        const c = capFor(shop,d);
+        const ratio = c.cap ? c.used/c.cap : 1; // if down, treat as fully used
+        ratios.push(ratio);
+        const cell = el('div',{class:'cell'});
+        cell.style.background = c.down ? '#111827' : ratioColor(ratio);
+        cell.title = `${shop} • ${d} • ${c.used}/${c.cap} utilisés` + (c.down?' (exception)':'');
+        hm.appendChild(cell);
+      }
+      const avgShop = Math.round(avg(ratios)*100);
+      row.appendChild(el('div',{class:'label', html:`${shop} — <b>${avgShop}%</b>`}));
+      row.appendChild(hm);
+      cont.appendChild(row);
+      summary.push(`${shop}: <b>${avgShop}%</b>`);
+    });
+    $('#kpiShopSummary').innerHTML = summary.join(' • ');
+  }
+  const avg = arr => arr.length? arr.reduce((a,b)=>a+b,0)/arr.length : 0;
+  function ratioColor(r){
+    // 0..1 -> light to deep accent
+    const p = Math.min(1, Math.max(0,r)); const g = 230 - Math.round(150*p);
+    return `rgb(${230-Math.round(50*p)}, ${g}, ${255-Math.round(180*p)})`;
+  }
+
+  // ---------- Forms & Events ----------
+  function bindEvents(){
+    // New Request
+    ['#reqType','#reqDate'].forEach(sel=> $(sel).addEventListener('change', recalcEstEnd));
+    $('#btnRecalcEta').addEventListener('click', recalcEstEnd);
+    $('#newReqForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const engineModel=$('#reqEngineModel').value.trim();
+      const engineSerial=$('#reqEngineSerial').value.trim();
+      const customer=$('#reqCustomer').value; const urgency=$('#reqUrgency').value; const reqType=$('#reqType').value; const reqDate=$('#reqDate').value; const eta=$('#reqEstEnd').value || estimateETA(reqType, reqDate); const notes=$('#reqNotes').value;
+      if(!engineModel||!engineSerial||!customer||!urgency||!reqType||!reqDate){ alert('Champs requis manquants.'); return; }
+      const id = idGen('R', S.requests.length? parseInt(S.requests[S.requests.length-1].id.slice(1))+1 : 1);
+      S.requests.push({id, engineModel, engineSerial, customer, urgency, reqType, reqDate, eta, notes});
+      renderRequestsTable(); populateDropdowns(); renderJSONViewer(); alert('Demande créée: '+id);
+      // clear minimal
+      $('#reqEngineSerial').value=''; $('#reqNotes').value='';
+    });
+
+    // Capacity Lookup
+    $('#capCheck').addEventListener('click', onCapLookup);
+
+    // Op Editor
+    $('#opShop').addEventListener('change', filterOpTypesByShop);
+    $('#opType').addEventListener('change', ()=>{ const t=$('#opType').value; if(S.opDur[t]) $('#opDur').value=S.opDur[t]; computeOpEnd(); renderOpShopHelper(); });
+    $('#opStart').addEventListener('change', computeOpEnd);
+    $('#opDur').addEventListener('change', computeOpEnd);
+
+    $('#opForm').addEventListener('submit', (e)=>{
+      e.preventDefault(); const msg=$('#opMsg'); msg.textContent='';
+      const id = $('#opId').value; const reqId=$('#opReqId').value; const shop=$('#opShop').value; const opType=$('#opType').value; const start=$('#opStart').value; const dur=parseInt($('#opDur').value||'1',10); const end=$('#opEnd').value; const status=$('#opStatus').value;
+      if(!reqId||!shop||!opType||!start||!dur){ alert('Champs requis manquants.'); return; }
+      if(!S.shopCapabilities[shop].ops.includes(opType)){ alert('Opération non supportée par cet atelier.'); return; }
+      if(!canFit(shop, new Date(start), dur)){ msg.textContent='Pas de capacité sur cette plage. Essayez Auto-planifier.'; msg.style.color='var(--danger)'; return; }
+      if(id){
+        const old = S.operations.find(o=>o.id===id);
+        if(old){ unbook(old.shop, new Date(old.start), old.duration); Object.assign(old, {reqId, shop, opType, start, duration:dur, end, status}); book(shop, new Date(start), dur); }
+      } else {
+        const nid = idGen('O', S.operations.length? parseInt(S.operations[S.operations.length-1].id.slice(1))+1 : 1);
+        S.operations.push({id:nid, reqId, shop, opType, start, duration:dur, end, status}); book(shop, new Date(start), dur); $('#opId').value = nid; $('#opMode').value='Édition'; $('#opDelete').disabled=false;
+      }
+      renderOperationsTable(); renderJSONViewer(); renderKPI(); msg.textContent='Opération enregistrée.'; msg.style.color='var(--accent)';
+    });
+    $('#opDelete').addEventListener('click',()=>{
+      const id = $('#opId').value; if(!id) return; const i = S.operations.findIndex(o=>o.id===id); if(i>-1){ const op=S.operations[i]; unbook(op.shop, new Date(op.start), op.duration); S.operations.splice(i,1); renderOperationsTable(); renderJSONViewer(); renderKPI(); $('#opReset').click(); alert('Opération supprimée.'); }
+    });
+    $('#opReset').addEventListener('click',()=>{ $('#opMode').value='Nouveau'; $('#opId').value=''; $('#opReqId').value=S.requests[0]?.id||''; $('#opShop').value=S.shops[0]; filterOpTypesByShop(); $('#opType').value=$('#opType').options[0]?.value||''; const t=$('#opType').value; if(S.opDur[t]) $('#opDur').value=S.opDur[t]; $('#opStart').value=fmt(new Date()); computeOpEnd(); $('#opStatus').value=S.mdLists.Status[0]; $('#opDelete').disabled=true; $('#opMsg').textContent=''; renderOpShopHelper(); });
+    $('#opAutoSlot').addEventListener('click',()=>{
+      const shop=$('#opShop').value; const dur=parseInt($('#opDur').value||'1',10); const earliest = $('#opStart').value? new Date($('#opStart').value): new Date(); const start = findStartWithCapacity(shop, earliest, dur); $('#opStart').value = fmt(start); computeOpEnd(); $('#opMsg').textContent='Créneau trouvé et appliqué.'; $('#opMsg').style.color='var(--accent-2)';
+    });
+
+    // Filters
+    $('#fltCustomer').addEventListener('change', renderRequestsTable);
+    $('#fltUrgency').addEventListener('change', renderRequestsTable);
+    $('#fltReqType').addEventListener('change', renderRequestsTable);
+    $('#btnClearFilters').addEventListener('click',()=>{ $('#fltCustomer').value='(Tous)'; $('#fltUrgency').value='(Toutes)'; $('#fltReqType').value='(Tous)'; renderRequestsTable(); });
+
+    $('#fltOpReq').addEventListener('change', renderOperationsTable);
+    $('#fltOpShop').addEventListener('change', renderOperationsTable);
+    $('#fltOpType').addEventListener('change', renderOperationsTable);
+    $('#btnClearOpFilters').addEventListener('click',()=>{ $('#fltOpReq').value='(Toutes)'; $('#fltOpShop').value='(Tous)'; $('#fltOpType').value='(Tous)'; renderOperationsTable(); });
+
+    // JSON viewer actions
+    $('#jsonCopy').addEventListener('click',()=>{ navigator.clipboard.writeText($('#jsonOut').textContent); alert('JSON copié.'); });
+    $('#jsonDownload').addEventListener('click',()=>{ const blob = new Blob([$('#jsonOut').textContent],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='maestro-data.json'; a.click(); URL.revokeObjectURL(a.href); });
+
+    // Self-tests
+    $('#btnSelfTest').addEventListener('click', runSelfTest);
+  }
+
+  function filterOpTypesByShop(){
+    const shop = $('#opShop').value || S.shops[0]; const ops = S.shopCapabilities[shop].ops; fillSelect('#opType', ops); if(ops.length){ $('#opType').value=ops[0]; if(S.opDur[ops[0]]) $('#opDur').value=S.opDur[ops[0]]; computeOpEnd(); }
+  }
+  function computeOpEnd(){
+    const s = $('#opStart').value; const d = parseInt($('#opDur').value||'1',10); if(s){ $('#opEnd').value = fmt(addDays(new Date(s), d)); }
+  }
+  function recalcEstEnd(){
+    const rtype = $('#reqType').value; const date = $('#reqDate').value; if(rtype && date){ $('#reqEstEnd').value = estimateETA(rtype, date); }
+  }
+  function renderOpShopHelper(){
+    const shop = $('#opShop').value; const sc = S.shopCapabilities[shop]; const box = $('#opShopHelper'); box.innerHTML='';
+    const ops = sc.ops.map(o=>`<span class="chip">${o}</span>`).join(' ');
+    box.innerHTML = `<div><strong>${shop}</strong> — ${sc.location}</div><div>Cap/jour: <b>${sc.capPerDay}</b></div><div class="chips" style="margin-top:6px">${ops}</div>` + (sc.exceptions?.length? `<div class="note">Exceptions: ${sc.exceptions.join(', ')}</div>`: '');
+  }
+
+  // ---------- Self-tests (lightweight) ----------
+  function runSelfTest(){
+    const out = [];
+    try{ out.push(ok(typeof renderKPI === 'function', 'renderKPI est défini.')); }catch(e){ out.push(ko('renderKPI non défini.')); }
+
+    try{ out.push(ok(S.requests.length>0 && S.operations.length>0, `Données seedées (requests=${S.requests.length}, ops=${S.operations.length}).`)); }catch(e){ out.push(ko('Seed de données non réalisé.')); }
+
+    try{ out.push(ok(!document.getElementById('tcHeat') && !document.getElementById('kpiTC'), 'Aucune référence obsolète (#tcHeat/#kpiTC).')); }catch(e){ out.push(ko('Références obsolètes détectées.')); }
+
+    try{ renderKPI(); out.push(ok($('#shopHeatContainer').children.length>0, 'Heatmaps par atelier rendues.')); }catch(e){ out.push(ko('renderKPI a levé une erreur.')); }
+
+    try{
+      const allGood = S.operations.every(o=> (S.shopCapabilities[o.shop]||{ops:[]}).ops.includes(o.opType));
+      out.push(ok(allGood, 'Chaque opération est compatible avec son atelier.'));
+    }catch(e){ out.push(ko('Compatibilité atelier/opération non vérifiée.')); }
+
+    $('#selfTest').innerHTML = out.map(x=>`• ${x}`).join('<br>');
+  }
+  const ok = (cond,msg)=> cond? `✅ ${msg}` : `❌ ${msg}`;
+  const ko = msg => `❌ ${msg}`;
+
+  // ---------- Boot ----------
+  function init(){
+    seedMasterData();
+    seedTransactions();
+    initTabs();
+    populateDropdowns();
+    renderReqTypeHelper();
+    renderShopHelper();
+    renderRequestsTable();
+    renderOperationsTable();
+    renderMDGrid();
+    renderMappingTable();
+    renderDurationTable();
+    renderKPI();
+    renderJSONViewer();
+    bindEvents();
+    $('#opReset').click();
+    // auto-run self tests on load
+    runSelfTest();
+  }
+  init();
+  </script>
+</body>
+</html>
