@@ -5,7 +5,7 @@
 - 📥 Importer CSV de la donnée fictive en masse
 
 **🛠 Usages concrets :**
-- ✍️ Spécifications enrichies
+- ✍️ Spécifications / Critères d'acceptance 
 - 👥 Tests utilisateurs (EXIM)
 - 🖼️ Démos réalistes (EXIM)
 
