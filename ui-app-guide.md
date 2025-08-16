@@ -41,10 +41,10 @@
 
 **Structure de données**:
 
-- **Request (Demande)** : `id`, `client`, `engineModel`, `requestType` (3), `urgency` (Normal/AOG), `status` (Ouvert/Prêt/En cours/Terminé), `siteCountry`, `dueDate`, `eta`, `createdAt`.
-- **Operation** : `id`, `requestId`, `opType` (12), `shopId`, `plannedDate`, `durationSlots`, `status`.
-- **Shop** : `id`, `name` (ville), `siteCountry` (pays), `allowedOpTypes` (subset des 12), `slotsPerDay`.
-- **Mappings** :
+**Request (Demande)** : `id`, `client`, `engineModel`, `requestType` (3), `urgency` (Normal/AOG), `status` (Ouvert/Prêt/En cours/Terminé), `siteCountry`, `dueDate`, `eta`, `createdAt`.
+**Operation** : `id`, `requestId`, `opType` (12), `shopId`, `plannedDate`, `durationSlots`, `status`.
+**Shop** : `id`, `name` (ville), `siteCountry` (pays), `allowedOpTypes` (subset des 12), `slotsPerDay`.
+**Mappings** :
   - `requestTypeToOps` (3 × 4) :  
     - Overhaul → Disassembly, Repair, Assembly, TestRun  
     - QuickInspection → Inspection, Cleaning, Assembly, TestRun  
@@ -105,7 +105,7 @@ classDiagram
   }
 
   enum RequestType {
-    OverHaul 
+    Overhaul 
     QuickInspection 
     DeepRepair  
   }
