@@ -1,8 +1,8 @@
 # Contexte
 **📌 Objectifs d'un prototype Excel :**
 
-- ✅ Valider la logique de calculs (formules, KPI) du logiciel sur un jeu de cas clair
-- 📥 Importer et structurer de la donnée fictive dans le logiciel
+- ✅ Valider la logique de calculs (formules, KPI) sur un jeu de cas clair
+- 📥 Importer et structurer de la donnée en masse
 
 **🛠 Usages concrets :**
 - 👥 Tests utilisateurs (Calcul)
