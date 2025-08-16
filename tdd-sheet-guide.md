@@ -16,7 +16,7 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 
 ## Guide 
 
-# 1. Contexte (Hypothèses + Mise en forme) ✨
+### 1) Contexte (Hypothèses + Mise en forme) ✨
 *Questions à se poser d’abord* 🤔  
 - Quel est l’objectif précis et sur quelle unité/échelle on mesure l’utilisation ?  
 - Quelles simplifications on fige pour isoler le calcul ?  
@@ -40,7 +40,7 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - Entêtes en gras, volets gelés sous la 1ʳᵉ ligne.  
 - Graphiques en **colonnes groupées**, axe Y **0–100%**.
 
-# 2) Modèle (Liste de références + Formules + TDD) 🧠
+### 2) Modèle (Liste de références + Formules + TDD) 🧠
 *Questions à se poser d’abord* 📝  
 - Quelles listes de référence minimales et sans IDs ?  
 - Quelles sont les règles de génération de la donnée ?
@@ -71,7 +71,7 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - **CA4** : si **Output_PlanDays > Input_PlanDays** → **Écart%>0** (rouge).  
 - **CA5** : toute cellule différente entre **Output_Operations** et **Input_Operations** (par `Id`) est **jaune**.
 
-# 3) Interface 🖥️
+### 3) Interface 🖥️
 *Questions à se poser d’abord* 💬  
 - Quelles feuilles minimales pour saisir/recoller et lire les KPI ?  
 - Comment signaler visuellement les différences cellule par cellule ?
@@ -117,7 +117,7 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 
 Rappels ⚠️ : mêmes libellés des deux côtés, même horizon, pas d’Output_CapacityDays; les différences cellule passent en jaune dans Output_Operations
 
-# 4) Technique 🛠️
+### 4) Technique 🛠️
 *Questions à se poser d’abord* 🧪  
 - Comment garantir la reproductibilité et la compatibilité Excel Desktop ?  
 - Quelles contraintes côté données aléatoires ?
