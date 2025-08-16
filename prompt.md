@@ -56,6 +56,58 @@ Elles contiennent toutes les valeurs disponibles dans les menus déroulants :
 - 3 types de demandes (chacun avec 4 opérations)  
 - 10 demandes et 30 opérations générées au hasard  
 
+## Synthèse UML
+```mermaid
+classDiagram
+    class Request {
+        +String id
+        +String customer
+        +String engine
+        +String location
+        +String shop
+        +String requestType
+        +String urgency
+        +String status
+        +Date requestDate
+        +Date estEnd
+        +String notes
+    }
+
+    class Operation {
+        +String id
+        +String reqId
+        +String shop
+        +String opType
+        +String status
+        +Date start
+        +Date finish
+        +Number duration
+    }
+
+    class ShopCapability {
+        +String shop
+        +String location
+        +Number defaultCapacity
+        +List<Exception> exceptions
+        +List<String> allowedOps
+    }
+
+    class RequestType {
+        +String name
+        +List<String> requiredOps (4)
+    }
+
+    class OperationType {
+        +String name
+        +Number defaultDuration
+    }
+
+    Request "1" --> "many" Operation : contient
+    ShopCapability "1" --> "many" Operation : planifiée à
+    RequestType "1" --> "4" OperationType : requiert
+    ShopCapability "1" --> "many" OperationType : autorise
+```
+
 ---
 
 # 3️⃣ Navigation et écrans  
