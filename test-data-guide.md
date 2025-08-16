@@ -29,13 +29,13 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 ### 1) Contexte (Hypothèses + Mise en forme) ✨
 *Questions à se poser d’abord* 🤔  
 - Quel est l’objectif précis et sur quelle unité/échelle on mesure l’utilisation ?  
-- Quelles simplifications on fige pour isoler le calcul ?  
+- Quelles hypothèses sur le périmètre pour simplifier le calcul ?  
 - Comment on présente les résultats pour qu’ils soient lisibles rapidement ?
 
 **Objectif** 🎯  
 - Mesurer le **taux de remplissage** des centres (shops) en **%**, comparer **Input (plan)** vs **Output (plan IBP)**, et **voir les écarts**.
 
-**Hypothèses (simples & TDD-friendly)** 🧩  
+**Hypothèses de simplification** 🧩  
 - **Horizon** = 90 jours, **7/7**.  
 - **Unité** = **slot-jour**.  
 - **Capacité constante** par **Shop × Catégorie** : `SlotsPerDay` (entier).  
@@ -53,9 +53,10 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 ### 2) Modèle (Liste de références + Formules + TDD) 🧠
 *Questions à se poser d’abord* 📝 
 - Quelles listes de référence minimales et sans IDs ?
-- Quelles sont les règles de génération de la donnée ?
-- Quelle est la structure de données 
-- Comment on valide par des tests unitaires simples ?
+- Quelles sont les règles de calcul de la donnée ?
+- Quelle stratégie de génération de la donnée ?
+- Quelles sont les critères d'acceptation de la donnée générée?
+- Quelle est la structure de données ?
 
 
 **Listes de références (noms lisibles, pas d’IDs)** 📇  
@@ -71,10 +72,17 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - `Util_Output% = Output_PlanDays / Input_CapacityDays`  
 - `Écart% = Util_Output% – Util_Input%`
 
-**Règles de génération (résumé)** 📦  
+**Stratégie de génération pour la donnée** 📦  
 - **Shop_Slots** : 2–3 catégories par shop, `SlotsPerDay ∈ [2..6]`, **chaque catégorie** présente dans **≥2 shops**.  
 - **Input_Operations** : `Id` = OP001…OP100 ; `Type` = “{Catégorie} Type n” (n ∈ [1..4]) ; `Durée (jours)` ∈ [5..90] ; `Start Date` uniforme, avec **fin ≤ START_DATE + 89 j** ; `Shop` éligible à la `Catégorie`.  
 - **Output_Operations** : copie d’Input + **~1% d’écarts** (Durée **ou** Start Date, ±1..±3 j) **sans sortir de l’horizon** ; **mise en évidence JAUNE** via XLOOKUP sur `Id`.
+
+**Critères d'acceptance pour la donnée** ✅  
+- **CA1** : `SlotsPerDay=4`, horizon 90 → **Input_CapacityDays=360**.  
+- **CA2** : 3 opérations de 30 j → **Input_PlanDays=90**, **Util_Input%=25%**.  
+- **CA3** : si **Output_PlanDays = Input_PlanDays** → **Écart%=0** (vert).  
+- **CA4** : si **Output_PlanDays > Input_PlanDays** → **Écart%>0** (rouge).  
+- **CA5** : toute cellule différente entre **Output_Operations** et **Input_Operations** (par `Id`) est **jaune**.
 
 **Diagramme UML**  
 ```mermaid
@@ -148,14 +156,6 @@ classDiagram
     %% Dépendance au paramétrage (pour CapacityDays)
     Shop_Slots ..> Parameters : HORIZON_DAYS
 ```
-
-
-**TDD / critères d’acceptation** ✅  
-- **CA1** : `SlotsPerDay=4`, horizon 90 → **Input_CapacityDays=360**.  
-- **CA2** : 3 opérations de 30 j → **Input_PlanDays=90**, **Util_Input%=25%**.  
-- **CA3** : si **Output_PlanDays = Input_PlanDays** → **Écart%=0** (vert).  
-- **CA4** : si **Output_PlanDays > Input_PlanDays** → **Écart%>0** (rouge).  
-- **CA5** : toute cellule différente entre **Output_Operations** et **Input_Operations** (par `Id`) est **jaune**.
 
 ### 3) Interface 🖥️
 *Questions à se poser d’abord* 💬  
