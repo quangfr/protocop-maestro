@@ -17,7 +17,7 @@
 4. 🔄 Mettre le plus de demandes possibles dans ton prompt avant régénération
 5. 📥 Amender le prompt jusqu'à ce qu'il te convient avec de générer le prototype
 6. 📋 Quand tu es satisfait, demande à GPT de te refournir le prompt pour reprendre ailleurs
-7. 🔶 Demander à GPT le diagramme UML pour documenter
+7. 🔶 Demander à GPT de générer le diagramme UML pour vérifier ou documenter
 
 **🤖 Lien à la conversation IA**
 ```
