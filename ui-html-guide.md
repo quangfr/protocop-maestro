@@ -29,6 +29,7 @@
 ❓ *Quel nom afficher dans le bandeau en haut ?*  
 ❓ *Quel style général ?*  
 ❓ *En une phrase, à quoi sert cet outil ?*
+❓ *Quelles sont les hypothèses de simplification ?*
 
 **Nom de l’application** : **MAESTRO**  
 **Style visuel** : interface claire et moderne, inspirée de SAP IBP :  
@@ -45,12 +46,27 @@ Elle permet de :
 - **Vérifier** les capacités des ateliers (shops)  
 - **Visualiser** des indicateurs clés de performance (KPI)  
 
+**Hypothèses** :  
+- 🎯 Demande = 1 moteur, 2 types supportés (Overhaul, QuickInspection)
+- 🧩 Pack fixe de 4 opérations par type (aucune variante ni sous-op)
+- ⏱️ Durées fixes par opération; ETA = somme des durées (sans attente capacité)
+- 🏭 Capacité par atelier en “créneaux/jour” (pas d’heures, pas d’équipes)
+- ✅ Compatibilité stricte atelier ↔ opération (pas d’exception)
+- 🔁 Séquencement simple des 4 opérations (pas de parallélisation, pas de buffers)
+- 🚦 Statuts simplifiés: Demande (Planned/Delivered), Opération (Planned/In Progress/Done)
+- 🧱 Règles de contrôle: shop incompatible, opération non requise, capacité pleine, ensemble exact des 4
+- ♻️ Suppression d’une opération = créneau capacité ré-ouvert immédiatement (pas de replanif auto)
+- 📊 KPI unique: On-Time % sur AOG (livré ≤ ETA)
+- 🔎 Navigation croisée simple Demandes ↔ Opérations (pas de recherche avancée)
+- 🔐 Rôle unique “Planner”; données locales en mémoire; référentiels statiques
+
 ## 2️⃣ Modèle
 
 ❓ *Quels sont les objets métiers de l'application ? (ex. Demande, Opération, Ressource, Calendrier…)*  
 ❓ *Pour chaque objet : propriétés, validations, permissions ?*  
 ❓ *Relations entre objets : cardinalités, contraintes (suppression en cascade, restrictions, compatibilités, relations obligatoires, limites quantitatives, contraintes temporelles, unicité, synchronisation d’état)*  
 ❓ *Quelles données en exemple ?*
+❓ *Quelle est la structure de données UML ?*
 
 **Demande (Request)**  
 C’est la fiche de départ : un client demande la maintenance d’un moteur.  
@@ -84,47 +100,7 @@ Elles contiennent toutes les valeurs disponibles dans les menus déroulants : ur
 - 12 types d’opérations  
 - 5 modèles de moteur, 5 clients  
 - 3 types de demandes (chacun avec 4 opérations)  
-- 10 demandes et 30 opérations générées au hasard  
-
-## 3️⃣ Interface
-
-❓ *Quels onglets/écrans veux-tu ?*  
-❓ *Pour chaque onglet : données, actions, aides ?*  
-❓ *Comment naviguer entre les onglets ?*  
-❓ *Comportement entre écrans ?*
-
-**Nouvelle demande**  
-- Formulaire simple pour saisir une demande (champs obligatoires en jaune)  
-- Panneau d’aide : montre automatiquement les 4 opérations requises par type de demande + vérification de capacité d’un atelier à une date donnée  
-- Actions : créer une demande, recalculer la date de fin  
-
-**Éditer opérations**  
-- Formulaire pour créer ou modifier une opération liée à une demande  
-- Panneau d’aide : indique quelles opérations sont autorisées dans l’atelier choisi  
-- Actions : sauvegarder ou supprimer l’opération  
-
-**Demandes**  
-- Tableau de toutes les demandes  
-- Chaque numéro de demande est cliquable → ouvre les opérations liées  
-
-**Opérations**  
-- Tableau de toutes les opérations  
-- Numéro d’opération cliquable → ouvre l’édition de cette opération  
-- Numéro de demande cliquable → ouvre la fiche demande correspondante  
-
-**Listes maîtres**  
-- Tableaux éditables pour ajouter/modifier les valeurs de référence  
-- Mapping obligatoire : chaque type de demande doit être lié à 4 opérations distinctes  
-- Table de durée par type d’opération  
-- Actions : appliquer les changements, voir les données au format JSON (export/copie possible)  
-
-**Tableau de bord (KPI)**  
-- Pourcentage de demandes urgentes livrées dans les temps  
-- Carte de chaleur (heatmap) des capacités hebdomadaires (par localisation et atelier, sur 8 semaines)  
-
-**Navigation**  
-- Onglets visibles en permanence en haut de l’écran  
-- Clic sur un ID → ouvre automatiquement l’écran concerné avec un filtre appliqué  
+- 10 demandes et 30 opérations générées au hasard
 
 **Synthèse UML**
 ```mermaid
@@ -177,6 +153,46 @@ classDiagram
     RequestType "1" --> "4" OperationType : requiert
     ShopCapability "1" --> "many" OperationType : autorise
 ```
+
+## 3️⃣ Interface
+
+❓ *Quels onglets/écrans veux-tu ?*  
+❓ *Pour chaque onglet : données, actions, aides ?*  
+❓ *Comment naviguer entre les onglets ?*  
+❓ *Comportement entre écrans ?*
+
+**Nouvelle demande**  
+- Formulaire simple pour saisir une demande (champs obligatoires en jaune)  
+- Panneau d’aide : montre automatiquement les 4 opérations requises par type de demande + vérification de capacité d’un atelier à une date donnée  
+- Actions : créer une demande, recalculer la date de fin  
+
+**Éditer opérations**  
+- Formulaire pour créer ou modifier une opération liée à une demande  
+- Panneau d’aide : indique quelles opérations sont autorisées dans l’atelier choisi  
+- Actions : sauvegarder ou supprimer l’opération  
+
+**Demandes**  
+- Tableau de toutes les demandes  
+- Chaque numéro de demande est cliquable → ouvre les opérations liées  
+
+**Opérations**  
+- Tableau de toutes les opérations  
+- Numéro d’opération cliquable → ouvre l’édition de cette opération  
+- Numéro de demande cliquable → ouvre la fiche demande correspondante  
+
+**Listes maîtres**  
+- Tableaux éditables pour ajouter/modifier les valeurs de référence  
+- Mapping obligatoire : chaque type de demande doit être lié à 4 opérations distinctes  
+- Table de durée par type d’opération  
+- Actions : appliquer les changements, voir les données au format JSON (export/copie possible)  
+
+**Tableau de bord (KPI)**  
+- Pourcentage de demandes urgentes livrées dans les temps  
+- Carte de chaleur (heatmap) des capacités hebdomadaires (par localisation et atelier, sur 8 semaines)  
+
+**Navigation**  
+- Onglets visibles en permanence en haut de l’écran  
+- Clic sur un ID → ouvre automatiquement l’écran concerné avec un filtre appliqué  
 
 ## 4️⃣ Technique
 
