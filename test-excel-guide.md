@@ -8,14 +8,14 @@
 - 👥 Tests utilisateurs (Export du logiciel / Import dans le prototype)
 - 🖼️ Démos réalistes (Import dans le logiciel / Export du prototype)
 
-**💡 Astuces **
+**💡 Astuces**
 - Demander à GPT de te poser des questions pour préciser ta demande
 - Demander à GPT de te proposer des pistes de simplification
 - Demander à GPT de générer une proposition au préalable
 - Amender la proposition jusqu'a ce qu'elle te convient avec de générer le prototype
 - Quand tu es satisfait du prototype, demande à GPT de te fournir le prompt pour reprendre ailleurs le prototype
 
-**🔗 Lien à la conversation **
+**🤖 Lien à la conversation IA**
 ```
 https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 ```
