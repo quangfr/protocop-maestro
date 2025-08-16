@@ -9,9 +9,9 @@
 
 **🛠 Usages concrets :**
 
-- 🖼️ Copie d’écran ou capture vidéo 
-- 📊 Illustration avec des données réalistes 
+- ✍️ Spécifications précises/ Critères d'acceptance
 - 👥 Tests utilisateurs (UI/UX)
+- 🖼️ Démos réalistes (UI/UX)
 
 **💡 Démarche IA**
 1. 🔍 Prototyper petit avec des hypothèses de simplification
