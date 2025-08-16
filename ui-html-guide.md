@@ -30,8 +30,6 @@
 ❓ *Quel style général ?*  
 ❓ *En une phrase, à quoi sert cet outil ?*
 
-**Exemple : MAESTRO**
-
 **Nom de l’application** : **MAESTRO**  
 **Style visuel** : interface claire et moderne, inspirée de SAP IBP :  
 - Organisation en **cartes et onglets**  
@@ -46,7 +44,6 @@ Elle permet de :
 - **Suivre** les opérations associées  
 - **Vérifier** les capacités des ateliers (shops)  
 - **Visualiser** des indicateurs clés de performance (KPI)  
----
 
 ## 2️⃣ Modèle
 
@@ -54,8 +51,6 @@ Elle permet de :
 ❓ *Pour chaque objet : propriétés, validations, permissions ?*  
 ❓ *Relations entre objets : cardinalités, contraintes (suppression en cascade, restrictions, compatibilités, relations obligatoires, limites quantitatives, contraintes temporelles, unicité, synchronisation d’état)*  
 ❓ *Quelles données en exemple ?*
-
-**Exemple : MAESTRO**
 
 **Demande (Request)**  
 C’est la fiche de départ : un client demande la maintenance d’un moteur.  
@@ -91,16 +86,12 @@ Elles contiennent toutes les valeurs disponibles dans les menus déroulants : ur
 - 3 types de demandes (chacun avec 4 opérations)  
 - 10 demandes et 30 opérations générées au hasard  
 
----
-
 ## 3️⃣ Interface
 
 ❓ *Quels onglets/écrans veux-tu ?*  
 ❓ *Pour chaque onglet : données, actions, aides ?*  
 ❓ *Comment naviguer entre les onglets ?*  
 ❓ *Comportement entre écrans ?*
-
-**Exemple : MAESTRO**
 
 **Nouvelle demande**  
 - Formulaire simple pour saisir une demande (champs obligatoires en jaune)  
@@ -187,15 +178,10 @@ classDiagram
     ShopCapability "1" --> "many" OperationType : autorise
 ```
 
-
----
-
 ## 4️⃣ Technique
 
 ❓ *Quelles fonctionnalités avancées ?*  
 ❓ *Quelles contraintes techniques ?*
-
-**Exemple : MAESTRO**
 
 **Fonctionnalités intégrées**  
 - Tout tient dans un seul fichier HTML (aucune installation, aucun serveur)  
