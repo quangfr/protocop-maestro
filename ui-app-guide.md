@@ -14,7 +14,7 @@
 - 🖼️ Démos réalistes (UI/UX)
 
 **💡 Démarche IA**
-0. 🏃‍♂️ Privilégier un format plus léger (données en dur sans JS ou pas de style CSS...) 
+0. 🏃‍♂️ Privilégier un format plus léger (données en dur sans JS, pas de style CSS...) avec peu de données
 1. 🔍 Prototyper petit avec des hypothèses de simplification
 2. ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
 3. 🆘 Demander à GPT de te proposer des pistes d'amélioration ou de simplification
