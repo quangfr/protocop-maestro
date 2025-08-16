@@ -124,8 +124,8 @@ classDiagram
 
     %% Dépendance au paramétrage (pour CapacityDays)
     Shop_Slots ..> Parameters : HORIZON_DAYS
+```
 
-```mermaid
 
 **Listes de références (noms lisibles, pas d’IDs)** 📇  
 - **Shops** : Lyon, Toulouse, Nantes, Bordeaux, Marseille.  
