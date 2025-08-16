@@ -25,7 +25,7 @@
 
 **🤖 Lien à la conversation IA**
 ```
-[https://chatgpt.com/share/68a0d517-08e8-8006-8686-eea0ad16b236](https://chatgpt.com/share/68a0d517-08e8-8006-8686-eea0ad16b236)
+https://chatgpt.com/share/68a0d517-08e8-8006-8686-eea0ad16b236
 ```
 
 # Prompt
