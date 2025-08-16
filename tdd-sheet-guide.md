@@ -1,5 +1,5 @@
 ## Contexte
-Illustrer la capacité à vérifier la justesse des données calculées venant d'un outil externe comme SAP-IBP. Dans notre cas il s'agit du taux d'occupation des centres de maintenance des moteurs d'avion. Le choix d'Excel est lié à l'utilisation d'Excel Add-in. On utilise ChatGPT pour générer un prototype de la feuille de calcul de vérification.
+Illustrer la capacité à créer un prototype qui vérifie la donnée venant d'un outil en cours de développement. Contexte : SAP-IBP / Excel Add-in
 
 ## IA🤖 
 **Astuces💡**
@@ -15,152 +15,107 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 ```
 
 ## Prompt 
-```
-RÔLE
-Tu es un assistant outillé (Python/Excel) qui doit produire un fichier Excel unique prêt à l’emploi.
 
-LIVRABLE
-- Nom du fichier : MAESTRO_FillRate_Simplified.xlsx
-- Un seul classeur, feuilles et graphiques inclus.
-- Retourne un lien de téléchargement direct une fois généré.
+# 1) Contexte (Hypothèses + Mise en forme) ✨
+*Questions à se poser d’abord* 🤔  
+- Quel est l’objectif précis et sur quelle unité/échelle on mesure l’utilisation ?  
+- Quelles simplifications on fige pour isoler le calcul ?  
+- Comment on présente les résultats pour qu’ils soient lisibles rapidement ?
 
-HYPOTHÈSES GLOBALES (figées)
-- Horizon = 90 jours, calendrier 7j/7.
-- Unité = slot-jour.
-- Capacité constante par couple (Shop × Catégorie) : SlotsPerDay (entier).
-- 100 opérations. 1 opération = 1 type = 1 catégorie = 1 shop.
-- La durée d’un type est fixe (5–90 jours).
-- Pas d’Output_CapacityDays : la capacité de référence est celle d’Input.
+**Objectif** 🎯  
+- Mesurer le **taux de remplissage** des centres (shops) en **%**, comparer **Input (plan)** vs **Output (plan IBP)**, et **voir les écarts**.
 
-LISTES RÉFÉRENCES (noms lisibles, pas d’IDs)
-- Shops : Lyon, Toulouse, Nantes, Bordeaux, Marseille.
-- Catégories : Inspection, Disassembly, Repair, Assembly, TestRun.
-- Types (texte libre) : “{Catégorie} Type n”.
+**Hypothèses (simples & TDD-friendly)** 🧩  
+- **Horizon** = 90 jours, **7/7**.  
+- **Unité** = **slot-jour**.  
+- **Capacité constante** par **Shop × Catégorie** : `SlotsPerDay` (entier).  
+- **100 opérations**. 1 opération = 1 type = 1 catégorie = 1 shop.  
+- **Durée d’un type** = **fixe** (5–90 jours).  
+- Pas d’**Output_CapacityDays** : la capacité de référence est **celle d’Input** uniquement.
 
-STRUCTURE DU CLASSEUR (feuilles)
+**Mise en forme & lisibilité** 👀  
+- Afficher **Util_Input%**, **Util_Output%** et **Écart%** en **pourcentage (2 décimales)**.  
+- Voyants **verts** si Écart% = 0, **rouges** sinon.  
+- Dates en **YYYY-MM-DD**.  
+- Entêtes en gras, volets gelés sous la 1ʳᵉ ligne.  
+- Graphiques en **colonnes groupées**, axe Y **0–100%**.
 
-1) Parameters
-- Colonnes : Parameter, Value, Notes
-- Valeurs minimales :
-  - START_DATE = 2025-09-01 (format ISO YYYY-MM-DD)
-  - HORIZON_DAYS = 90
-  - NOTES indiquant l’usage (facultatif)
-- Mise en forme : entêtes en gras, gel des volets sous la ligne 1.
+---
 
-2) Shop_Slots
-- Colonnes : Shop, Catégorie, SlotsPerDay
-- Règles de génération :
-  - Chaque shop propose 2 à 3 catégories (tirage aléatoire).
-  - SlotsPerDay ∈ [2..6].
-  - Couverture : chaque catégorie doit être présente dans au moins 2 shops.
-- Mise en forme : entêtes en gras, gel des volets sous la ligne 1.
+# 2) Modèle (Liste de références + Formules + TDD) 🧠
+*Questions à se poser d’abord* 📝  
+- Quelles listes de référence minimales et sans IDs ?  
+- Quelles formules garantissent le calcul “input vs output” au bon grain ?  
+- Comment on valide par des tests unitaires simples ?
 
-3) Input_Operations (ex-Seed_Operations)
-- Colonnes (dans cet ordre) :
-  - Id (ex. OP001…OP100)
-  - Type (ex. “Inspection Type 1”)
-  - Catégorie (parmi la liste)
-  - Shop (parmi la liste)
-  - Durée (jours) ∈ [5..90]
-  - Start Date (date ISO dans la fenêtre des 90 jours ; la fin = start + durée - 1 doit rester ≤ fin d’horizon)
-- Règles de génération :
-  - 100 lignes.
-  - Le Type est cohérent avec la Catégorie (“{Catégorie} Type n”).
-  - Le Shop est éligible à la Catégorie (présent dans Shop_Slots).
-  - Répartition aléatoire mais raisonnable (simple, pas d’optimisation).
-- Mise en forme : entêtes en gras, gel des volets ; dates au format YYYY-MM-DD.
+**Listes de références (noms lisibles, pas d’IDs)** 📇  
+- **Shops** : Lyon, Toulouse, Nantes, Bordeaux, Marseille.  
+- **Catégories** : Inspection, Disassembly, Repair, Assembly, TestRun.  
+- **Types** : texte libre au format **“{Catégorie} Type n”** (ex. “Inspection Type 1”).
 
-4) Output_Operations (nouveau)
-- Même structure/colonnes que Input_Operations.
-- Générer automatiquement ~1% d’écarts aléatoires par rapport à Input_Operations (≈ 1 opération sur 100) :
-  - Modifier soit Durée (±1 à ±3 jours) soit Start Date (±1 à ±3 jours), en restant dans l’horizon.
-- Mise en évidence des différences cellule par cellule, basées sur la clé Id :
-  - Règle de mise en forme conditionnelle JAUNE si la valeur Output ≠ valeur Input pour la même colonne (Type, Catégorie, Shop, Durée, Start Date).
-  - Exemple (idée) : pour Output_Operations!E2 (Durée), comparer à XLOOKUP($A2, Input_Operations!$A:$A, Input_Operations!$E:$E, "").
+**KPI (tous en %)** 📈  
+- `Input_CapacityDays = SlotsPerDay(Shop×Cat) × 90`  
+- `Input_PlanDays = Σ durées des opérations Input (Shop×Cat)`  
+- `Output_PlanDays = Σ durées des opérations Output (Shop×Cat)`  
+- `Util_Input% = Input_PlanDays / Input_CapacityDays`  
+- `Util_Output% = Output_PlanDays / Input_CapacityDays`  
+- `Écart% = Util_Output% – Util_Input%`
 
-5) KPI_Check (consolidation par Shop × Catégorie)
-- Colonnes (dans cet ordre) :
-  - Shop
-  - Catégorie
-  - Input_CapacityDays
-  - Input_PlanDays
-  - Output_PlanDays
-  - Util_Input%    (= Input_PlanDays / Input_CapacityDays)
-  - Util_Output%   (= Output_PlanDays / Input_CapacityDays)
-  - Écart%         (= Util_Output% - Util_Input%)
-- Détails de calcul :
-  - Input_CapacityDays = (SlotsPerDay du couple) × HORIZON_DAYS.
-    - SlotsPerDay via SUMIFS sur Shop_Slots.
-  - Input_PlanDays = somme des Durée (jours) d’Input_Operations filtrées par Shop & Catégorie (SUMIFS).
-  - Output_PlanDays = idem mais sur Output_Operations.
-  - Ratios formatés en pourcentage (2 décimales).
-- Mise en forme conditionnelle :
-  - Écart% = 0 → vert ; ≠ 0 → rouge.
-  - Optionnel : surlignage si Util_*% > 100%.
+**Formules Excel (exemples)** 🧮  
+*(Supposons dans **KPI_Check** : A=Shop, B=Catégorie, C=Input_CapacityDays, D=Input_PlanDays, E=Output_PlanDays, F=Util_Input%, G=Util_Output%, H=Écart% ; ligne 2 = 1ʳᵉ donnée)*  
+- **SlotsParJour (helper)** : `=SUMIFS(Shop_Slots!$C:$C, Shop_Slots!$A:$A, $A2, Shop_Slots!$B:$B, $B2)`  
+- **Input_CapacityDays (C2)** : `=SlotsParJour * 90`  
+- **Input_PlanDays (D2)** : `=SUMIFS(Input_Operations!$E:$E, Input_Operations!$C:$C, $B2, Input_Operations!$D:$D, $A2)`  
+- **Output_PlanDays (E2)** : `=SUMIFS(Output_Operations!$E:$E, Output_Operations!$C:$C, $B2, Output_Operations!$D:$D, $A2)`  
+- **Util_Input% (F2)** : `=IFERROR(D2/C2,0)`  
+- **Util_Output% (G2)** : `=IFERROR(E2/C2,0)`  
+- **Écart% (H2)** : `=G2 - F2`
 
-6) KPI_Dashboard
-- 5 graphiques “barres qui se remplissent”, un par shop.
-- Pour chaque shop :
-  - Table d’aide : Catégorie, Util_Input%, Util_Output% (tirées de KPI_Check).
-  - Graphique en colonnes groupées (2 séries) avec les Catégories en abscisse.
-  - Axe Y borné à 0–100%.
-  - Titre : “{Shop} — Utilisation (%) par catégorie”.
-- Important : charts compatibles Excel Desktop (ne pas cibler Google Sheets).
+**TDD / critères d’acceptation** ✅  
+- **CA1** : `SlotsPerDay=4`, horizon 90 → **Input_CapacityDays=360**.  
+- **CA2** : 3 opérations de 30 j → **Input_PlanDays=90**, **Util_Input%=25%**.  
+- **CA3** : si **Output_PlanDays = Input_PlanDays** → **Écart%=0** (vert).  
+- **CA4** : si **Output_PlanDays > Input_PlanDays** → **Écart%>0** (rouge).  
+- **CA5** : toute cellule différente entre **Output_Operations** et **Input_Operations** (par `Id`) est **jaune**.
 
-FORMULES EXCEL (références colonnes)
-Supposons KPI_Check : A=Shop, B=Catégorie, C=Input_CapacityDays, D=Input_PlanDays, E=Output_PlanDays, F=Util_Input%, G=Util_Output%, H=Écart%, et ligne 2 = 1ʳᵉ ligne de données.
+---
 
-- SlotsPerDay (helper interne, ou inline)
-  =SUMIFS(Shop_Slots!$C:$C, Shop_Slots!$A:$A, $A2, Shop_Slots!$B:$B, $B2)
+# 3) Interface 🖥️
+*Questions à se poser d’abord* 💬  
+- Quelles feuilles minimales pour saisir/recoller et lire les KPI ?  
+- Comment signaler visuellement les différences cellule par cellule ?  
+- Comment rendre la comparaison par shop immédiate ?
 
-- Input_CapacityDays (C2)
-  =SlotsPerDay * 90
-  (ou inline avec la formule SUMIFS × 90)
+**Feuilles du classeur** 📒  
+- **Parameters** : `START_DATE = 2025-09-01`, `HORIZON_DAYS = 90`.  
+- **Shop_Slots** : colonnes `Shop`, `Catégorie`, `SlotsPerDay` (2–3 catégories par shop, `SlotsPerDay ∈ [2..6]`, chaque catégorie couverte par ≥2 shops).  
+- **Input_Operations** *(ex-Seed_Operations)* : colonnes `Id`, `Type`, `Catégorie`, `Shop`, `Durée (jours)`, `Start Date` (100 lignes ; cohérence Catégorie/Shop ; dates dans l’horizon).  
+- **Output_Operations** *(retour IBP)* : même structure ; générer ~1% d’écarts (durée ±1–3 j **ou** start ±1–3 j) ; **mise en forme conditionnelle JAUNE** si valeur ≠ Input (comparaison par `Id`, colonne à colonne).  
+  - Exemple (Durée, cellule E2) : `=$E2<>XLOOKUP($A2, Input_Operations!$A:$A, Input_Operations!$E:$E, "")`  
+- **KPI_Check** *(consolidation Shop×Cat)* : colonnes `Shop`, `Catégorie`, `Input_CapacityDays`, `Input_PlanDays`, `Output_PlanDays`, `Util_Input%`, `Util_Output%`, `Écart%` (formater F–H en % ; **vert** si `Écart%=0`, **rouge** sinon).  
+- **KPI_Dashboard** : **5 graphiques** (un par shop) en **colonnes groupées** **Util_Input% vs Util_Output%** par **Catégorie** ; axe **0–100%** ; lecture “barres qui se remplissent” 📊.
 
-- Input_PlanDays (D2)
-  =SUMIFS(Input_Operations!$E:$E, Input_Operations!$C:$C, $B2, Input_Operations!$D:$D, $A2)
+**Flux IBP (le plus simple)** 🔄  
+- **Entrée (INPUT)** : pousser/ajuster les opérations depuis **Input_Operations** vers IBP.  
+- **Sortie (OUTPUT)** : coller le retour IBP dans **Output_Operations** (même structure).
 
-- Output_PlanDays (E2)
-  =SUMIFS(Output_Operations!$E:$E, Output_Operations!$C:$C, $B2, Output_Operations!$D:$D, $A2)
+---
 
-- Util_Input% (F2)
-  =IFERROR(D2/C2,0)
+# 4) Technique 🛠️
+*Questions à se poser d’abord* 🧪  
+- Comment garantir la reproductibilité et la compatibilité Excel Desktop ?  
+- Quels outils/bibliothèques utiliser pour générer fichier + graphiques ?  
+- Quelles contraintes côté données aléatoires ?
 
-- Util_Output% (G2)
-  =IFERROR(E2/C2,0)
+**Génération & compatibilité** 🧰  
+- Générer un fichier **Excel Desktop** (graphiques colonnes visibles dans Excel, non garanti pour Google Sheets).  
+- Bibliothèques recommandées si script : **openpyxl** ou **xlsxwriter** (Python).  
+- **Seed aléatoire fixée** pour la reproductibilité.
 
-- Écart% (H2)
-  =G2-F2
+**Règles de génération (résumé)** 📦  
+- **Shop_Slots** : 2–3 catégories par shop, `SlotsPerDay ∈ [2..6]`, **chaque catégorie** présente dans **≥2 shops**.  
+- **Input_Operations** : `Id` = OP001…OP100 ; `Type` = “{Catégorie} Type n” (n ∈ [1..4]) ; `Durée (jours)` ∈ [5..90] ; `Start Date` uniforme, avec **fin ≤ START_DATE + 89 j** ; `Shop` éligible à la `Catégorie`.  
+- **Output_Operations** : copie d’Input + **~1% d’écarts** (Durée **ou** Start Date, ±1..±3 j) **sans sortir de l’horizon** ; **mise en évidence JAUNE** via XLOOKUP sur `Id`.
 
-MISE EN FORME / UX
-- Entêtes en gras, gel des volets (A2).
-- Auto-fit colonnes.
-- Dates en ISO (YYYY-MM-DD).
-- Pour Output_Operations : règles de mise en forme conditionnelle JAUNES pour chaque colonne (Type, Catégorie, Shop, Durée, Start Date) vs Input_Operations, basées sur la clé Id.
-- Pour KPI_Check : pourcentages sur F, G, H ; voyants vert/rouge sur H.
-
-GÉNÉRATION DES DONNÉES (détails)
-- Seed aléatoire fixé pour reproductibilité.
-- Shop_Slots : 2–3 catégories par shop, SlotsPerDay ∈ [2..6], couverture min. 2 shops par catégorie.
-- Input_Operations :
-  - Id : OP001 à OP100.
-  - Type : “{Catégorie} Type n” (n ∈ [1..4]).
-  - Durée : uniformément entre 5 et 90 jours.
-  - Start Date : tirée uniformément, en veillant à ne pas dépasser la fin d’horizon (end = start + durée - 1 ≤ START_DATE + 89 j).
-  - Shop éligible à la Catégorie (via Shop_Slots).
-- Output_Operations :
-  - Copie d’Input_Operations + ~1% d’écarts (Durée ±1..±3 jours OU Start Date ±1..±3 jours), en restant dans l’horizon.
-  - Mettre en évidence les écarts en JAUNE.
-
-ACCEPTANCE / TDD (cases à vérifier automatiquement ou en note)
-- CA1 : Si SlotsPerDay=4 et HORIZON=90 → Input_CapacityDays=360.
-- CA2 : 3 opérations de 30 j → Input_PlanDays=90 → Util_Input%=25%.
-- CA3 : Output_PlanDays = Input_PlanDays → Écart%=0 (voyant vert).
-- CA4 : Output_PlanDays > Input_PlanDays → Écart%>0 (voyant rouge).
-- CA5 : Les cellules réellement modifiées dans Output_Operations sont JAUNES (comparaison par Id).
-
-CONTRAINTE OUTIL
-- Génère réellement le fichier Excel “MAESTRO_FillRate_Simplified.xlsx” avec toutes les feuilles, formules et graphiques.
-- Si tu utilises Python, privilégie openpyxl/xlsxwriter ; s’assurer que les graphiques sont visibles dans Excel Desktop.
-- Fournis un lien de téléchargement direct en sortie.
-```
+**Livrable attendu** 📁  
+- Classeur unique **MAESTRO_FillRate_Simplified.xlsx** avec toutes les feuilles, formules, formats et **5 graphiques** prêts.  
