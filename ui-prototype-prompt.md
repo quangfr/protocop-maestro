@@ -1,3 +1,7 @@
+À copier dans GPT en lui demandant de `créer un prototype HTML standalone avec le contexte suivant`
+
+---
+
 # 1️⃣ Identité  
 
 **Nom de l’application** : **MAESTRO**  
