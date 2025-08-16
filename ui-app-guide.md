@@ -65,8 +65,6 @@
   - OpTypes (12) : Inspection, Disassembly, Repair, DeepRepair, Cleaning, Assembly, TestRun, NDT, Calibration, Balancing, Painting, Documentation.
   - Volumétrie POC : **10 demandes**, **50 opérations**, étalées sur **J+0 → J+55**.
 
-**Diagramme UML** :
-
 ```mermaid
 
 classDiagram
