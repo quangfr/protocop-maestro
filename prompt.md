@@ -1,114 +1,120 @@
-# 1️⃣ Identité
+# 1️⃣ Identité  
 
-**Nom affiché** : MAESTRO  
-**Style** : Thème clair, interface SAP IBP-like (cartes, onglets, entêtes figées, couleurs codes capacité, boutons arrondis)  
-**Objectif** : Gérer en local les demandes et opérations de maintenance sur moteurs d’avion : création, édition, suivi des capacités et visualisation d’indicateurs clés, le tout dans un fichier HTML unique sans dépendances externes.
+**Nom de l’application** : **MAESTRO**  
+**Style visuel** : interface claire et moderne, inspirée de SAP IBP :  
+- Organisation en **cartes et onglets**  
+- En-têtes toujours visibles  
+- **Couleurs codées** pour représenter les capacités (vert, jaune, rouge)  
+- Boutons arrondis pour un rendu plus agréable  
 
----
-
-# 2️⃣ Modèle de données
-
-## Objets métiers
-
-### Demande (Request)
-- **Propriétés** : ID, Client, Modèle moteur, Localisation, Atelier (Shop), Type de demande, Urgence, Statut, Date demande, Date de fin estimée, Notes
-- **Validations** : champs obligatoires (Client, Moteur, Localisation, Shop, Type, Urgence, Statut), ID auto, Date fin calculée automatiquement
-- **Contraintes** : chaque type de demande impose exactement 4 opérations requises ; relations vers un Shop et un Type de demande existants
-
-### Opération (Operation)
-- **Propriétés** : ID, Request ID, Shop, Type d’opération, Statut, Date début, Durée (1–5 semaines), Date fin
-- **Validations** : champs obligatoires (Request ID, Shop, Type op, Statut), ID auto, Date fin calculée depuis début+durée
-- **Contraintes** : Type op autorisé par Shop, lié à une demande existante
-
-### Listes maîtres (`mdLists`)
-- Urgency, Status, Shop, Location, Operation Type, Engine Model, Customer, Request Type
-
-### Mapping Request Type → Ops requises
-- **Règle** : chaque Request Type doit avoir exactement 4 types d’opération distincts
-
-### Durées par type d’opération (`opDur`)
-- **Valeur** : entre 1 et 5 semaines
-
-### Capacités atelier (`shopCapabilities`)
-- **Propriétés** : Ops autorisées, capacité par défaut, localisation, exceptions de capacité par période
-
-## Relations
-- 1 Demande → N Opérations
-- 1 Shop → N Operation Types autorisés
-- 1 Request Type → exactement 4 Operation Types
-- ShopCapabilities liés à Shop et Location
-
-## Données d’exemple (seed)
-- Urgency : 4 valeurs
-- Status : 4 valeurs
-- Shops : 10 (S01 à S10)
-- Locations : 5
-- Operation Types : 12
-- Engine Models : 5
-- Customers : 5
-- Request Types : 3 (4 ops chacune)
-- Durées : 1 à 5 semaines
-- Transactions : 10 demandes, 30 opérations aléatoires
+**Objectif** :  
+MAESTRO est une application locale, qui fonctionne entièrement dans un fichier HTML sans connexion Internet.  
+Elle permet de :  
+- **Créer et modifier** des demandes de maintenance moteur  
+- **Suivre** les opérations associées  
+- **Vérifier** les capacités des ateliers (shops)  
+- **Visualiser** des indicateurs clés de performance (KPI)  
 
 ---
 
-# 3️⃣ Navigation et écrans
+# 2️⃣ Modèle de données  
 
-## Onglets / écrans
+## Objets principaux  
 
-### Nouvelle demande
-- Formulaire création demande (champs obligatoires en jaune)
-- Helper panel : liste des 4 ops requises par type, Capacity Lookup (date+shop+op type → capacity/used/free)
-- **Actions** : créer demande, recalculer date fin estimée
+### Demande (Request)  
+C’est la fiche de départ : un client demande la maintenance d’un moteur.  
+- **Contenu** : numéro unique, client, type de moteur, localisation, atelier choisi, type de demande, niveau d’urgence, statut, date de création, date de fin estimée, notes éventuelles  
+- **Règles** : certains champs sont obligatoires (client, moteur, atelier, etc.). La date de fin est calculée automatiquement.  
+- **Particularité** : chaque type de demande nécessite exactement **4 opérations** obligatoires.  
 
-### Éditer opérations
-- Formulaire création/édition opération
-- Helper panel : liste ops autorisées par shop, capacité par défaut et exceptions
-- **Actions** : sauvegarder ou supprimer opération
+### Opération (Operation)  
+Une demande est toujours composée de plusieurs opérations.  
+- **Contenu** : numéro unique, lien avec une demande, atelier concerné, type d’opération, statut, date de début, durée prévue (1 à 5 semaines), date de fin  
+- **Règles** : certains champs obligatoires. La date de fin se calcule seule.  
+- **Particularité** : une opération doit être autorisée dans l’atelier choisi.  
 
-### Demandes
-- Tableau filtrable par Request ID
-- Liens sur Request ID / nombre d’ops → ouvrent tableau opérations filtré
+### Listes maîtres (référentiels)  
+Elles contiennent toutes les valeurs disponibles dans les menus déroulants :  
+- Urgences, statuts, ateliers, localisations, types d’opérations, modèles moteurs, clients, types de demandes  
 
-### Opérations
-- Tableau filtrable par Operation ID ou Request ID
-- Liens sur Request ID → ouvrent tableau demandes filtré
-- Liens sur Operation ID → ouvrent formulaire édition opération pré-rempli
+### Mappings & règles  
+- Chaque type de demande doit correspondre à **4 opérations distinctes**  
+- Chaque type d’opération a une **durée par défaut** (1 à 5 semaines)  
+- Chaque atelier (shop) a une **capacité par défaut**, une localisation et peut avoir des exceptions  
 
-### Listes maîtres
-- Colonnes éditables pour chaque liste
-- Table mapping (Request Type → 4 ops) avec contrôle unicité
-- Table durées par type op
-- Bouton **Apply MD Changes**
-- JSON Viewer (read-only, collapsible, copy, download)
+## Relations entre données  
+- Une demande → plusieurs opérations  
+- Un atelier → plusieurs types d’opérations autorisés  
+- Un type de demande → exactement 4 opérations  
 
-### KPI Dashboard
-- On-time % urgent (calcul sur demandes Urgent livrées à temps)
-- Heatmap capacité hebdo (Location × Shop, 8 semaines, codes couleur vert/jaune/rouge)
-
-## Navigation
-- Barre d’onglets persistante en haut
-- Clics sur IDs dans les tableaux pour naviguer avec filtre appliqué
-- Passage auto à l’écran concerné après clic
+## Données d’exemple  
+À l’ouverture, l’application se remplit avec des données fictives :  
+- 4 urgences, 4 statuts  
+- 10 ateliers, 5 localisations  
+- 12 types d’opérations  
+- 5 modèles de moteur, 5 clients  
+- 3 types de demandes (chacun avec 4 opérations)  
+- 10 demandes et 30 opérations générées au hasard  
 
 ---
 
-# 4️⃣ Techniques
+# 3️⃣ Navigation et écrans  
 
-## Fonctionnalités avancées
-- Fichier HTML autonome (offline, Vanilla JS, pas de dépendance externe)
-- Données seed aléatoires au démarrage
-- Dropdowns dynamiques (filtrage ops par shop)
-- Calculs auto (dates fin, capacity lookup, KPI)
-- Recherche texte avec rafraîchissement instantané
-- Import / Export JSON complet (tous objets métiers)
-- JSON Viewer avec sections repliables, copy/download
-- Tableaux avec entêtes sticky et survol ligne
-- KPI & Heatmap calculés à la volée
-- Responsive simplifié (stack en mobile)
+## Les onglets principaux  
 
-## Contraintes techniques
-- Pas de stockage persistant natif (hors export/import JSON)
-- Pas de backend, toute logique côté client
-- Capacités calculées à la semaine ISO entière
-- Mapping et durées doivent respecter les validations sinon avertissement
+### Nouvelle demande  
+- Formulaire simple pour saisir une demande (champs obligatoires en jaune)  
+- Panneau d’aide :  
+  - montre automatiquement les 4 opérations requises par type de demande  
+  - permet de vérifier la capacité d’un atelier à une date donnée  
+- **Actions** : créer une demande, recalculer la date de fin  
+
+### Éditer opérations  
+- Formulaire pour créer ou modifier une opération liée à une demande  
+- Panneau d’aide : indique quelles opérations sont autorisées dans l’atelier choisi  
+- **Actions** : sauvegarder ou supprimer l’opération  
+
+### Demandes  
+- Tableau de toutes les demandes  
+- Chaque numéro de demande est cliquable → ouvre les opérations liées  
+
+### Opérations  
+- Tableau de toutes les opérations  
+- Numéro d’opération cliquable → ouvre l’édition de cette opération  
+- Numéro de demande cliquable → ouvre la fiche demande correspondante  
+
+### Listes maîtres  
+- Tableaux éditables pour ajouter/modifier les valeurs de référence (urgences, statuts, ateliers, etc.)  
+- Mapping obligatoire : chaque type de demande doit être lié à 4 opérations distinctes  
+- Table de durée par type d’opération  
+- **Actions** : appliquer les changements, voir les données au format JSON (export/copie possible)  
+
+### Tableau de bord (KPI)  
+- % de demandes urgentes livrées dans les temps  
+- Carte de chaleur (heatmap) des capacités hebdomadaires (par localisation et atelier, sur 8 semaines)  
+
+## Navigation  
+- Onglets visibles en permanence en haut de l’écran  
+- Clic sur un ID → ouvre automatiquement l’écran concerné, avec un filtre déjà appliqué  
+
+---
+
+# 4️⃣ Techniques  
+
+## Fonctionnalités intégrées  
+- Tout tient dans **un seul fichier HTML** (aucune installation, aucun serveur)  
+- Données d’exemple créées automatiquement au démarrage  
+- Menus déroulants dynamiques (par ex. : les opérations proposées dépendent de l’atelier choisi)  
+- Calculs automatiques : dates de fin, capacité disponible, KPI  
+- Tableaux filtrables et recherche instantanée  
+- Import / export de toutes les données en JSON  
+- Visionneuse JSON pratique : repliable, copiable, téléchargeable  
+- Tableaux avec en-têtes fixes et survol des lignes  
+- Tableau de bord mis à jour en temps réel  
+- Affichage adapté mobile (les sections se mettent en pile)  
+
+## Limitations techniques  
+- Pas de sauvegarde automatique (il faut exporter/importer les données pour garder l’historique)  
+- Pas de connexion serveur (tout se fait dans ton navigateur)  
+- Les capacités sont toujours calculées par semaine entière (selon la norme ISO)  
+- Si les règles de mapping ou de durée ne sont pas respectées, un avertissement s’affiche  
