@@ -18,9 +18,7 @@
 **📥 Fichiers :**
 - readme.md : questionnaire à répondre pour préparer le prompt
 - prompt.md : exemple de prompt complet MAESTRO (à mettre dans GPT pour générer le prototype)
-- prototype-prompt.html : exemple de prototype MAESTRO généré à partir du prompt (à télécharger et à ouvrir dans un navigateur)
-- pseudocode.md : exemple de pseudocode MAESTRO  (specs synthétique)
-- prototype-pseudocode.html : exemple de prototype MAESTRO généré à partir du pseudocode
+- prototype.html : exemple de prototype MAESTRO généré à partir du prompt (à télécharger et à ouvrir dans un navigateur)
 
 
 **🤖 Astuces**
