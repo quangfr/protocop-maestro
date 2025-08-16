@@ -8,19 +8,20 @@
 - 👥 Tests utilisateurs (Export du logiciel / Import dans le prototype)
 - 🖼️ Démos réalistes (Import dans le logiciel / Export du prototype)
 
-**💡 Astuces**
-- Demander à GPT de te poser des questions pour préciser ta demande
-- Demander à GPT de te proposer des pistes de simplification
-- Demander à GPT de générer une proposition au préalable
-- Amender la proposition jusqu'a ce qu'elle te convient avec de générer le prototype
-- Quand tu es satisfait du prototype, demande à GPT de te fournir le prompt pour reprendre ailleurs le prototype
+**💡 Démarche IA**
+1. 🔍 Prototyper petit avec des hypothèses de simplification
+2. ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
+3. 🆘 Demander à GPT de te proposer des pistes d'amélioration ou de simplification
+4. 🔄 Mettre le plus de demandes possibles dans ton prompt avant régénération
+5. 📥 Amender le prompt jusqu'à ce qu'il te convient avec de générer le prototype
+6. 📋 Quand tu es satisfait, demande à GPT de te refournir le prompt pour reprendre ailleurs
 
 **🤖 Lien à la conversation IA**
 ```
 https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 ```
 
-# Guide 
+# Prompt
 
 ### 1) Contexte (Hypothèses + Mise en forme) ✨
 *Questions à se poser d’abord* 🤔  
