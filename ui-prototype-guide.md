@@ -25,7 +25,7 @@
 - 📋 Plus ton prompt est précis, plus ton prototype sera fidèle mais plus la génération prend du temps
   
 ---
-# Questionnaire
+# Guide
 
 ## 1️⃣ Contexte
 
