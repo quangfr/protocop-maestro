@@ -47,7 +47,7 @@ Elle permet de :
 - **Visualiser** des indicateurs clés de performance (KPI)  
 
 **Hypothèses** :  
-- 🎯 Demande = 1 moteur, 2 types supportés (Overhaul, QuickInspection)
+- 🎯 Demande = 1 moteur, plusieurs types supportés
 - 🧩 Pack fixe de 4 opérations par type (aucune variante ni sous-op)
 - ⏱️ Durées fixes par opération; ETA = somme des durées (sans attente capacité)
 - 🏭 Capacité par atelier en “créneaux/jour” (pas d’heures, pas d’équipes)
