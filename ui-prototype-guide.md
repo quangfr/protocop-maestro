@@ -1,6 +1,4 @@
-# 🚀 Protocop GO-LIVE : prompt GPT pour créer un prototype HTML
-
-**🎯 But du doc :** cadrer un **prototype HTML autonome** (offline, sans dépendance)
+## Contexte
 
 **📌 Objectifs d'un prototype HTML :**
 
