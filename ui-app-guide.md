@@ -22,7 +22,12 @@
 5. 📥 Amender le prompt jusqu'à ce qu'il te convient avec de générer le prototype
 6. 📋 Quand tu es satisfait, demande à GPT de te refournir le prompt pour reprendre ailleurs
 7. 🔶 Demander à GPT de générer le diagramme UML pour vérifier ou documenter
-  
+
+**🤖 Lien à la conversation IA**
+```
+[https://chatgpt.com/share/68a0d517-08e8-8006-8686-eea0ad16b236](https://chatgpt.com/share/68a0d517-08e8-8006-8686-eea0ad16b236)
+```
+
 # Prompt
 
 ## 1) 🎯 CONTEXTE
