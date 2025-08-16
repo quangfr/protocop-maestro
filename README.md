@@ -15,10 +15,12 @@
 - 📊 Illustration avec des données réalistes 
 - 👥 Tests utilisateurs (UI/UX)
 
-**📥 Dépôt :**
-- readme.md : questionnaire (et ex synthétique MAESTRO) à mettre dans GPT pour créer son prompt
-- prompt.md : exemple de prompt complet MAESTRO à mettre dans GPT pour générer le prototype
-- prototype.html : exemple de prototype MAESTRO à télécharger et à ouvrir dans un navigateur
+**📥 Fichiers :**
+- readme.md : questionnaire à répondre pour préparer le prompt
+- prompt.md : exemple de prompt complet MAESTRO (à mettre dans GPT pour générer le prototype)
+- prototype-prompt.html : exemple de prototype MAESTRO généré à partir du prompt (à télécharger et à ouvrir dans un navigateur)
+- pseudocode.md : exemple de pseudocode MAESTRO  (specs synthétique)
+- prototype-pseudocode.html : exemple de prototype MAESTRO généré à partir du pseudocode
 
 
 **🤖 Astuces**
