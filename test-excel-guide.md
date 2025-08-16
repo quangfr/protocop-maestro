@@ -1,12 +1,12 @@
 # Contexte
 **📌 Objectifs d'un prototype Excel :**
 
-- ✅ Valider la logique de calculs (formules, KPI) sur un jeu de cas clair
-- 📥 Importer et structurer de la donnée en masse
+- ✅ Valider la logique de calculs sur un périmètre réduit
+- 📥 Importer CSV de la donnée fictive en masse
 
 **🛠 Usages concrets :**
-- 👥 Tests utilisateurs (Calcul)
-- 🖼️ Illustrations de cas réalistes
+- 👥 Tests utilisateurs (Export du logiciel / Import dans le prototype)
+- 🖼️ Démos réalistes (Import dans le logiciel / Export du prototype)
 
 **Astuces 💡**
 - Demander à GPT de te poser des questions pour préciser ta demande
