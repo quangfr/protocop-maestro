@@ -105,9 +105,9 @@ classDiagram
   }
 
   enum RequestType {
-    Overhaul
-    QuickInspection
-    DeepRepair 
+    OverHaul 
+    QuickInspection 
+    DeepRepair  
   }
 
   enum Urgency {
