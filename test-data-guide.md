@@ -50,7 +50,7 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - Entêtes en gras, volets gelés sous la 1ʳᵉ ligne.  
 - Graphiques en **colonnes groupées**, axe Y **0–100%**.
 
-### 2) Modèle (Liste de références + Formules + TDD) 🧠
+### 2) Modèle de données 🧠
 *Questions à se poser d’abord* 📝 
 - Quelles listes de référence minimales et sans IDs ?
 - Quelles sont les règles de calcul de la donnée ?
