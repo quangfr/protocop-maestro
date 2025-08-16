@@ -5,8 +5,9 @@
 - 📥 Importer CSV de la donnée fictive en masse
 
 **🛠 Usages concrets :**
-- 👥 Tests utilisateurs (Export du logiciel / Import dans le prototype)
-- 🖼️ Démos réalistes (Import dans le logiciel / Export du prototype)
+- ✍️ Spécifications enrichies
+- 👥 Tests utilisateurs (EXIM)
+- 🖼️ Démos réalistes (EXIM)
 
 **💡 Démarche IA**
 1. 🔍 Prototyper petit avec des hypothèses de simplification
