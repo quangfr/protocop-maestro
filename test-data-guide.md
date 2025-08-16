@@ -54,6 +54,79 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - Quelles sont les règles de génération de la donnée ?
 - Comment on valide par des tests unitaires simples ?
 
+```mermaid
+classDiagram
+    class Parameters {
+      START_DATE: date
+      HORIZON_DAYS: int = 90
+    }
+
+    class Shop {
+      name: string
+    }
+
+    class Catégorie {
+      name: string
+    }
+
+    class Shop_Slots {
+      Shop: string
+      Catégorie: string
+      SlotsPerDay: int [2..6]
+      CapacityDays = SlotsPerDay * HORIZON_DAYS
+    }
+
+    class Input_Operations {
+      Id: string
+      Type: string
+      Catégorie: string
+      Shop: string
+      Durée_jours: int [5..90]
+      StartDate: date
+    }
+
+    class Output_Operations {
+      Id: string
+      Type: string
+      Catégorie: string
+      Shop: string
+      Durée_jours: int
+      StartDate: date
+      ~1% de différences vs Input (par Id)
+    }
+
+    class KPI_Check {
+      Shop: string
+      Catégorie: string
+      Input_CapacityDays: int
+      Input_PlanDays: int
+      Output_PlanDays: int
+      Util_Input_% = Input_PlanDays / Input_CapacityDays
+      Util_Output_% = Output_PlanDays / Input_CapacityDays
+      Écart_% = Util_Output_% - Util_Input_%
+    }
+
+    %% Relations de structure
+    Shop "1" -- "0..*" Shop_Slots : offre
+    Catégorie "1" -- "0..*" Shop_Slots : éligible
+
+    Shop "1" -- "0..*" Input_Operations : planifié_dans
+    Catégorie "1" -- "0..*" Input_Operations : de_cat
+
+    Shop "1" -- "0..*" Output_Operations : issu_d'IBP
+    Catégorie "1" -- "0..*" Output_Operations : de_cat
+
+    KPI_Check "0..*" -- "1" Shop : pour
+    KPI_Check "0..*" -- "1" Catégorie : pour
+
+    %% Traçabilité Input -> Output
+    Input_Operations "1" <-- "0..1" Output_Operations : même Id
+
+    %% Dépendance au paramétrage (pour CapacityDays)
+    Shop_Slots ..> Parameters : HORIZON_DAYS
+
+```mermaid
+
 **Listes de références (noms lisibles, pas d’IDs)** 📇  
 - **Shops** : Lyon, Toulouse, Nantes, Bordeaux, Marseille.  
 - **Catégories** : Inspection, Disassembly, Repair, Assembly, TestRun.  
