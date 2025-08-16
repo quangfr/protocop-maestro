@@ -6,9 +6,9 @@
 
 **🛠 Usages concrets :**
 
-🖼️ Import / Export CSV
-📊 Connecteurs Excel Add In (SAP-IBP
-👥 Tests utilisateurs (Calcul)
+- 🖼️ Import / Export CSV
+- 📊 Connecteurs Excel Add In (SAP-IBP
+- 👥 Tests utilisateurs (Calcul)
 
 
 **Astuces 💡**
