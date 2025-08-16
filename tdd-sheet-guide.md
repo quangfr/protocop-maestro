@@ -1,27 +1,6 @@
 ## Contexte
 Illustrer la capacité à vérifier la justesse des données calculées venant d'un outil externe comme SAP-IBP. Dans notre cas il s'agit du taux d'occupation des centres de maintenance des moteurs d'avion. Le choix d'Excel est lié à l'utilisation d'Excel Add-in. On utilise ChatGPT pour générer un prototype de la feuille de calcul de vérification.
 
-**Hypothèses de simplification**
-- 🗓️ Horizon fixe : 90 jours, 7/7, pas de calendrier/fériés/exceptions.
-- 🔢 Unité : slot-jour (1 opération consomme 1 slot/jour sur toute sa durée).
-- 🧩 Capacité constante : définie par Shop × Catégorie (SlotsPerDay), identique sur tout l’horizon.
-- 🛠️ Modèle minimal : 1 opération = 1 type = 1 catégorie = 1 shop (pas de multi-shop/catégorie).
-- ⏱️ Durées fixes par type : 5–90 jours, sans variance (pas de set-up, pas d’heures sup).
-- 🧭 Ignoré : demande (request), priorités/urgences, rework, ressources multiples, séquencement entre opérations.
-- ✈️ Moteur : la déclinaison moteur n’influence pas la durée.
-- 🏷️ Noms lisibles partout (shops, catégories, types) — pas d’IDs techniques.
-- 🏬 Shops & catégories : chaque shop offre 2–3 catégories ; chaque catégorie est présente sur ≥ 2 shops.
-- 🧮 KPI agrégé (sur 90 j, pas quotidien) :
-  - Input_CapacityDays = Slots/jour × 90
-  - Input_PlanDays = Σ durées des ops Input (Shop×Cat)
-  - Output_PlanDays = Σ durées des ops Output (Shop×Cat)
-  - Util_Input% = Input_PlanDays / Input_CapacityDays
-  - Util_Output% = Output_PlanDays / Input_CapacityDays
-  - Écart% = Util_Output% − Util_Input%
-- 🚦 >100% autorisé côté Output (affiché tel quel).
-- 🟡 Écarts simulés : ~1% de différences dans Output_Operations vs Input_Operations, cellules modifiées surlignées en jaune (clé = Id).
-- 📊 Dashboard : 5 graphiques (un par shop) — barres Util_Input% vs Util_Output% par catégorie (axe 0–100%).
-
 ## IA🤖 
 **Astuces💡**
 - Demander à GPT de te poser des questions pour préciser ta demande
