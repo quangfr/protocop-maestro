@@ -66,7 +66,7 @@
   - Volumétrie POC : **10 demandes**, **50 opérations**, étalées sur **J+0 → J+55**.
 
 **Diagramme UML** :
-````mermaid
+```mermaid
 classDiagram
   class Request {
     +string id
