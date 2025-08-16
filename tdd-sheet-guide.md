@@ -14,9 +14,9 @@ Illustrer la capacité à créer un prototype qui vérifie la donnée venant d'u
 https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 ```
 
-## Prompt 
+## Guide 
 
-# 1) Contexte (Hypothèses + Mise en forme) ✨
+# 1. Contexte (Hypothèses + Mise en forme) ✨
 *Questions à se poser d’abord* 🤔  
 - Quel est l’objectif précis et sur quelle unité/échelle on mesure l’utilisation ?  
 - Quelles simplifications on fige pour isoler le calcul ?  
@@ -45,7 +45,7 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 # 2) Modèle (Liste de références + Formules + TDD) 🧠
 *Questions à se poser d’abord* 📝  
 - Quelles listes de référence minimales et sans IDs ?  
-- Quelles formules garantissent le calcul “input vs output” au bon grain ?  
+- Quelles sont les règles de génération de la donnée ?
 - Comment on valide par des tests unitaires simples ?
 
 **Listes de références (noms lisibles, pas d’IDs)** 📇  
@@ -61,15 +61,10 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - `Util_Output% = Output_PlanDays / Input_CapacityDays`  
 - `Écart% = Util_Output% – Util_Input%`
 
-**Formules Excel (exemples)** 🧮  
-*(Supposons dans **KPI_Check** : A=Shop, B=Catégorie, C=Input_CapacityDays, D=Input_PlanDays, E=Output_PlanDays, F=Util_Input%, G=Util_Output%, H=Écart% ; ligne 2 = 1ʳᵉ donnée)*  
-- **SlotsParJour (helper)** : `=SUMIFS(Shop_Slots!$C:$C, Shop_Slots!$A:$A, $A2, Shop_Slots!$B:$B, $B2)`  
-- **Input_CapacityDays (C2)** : `=SlotsParJour * 90`  
-- **Input_PlanDays (D2)** : `=SUMIFS(Input_Operations!$E:$E, Input_Operations!$C:$C, $B2, Input_Operations!$D:$D, $A2)`  
-- **Output_PlanDays (E2)** : `=SUMIFS(Output_Operations!$E:$E, Output_Operations!$C:$C, $B2, Output_Operations!$D:$D, $A2)`  
-- **Util_Input% (F2)** : `=IFERROR(D2/C2,0)`  
-- **Util_Output% (G2)** : `=IFERROR(E2/C2,0)`  
-- **Écart% (H2)** : `=G2 - F2`
+**Règles de génération (résumé)** 📦  
+- **Shop_Slots** : 2–3 catégories par shop, `SlotsPerDay ∈ [2..6]`, **chaque catégorie** présente dans **≥2 shops**.  
+- **Input_Operations** : `Id` = OP001…OP100 ; `Type` = “{Catégorie} Type n” (n ∈ [1..4]) ; `Durée (jours)` ∈ [5..90] ; `Start Date` uniforme, avec **fin ≤ START_DATE + 89 j** ; `Shop` éligible à la `Catégorie`.  
+- **Output_Operations** : copie d’Input + **~1% d’écarts** (Durée **ou** Start Date, ±1..±3 j) **sans sortir de l’horizon** ; **mise en évidence JAUNE** via XLOOKUP sur `Id`.
 
 **TDD / critères d’acceptation** ✅  
 - **CA1** : `SlotsPerDay=4`, horizon 90 → **Input_CapacityDays=360**.  
@@ -83,8 +78,10 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 # 3) Interface 🖥️
 *Questions à se poser d’abord* 💬  
 - Quelles feuilles minimales pour saisir/recoller et lire les KPI ?  
-- Comment signaler visuellement les différences cellule par cellule ?  
-- Comment rendre la comparaison par shop immédiate ?
+- Comment signaler visuellement les différences cellule par cellule ?
+- Comment garantir le calcul “input vs output” au bon grain ?
+- Comment rendre la comparaison avec SAP-IBP immédiate ?
+
 
 **Feuilles du classeur** 📒  
 - **Parameters** : `START_DATE = 2025-09-01`, `HORIZON_DAYS = 90`.  
@@ -95,27 +92,46 @@ https://chatgpt.com/c/68a05788-7224-8320-a6c3-56255e835581
 - **KPI_Check** *(consolidation Shop×Cat)* : colonnes `Shop`, `Catégorie`, `Input_CapacityDays`, `Input_PlanDays`, `Output_PlanDays`, `Util_Input%`, `Util_Output%`, `Écart%` (formater F–H en % ; **vert** si `Écart%=0`, **rouge** sinon).  
 - **KPI_Dashboard** : **5 graphiques** (un par shop) en **colonnes groupées** **Util_Input% vs Util_Output%** par **Catégorie** ; axe **0–100%** ; lecture “barres qui se remplissent” 📊.
 
+**Formules Excel (exemples)** 🧮  
+*(Supposons dans **KPI_Check** : A=Shop, B=Catégorie, C=Input_CapacityDays, D=Input_PlanDays, E=Output_PlanDays, F=Util_Input%, G=Util_Output%, H=Écart% ; ligne 2 = 1ʳᵉ donnée)*  
+- **SlotsParJour (helper)** : `=SUMIFS(Shop_Slots!$C:$C, Shop_Slots!$A:$A, $A2, Shop_Slots!$B:$B, $B2)`  
+- **Input_CapacityDays (C2)** : `=SlotsParJour * 90`  
+- **Input_PlanDays (D2)** : `=SUMIFS(Input_Operations!$E:$E, Input_Operations!$C:$C, $B2, Input_Operations!$D:$D, $A2)`  
+- **Output_PlanDays (E2)** : `=SUMIFS(Output_Operations!$E:$E, Output_Operations!$C:$C, $B2, Output_Operations!$D:$D, $A2)`  
+- **Util_Input% (F2)** : `=IFERROR(D2/C2,0)`  
+- **Util_Output% (G2)** : `=IFERROR(E2/C2,0)`  
+- **Écart% (H2)** : `=G2 - F2`
+
 **Flux IBP (le plus simple)** 🔄  
-- **Entrée (INPUT)** : pousser/ajuster les opérations depuis **Input_Operations** vers IBP.  
+- **Entrée (INPUT)** : pousser/ajuster les opérations depuis **Input_Operations** vers IBP.
+
+- Crée une feuille IBP_INPUT dans le même fichier avec l’Excel Add-in SAP IBP.
+- Choisis la même période (90 j), les mêmes shops et catégories.
+- Dans la vue, affiche 2 KFs : CAPACITY_SLOTS (capacité/jour) et LOAD_PLAN_SLOTS (plan/jour).
+- Colle tes données (capacité + plan) depuis le classeur, puis Save Data ✅
+- Côté classeur, tu continues d’utiliser Input_Operations comme référence pour les KPI (la capacité de référence reste l’input).
+
 - **Sortie (OUTPUT)** : coller le retour IBP dans **Output_Operations** (même structure).
+
+- Ajoute l’Excel Add-in SAP IBP dans le même fichier ✅
+- Crée une feuille IBP_OUTPUT avec les mêmes shops, catégories et période (90 j) que ta feuille de test
+- Dans l’add-in, affiche la KF de plan/réel, puis Refresh
+- Copie-colle ce résultat dans Output_Operations (même structure que Input_Operations)
+- KPI_Check et KPI_Dashboard se mettent à jour tout seuls : Util_Input% vs Util_Output% et Écart%
+
+Rappels ⚠️ : mêmes libellés des deux côtés, même horizon, pas d’Output_CapacityDays; les différences cellule passent en jaune dans Output_Operations
 
 ---
 
 # 4) Technique 🛠️
 *Questions à se poser d’abord* 🧪  
 - Comment garantir la reproductibilité et la compatibilité Excel Desktop ?  
-- Quels outils/bibliothèques utiliser pour générer fichier + graphiques ?  
 - Quelles contraintes côté données aléatoires ?
 
 **Génération & compatibilité** 🧰  
 - Générer un fichier **Excel Desktop** (graphiques colonnes visibles dans Excel, non garanti pour Google Sheets).  
 - Bibliothèques recommandées si script : **openpyxl** ou **xlsxwriter** (Python).  
 - **Seed aléatoire fixée** pour la reproductibilité.
-
-**Règles de génération (résumé)** 📦  
-- **Shop_Slots** : 2–3 catégories par shop, `SlotsPerDay ∈ [2..6]`, **chaque catégorie** présente dans **≥2 shops**.  
-- **Input_Operations** : `Id` = OP001…OP100 ; `Type` = “{Catégorie} Type n” (n ∈ [1..4]) ; `Durée (jours)` ∈ [5..90] ; `Start Date` uniforme, avec **fin ≤ START_DATE + 89 j** ; `Shop` éligible à la `Catégorie`.  
-- **Output_Operations** : copie d’Input + **~1% d’écarts** (Durée **ou** Start Date, ±1..±3 j) **sans sortir de l’horizon** ; **mise en évidence JAUNE** via XLOOKUP sur `Id`.
 
 **Livrable attendu** 📁  
 - Classeur unique **MAESTRO_FillRate_Simplified.xlsx** avec toutes les feuilles, formules, formats et **5 graphiques** prêts.  
