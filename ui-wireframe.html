@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MAESTRO • KPI Safran (maquette Fiori enrichie)</title>
+<style>
+  :root{
+    --bg:#f8f9fb; --card:#ffffff; --ink:#1f2937; --muted:#e5e7eb;
+    --accent:#2563eb; --accent-2:#10b981; --warn:#f59e0b; --bad:#ef4444; --good:#16a34a;
+    --shadow:0 6px 18px rgba(0,0,0,.06); --radius:16px;
+    --op-inspect:#60a5fa; /* Inspection */
+    --op-disasm:#34d399;  /* Disassembly */
+    --op-repair:#f59e0b;  /* Repair */
+    --op-clean:#a78bfa;   /* Cleaning */
+    --op-testr:#ef4444;   /* Test Run */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial;color:var(--ink);background:var(--bg);} 
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#ffffff 0%,#fafafa 100%);border-bottom:1px solid var(--muted)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700}
+  .brand .logo{width:28px;height:28px;border-radius:8px;background:var(--accent);box-shadow:var(--shadow)}
+  .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;opacity:.9}
+  .meta .pill{background:#eef2ff;color:#3730a3;padding:6px 10px;border-radius:999px}
+  .filters{display:flex;gap:10px;padding:10px 20px 16px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--muted);background:#fff;border-radius:999px;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+  .tabs{display:flex;gap:6px;padding:0 20px 14px}
+  .tab{padding:10px 14px;border-radius:10px;background:#fff;border:1px solid var(--muted);font-weight:600}
+  .tab.active{background:#eef2ff;border-color:#c7d2fe;color:#312e81}
+
+  main{padding:22px;max-width:1400px;margin:0 auto}
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
+  .card{grid-column:span 6;background:var(--card);border:1px solid var(--muted);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 16px 14px}
+  .card.wide{grid-column:span 12}
+  .card h3{margin:0 0 10px;font-size:16px;display:flex;align-items:center;gap:10px}
+  .sub{font-size:12px;opacity:.75;margin-top:6px}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 18px}
+  .tile{background:#fff;border:1px solid var(--muted);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
+  .tile .k{font-size:12px;opacity:.8}.tile .v{font-size:22px;font-weight:800}.ok{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+
+  .donut{--deg:180deg;width:140px;height:140px;border-radius:50%;
+         background:conic-gradient(var(--accent) 0 var(--deg), #e9edf7 var(--deg) 360deg);
+         position:relative;margin:auto}
+  .donut.alt{background:conic-gradient(var(--bad) 0 var(--deg), #f3f4f6 var(--deg) 360deg)}
+  .donut::after{content:"";position:absolute;inset:12px;background:#fff;border-radius:50%;box-shadow:inset 0 0 0 1px var(--muted)}
+  .donut .label{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:20px}
+  .donut .label small{display:block;font-weight:600;font-size:11px;opacity:.7;margin-top:2px}
+
+  .bars{display:grid;gap:10px;margin-top:10px}
+  .bar{display:grid;grid-template-columns:220px 1fr 140px;gap:10px;align-items:center}
+  .track{height:12px;background:#f1f5f9;border-radius:999px;overflow:hidden;border:1px solid #e5e7eb}
+  .fill{height:100%;background:linear-gradient(90deg,var(--accent-2),#22d3ee)}
+  .val{font-variant-numeric:tabular-nums;text-align:right;font-weight:700}
+
+  .hpair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+  .hbar{height:14px;background:#f1f5f9;border:1px solid #e5e7eb;border-radius:999px;overflow:hidden}
+  .planned{background:linear-gradient(90deg,#93c5fd,#60a5fa)}
+  .actual{background:linear-gradient(90deg,#a7f3d0,#34d399)}
+  .legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:12px}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+  .dot.pl{background:#60a5fa}.dot.ac{background:#34d399}
+
+  .svgwrap{width:100%;overflow:hidden;margin-top:6px;border:1px dashed #e5e7eb;border-radius:12px;background:#fcfcfd}
+
+  /* Stacked horizontal bars for request composition */
+  .stack{display:grid;gap:10px;margin-top:8px}
+  .stackrow{display:grid;grid-template-columns:220px 1fr 70px;gap:10px;align-items:center}
+  .stackbar{height:16px;display:flex;border-radius:10px;overflow:hidden;border:1px solid #e5e7eb;background:#f8fafc}
+  .seg{height:100%}
+  .seg.ins{background:var(--op-inspect)}
+  .seg.dis{background:var(--op-disasm)}
+  .seg.rep{background:var(--op-repair)}
+  .seg.cln{background:var(--op-clean)}
+  .seg.tst{background:var(--op-testr)}
+
+  /* Pagination controls (CSS only via radio) */
+  .pager{display:flex;gap:6px;align-items:center;margin-top:10px}
+  .pager label{padding:6px 10px;border:1px solid var(--muted);border-radius:10px;background:#fff;cursor:pointer}
+  input[type="radio"][name="capPage"]{display:none}
+  .cap-page{display:none}
+  #p1:checked ~ .capwrap #page1,
+  #p2:checked ~ .capwrap #page2,
+  #p3:checked ~ .capwrap #page3,
+  #p4:checked ~ .capwrap #page4{display:block}
+  #p1:checked ~ .pager label[for="p1"],
+  #p2:checked ~ .pager label[for="p2"],
+  #p3:checked ~ .pager label[for="p3"],
+  #p4:checked ~ .pager label[for="p4"]{background:#eef2ff;border-color:#c7d2fe}
+
+  /* Selector for request type (CSS only) */
+  .rselector{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+  .rselector input{display:none}
+  .rselector label{padding:6px 10px;border:1px solid var(--muted);border-radius:999px;background:#fff;cursor:pointer}
+  .panel{display:none}
+  #rt-overhaul:checked ~ .panels #panel-overhaul,
+  #rt-quick:checked ~ .panels #panel-quick,
+  #rt-onwing:checked ~ .panels #panel-onwing,
+  #rt-llp:checked ~ .panels #panel-llp,
+  #rt-perf:checked ~ .panels #panel-perf{display:block}
+  #rt-overhaul:checked ~ .rselector label[for="rt-overhaul"],
+  #rt-quick:checked ~ .rselector label[for="rt-quick"],
+  #rt-onwing:checked ~ .rselector label[for="rt-onwing"],
+  #rt-llp:checked ~ .rselector label[for="rt-llp"],
+  #rt-perf:checked ~ .rselector label[for="rt-perf"]{background:#eef2ff;border-color:#c7d2fe}
+
+  .kv{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kv div{display:flex;gap:6px;align-items:center}
+  .kv .k{opacity:.7}
+
+  /* Diverging gauge (center) */
+  .gauge{position:relative;height:80px;padding:10px 10px 16px;border:1px dashed #e5e7eb;border-radius:12px;background:#fcfcfd;display:grid;gap:6px}
+  .gtrack{position:relative;height:10px;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;background:linear-gradient(90deg,#e5e7eb 0%,#c7f9cc 50%,#ffe4e6 100%)}
+  .gneedle{position:absolute;top:-4px;width:2px;height:18px;background:#111827;left:calc((var(--pct) + 50) * 1%)}
+  .gticks{display:flex;justify-content:space-between;font-size:11px;opacity:.7}
+  .gmeta{display:flex;justify-content:space-between;font-size:12px}
+  .gmeta .delta{font-weight:800}
+</style>
+</head>
+<body>
+<header>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>MAESTRO • KPI Safran</div>
+    </div>
+    <div class="meta">
+      <div class="pill">📦 1000 demandes</div>
+      <div class="pill">🧰 5000 opérations</div>
+      <div class="pill">🏭 50 centres MRO / test</div>
+      <div class="pill">⏱️ instantané t0</div>
+    </div>
+  </div>
+  <div class="filters">
+    <div class="chip">🔎 Recherche…</div>
+    <div class="chip">🛫 Modèles : CFM56-5B/7B, LEAP-1A/1B/1C, SaM146, Arriel 2D, Arrano 1A, Aneto-1K, Makila 2A</div>
+    <div class="chip">🏷️ Demandes : Overhaul • Quick Turn • On-Wing • LLP Replacement • Perf. Restoration</div>
+    <div class="chip">🧪 Opérations (50) : Inspection, Disassembly, Repair, Cleaning, Test Run…</div>
+    <div class="chip">📅 Fenêtre : 30 derniers jours</div>
+  </div>
+  <div class="tabs">
+    <div class="tab active">📊 KPI & Analytique</div>
+    <div class="tab">📋 Demandes</div>
+    <div class="tab">🛠️ Opérations</div>
+    <div class="tab">🏭 Capacités</div>
+  </div>
+</header>
+
+<main>
+  <!-- Tuiles -->
+  <section class="tiles">
+    <div class="tile">
+      <div class="k">Respect délais (OTD) opérations</div>
+      <div class="v ok">91,4%</div>
+      <div class="sub">4 570 / 5 000 opérations à l’heure</div>
+    </div>
+    <div class="tile">
+      <div class="k">Utilisation moyenne des centres</div>
+      <div class="v">78%</div>
+      <div class="sub">moyenne pondérée sur 50 centres</div>
+    </div>
+    <div class="tile">
+      <div class="k">Temps moyen global / demande</div>
+      <div class="v">11,2 j</div>
+      <div class="sub">prévu 10,6 j • écart +0,6 j</div>
+    </div>
+    <div class="tile">
+      <div class="k">Taux de rework / anomalies</div>
+      <div class="v warn">3,8%</div>
+      <div class="sub">190 opérations impactées</div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <!-- 1. OTD + Temps moyen par type de demande + jauge centrale d'écart -->
+    <article class="card">
+      <h3>⏱️ OTD & Temps moyen par type de demande</h3>
+      <div style="display:grid;grid-template-columns:160px 1fr 220px;gap:16px;align-items:center">
+        <!-- Gauche: OTD global -->
+        <div class="donut" style="--deg:329.04deg">
+          <div class="label">91,4%<small>OTD global</small></div>
+        </div>
+
+        <!-- Centre: jauge d'écart Prévu ↔ Réel (moyenne globale) -->
+        <div class="gauge" style="--pct:5.7">
+          <div class="gmeta"><span>Écart moyen</span><span class="delta">+0,6 j (+5,7%)</span></div>
+          <div class="gtrack"><div class="gneedle"></div></div>
+          <div class="gticks"><span>-50%</span><span>0%</span><span>+50%</span></div>
+          <div class="sub">% = (Réel - Prévu) / Prévu • avance &lt; 0 • retard &gt; 0</div>
+        </div>
+
+        <!-- Droite: détail par type -->
+        <div class="bars">
+          <div class="bar"><div>Overhaul</div><div class="track"><div class="fill" style="width:89%"></div></div><div class="val">OTD 89% • 18,5 j • Δ +2,5 j (+15,6%)</div></div>
+          <div class="bar"><div>Quick Turn</div><div class="track"><div class="fill" style="width:93%"></div></div><div class="val">OTD 93% • 5,8 j • Δ +0,8 j (+16,0%)</div></div>
+          <div class="bar"><div>On-Wing</div><div class="track"><div class="fill" style="width:92%"></div></div><div class="val">OTD 92% • 7,6 j • Δ +0,6 j (+8,6%)</div></div>
+          <div class="bar"><div>LLP Replacement</div><div class="track"><div class="fill" style="width:88%"></div></div><div class="val">OTD 88% • 10,2 j • Δ +0,7 j (+7,4%)</div></div>
+          <div class="bar"><div>Performance Restoration</div><div class="track"><div class="fill" style="width:90%"></div></div><div class="val">OTD 90% • 12,1 j • Δ +0,6 j (+5,2%)</div></div>
+        </div>
+      </div>
+      <div class="sub">Objectifs : OTD ≥ 90% • Temps cible (prévu) : 16 / 5 / 7 / 9,5 / 11,5 j</div>
+    </article>
+
+    <!-- 2. Utilisation capacité triée croissant + nb opérations en cours, pagination 15 -->
+    <article class="card">
+      <h3>⚡ Utilisation des capacités — tri croissant (15 par page)</h3>
+      <!-- Pagination radios -->
+      <input type="radio" id="p1" name="capPage" checked>
+      <input type="radio" id="p2" name="capPage">
+      <input type="radio" id="p3" name="capPage">
+      <input type="radio" id="p4" name="capPage">
+      <div class="capwrap">
+        <!-- Page 1 -->
+        <div id="page1" class="cap-page">
+          <div class="bars">
+            <div class="bar"><div>Shannon – Cleaning</div><div class="track"><div class="fill" style="width:58%"></div></div><div class="val">58% • 62 ops</div></div>
+            <div class="bar"><div>Québec – Component</div><div class="track"><div class="fill" style="width:60%"></div></div><div class="val">60% • 55 ops</div></div>
+            <div class="bar"><div>Casablanca – Cleaning</div><div class="track"><div class="fill" style="width:61%"></div></div><div class="val">61% • 68 ops</div></div>
+            <div class="bar"><div>Seville – Assembly</div><div class="track"><div class="fill" style="width:63%"></div></div><div class="val">63% • 72 ops</div></div>
+            <div class="bar"><div>Warsaw – Component</div><div class="track"><div class="fill" style="width:64%"></div></div><div class="val">64% • 70 ops</div></div>
+            <div class="bar"><div>Liège – Component</div><div class="track"><div class="fill" style="width:66%"></div></div><div class="val">66% • 77 ops</div></div>
+            <div class="bar"><div>Porto – Repair</div><div class="track"><div class="fill" style="width:67%"></div></div><div class="val">67% • 80 ops</div></div>
+            <div class="bar"><div>Valence – Cleaning</div><div class="track"><div class="fill" style="width:68%"></div></div><div class="val">68% • 83 ops</div></div>
+            <div class="bar"><div>Nice – Engine Shop</div><div class="track"><div class="fill" style="width:69%"></div></div><div class="val">69% • 88 ops</div></div>
+            <div class="bar"><div>Brno – Test Cell</div><div class="track"><div class="fill" style="width:70%"></div></div><div class="val">70% • 74 ops</div></div>
+            <div class="bar"><div>Bilbao – Assembly</div><div class="track"><div class="fill" style="width:71%"></div></div><div class="val">71% • 92 ops</div></div>
+            <div class="bar"><div>Bordes – Helicopter MRO</div><div class="track"><div class="fill" style="width:72%"></div></div><div class="val">72% • 90 ops</div></div>
+            <div class="bar"><div>Turin – Module Shop</div><div class="track"><div class="fill" style="width:73%"></div></div><div class="val">73% • 96 ops</div></div>
+            <div class="bar"><div>Casablanca – Component</div><div class="track"><div class="fill" style="width:74%"></div></div><div class="val">74% • 98 ops</div></div>
+            <div class="bar"><div>Hambourg – Assembly</div><div class="track"><div class="fill" style="width:75%"></div></div><div class="val">75% • 105 ops</div></div>
+          </div>
+        </div>
+        <!-- Page 2 -->
+        <div id="page2" class="cap-page">
+          <div class="bars">
+            <div class="bar"><div>Charleroi – Component</div><div class="track"><div class="fill" style="width:76%"></div></div><div class="val">76% • 103 ops</div></div>
+            <div class="bar"><div>Valladolid – Repair</div><div class="track"><div class="fill" style="width:77%"></div></div><div class="val">77% • 110 ops</div></div>
+            <div class="bar"><div>Prague – Cleaning</div><div class="track"><div class="fill" style="width:78%"></div></div><div class="val">78% • 112 ops</div></div>
+            <div class="bar"><div>Grenoble – Component</div><div class="track"><div class="fill" style="width:79%"></div></div><div class="val">79% • 114 ops</div></div>
+            <div class="bar"><div>Villaroche – Engine Shop</div><div class="track"><div class="fill" style="width:80%"></div></div><div class="val">80% • 118 ops</div></div>
+            <div class="bar"><div>Nantes – Assembly</div><div class="track"><div class="fill" style="width:81%"></div></div><div class="val">81% • 120 ops</div></div>
+            <div class="bar"><div>Châtellerault – Repair</div><div class="track"><div class="fill" style="width:82%"></div></div><div class="val">82% • 122 ops</div></div>
+            <div class="bar"><div>Derby – Module Shop</div><div class="track"><div class="fill" style="width:83%"></div></div><div class="val">83% • 124 ops</div></div>
+            <div class="bar"><div>Seville – Test Cell</div><div class="track"><div class="fill" style="width:84%"></div></div><div class="val">84% • 128 ops</div></div>
+            <div class="bar"><div>Vitoria – Cleaning</div><div class="track"><div class="fill" style="width:85%"></div></div><div class="val">85% • 132 ops</div></div>
+            <div class="bar"><div>Hambourg – Engine Shop</div><div class="track"><div class="fill" style="width:86%"></div></div><div class="val">86% • 135 ops</div></div>
+            <div class="bar"><div>Marseille – Cleaning</div><div class="track"><div class="fill" style="width:87%"></div></div><div class="val">87% • 138 ops</div></div>
+            <div class="bar"><div>Brno – Repair</div><div class="track"><div class="fill" style="width:88%"></div></div><div class="val">88% • 140 ops</div></div>
+            <div class="bar"><div>Lille – Test Cell</div><div class="track"><div class="fill" style="width:89%"></div></div><div class="val">89% • 144 ops</div></div>
+            <div class="bar"><div>Tarnos – Test Cell</div><div class="track"><div class="fill" style="width:90%"></div></div><div class="val">90% • 150 ops</div></div>
+          </div>
+        </div>
+        <!-- Page 3 -->
+        <div id="page3" class="cap-page">
+          <div class="bars">
+            <div class="bar"><div>Madrid – Assembly</div><div class="track"><div class="fill" style="width:91%"></div></div><div class="val">91% • 152 ops</div></div>
+            <div class="bar"><div>Porto – Cleaning</div><div class="track"><div class="fill" style="width:92%"></div></div><div class="val">92% • 155 ops</div></div>
+            <div class="bar"><div>Liège – Engine Shop</div><div class="track"><div class="fill" style="width:93%"></div></div><div class="val">93% • 158 ops</div></div>
+            <div class="bar"><div>Derby – Test Cell</div><div class="track"><div class="fill" style="width:94%"></div></div><div class="val">94% • 160 ops</div></div>
+            <div class="bar"><div>Villaroche – Test Cell</div><div class="track"><div class="fill" style="width:95%"></div></div><div class="val">95% • 162 ops</div></div>
+            <div class="bar"><div>Toulouse – Engine Shop</div><div class="track"><div class="fill" style="width:96%"></div></div><div class="val">96% • 166 ops</div></div>
+            <div class="bar"><div>Paris – Engine Shop</div><div class="track"><div class="fill" style="width:97%"></div></div><div class="val">97% • 170 ops</div></div>
+            <div class="bar"><div>Lyon – Engine Shop</div><div class="track"><div class="fill" style="width:98%"></div></div><div class="val">98% • 172 ops</div></div>
+            <div class="bar"><div>Nantes – Test Cell</div><div class="track"><div class="fill" style="width:99%"></div></div><div class="val">99% • 175 ops</div></div>
+            <div class="bar"><div>Bordeaux – Repair</div><div class="track"><div class="fill" style="width:99%"></div></div><div class="val">99% • 176 ops</div></div>
+          </div>
+        </div>
+        <!-- Page 4 (5 sites pour atteindre 50) -->
+        <div id="page4" class="cap-page">
+          <div class="bars">
+            <div class="bar"><div>Vienne – Cleaning</div><div class="track"><div class="fill" style="width:80%"></div></div><div class="val">80% • 120 ops</div></div>
+            <div class="bar"><div>Rome – Assembly</div><div class="track"><div class="fill" style="width:82%"></div></div><div class="val">82% • 115 ops</div></div>
+            <div class="bar"><div>Zurich – Component</div><div class="track"><div class="fill" style="width:85%"></div></div><div class="val">85% • 123 ops</div></div>
+            <div class="bar"><div>Bruxelles – Repair</div><div class="track"><div class="fill" style="width:87%"></div></div><div class="val">87% • 128 ops</div></div>
+            <div class="bar"><div>Genève – Test Cell</div><div class="track"><div class="fill" style="width:88%"></div></div><div class="val">88% • 130 ops</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="pager">
+        <label for="p1">1</label><label for="p2">2</label><label for="p3">3</label><label for="p4">4</label>
+        <div class="sub">Affiche 15 sites/page (triés du moins chargé au plus chargé). Valeurs ≈ instant t0.</div>
+      </div>
+    </article>
+
+    <!-- 3. Temps moyen par modèle moteur avec sélecteur de type de demande (prévu vs réel) -->
+    <article class="card">
+      <h3>🛫 Temps moyen (jours) par modèle moteur — par type de demande</h3>
+      <!-- Request type selector (CSS only) -->
+      <input type="radio" id="rt-overhaul" name="rtype" checked>
+      <input type="radio" id="rt-quick"    name="rtype">
+      <input type="radio" id="rt-onwing"   name="rtype">
+      <input type="radio" id="rt-llp"      name="rtype">
+      <input type="radio" id="rt-perf"     name="rtype">
+
+      <div class="rselector">
+        <label for="rt-overhaul">Overhaul</label>
+        <label for="rt-quick">Quick Turn</label>
+        <label for="rt-onwing">On-Wing</label>
+        <label for="rt-llp">LLP Replacement</label>
+        <label for="rt-perf">Perf. Restoration</label>
+      </div>
+
+      <div class="panels">
+        <!-- Overhaul panel (planned vs actual gauges per engine) -->
+        <div id="panel-overhaul" class="panel">
+          <div class="bars">
+            <div class="bar"><div>LEAP-1A</div><div class="hbar"><div class="planned" style="width:64%"></div></div><div class="val">Prévu 16,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:74%"></div></div><div class="val">Réel 18,5 j</div></div>
+
+            <div class="bar"><div>LEAP-1B</div><div class="hbar"><div class="planned" style="width:64%"></div></div><div class="val">16,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:72%"></div></div><div class="val">18,0 j</div></div>
+
+            <div class="bar"><div>CFM56-7B</div><div class="hbar"><div class="planned" style="width:60%"></div></div><div class="val">15,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:68%"></div></div><div class="val">17,0 j</div></div>
+
+            <div class="bar"><div>CFM56-5B</div><div class="hbar"><div class="planned" style="width:60%"></div></div><div class="val">15,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:69%"></div></div><div class="val">17,2 j</div></div>
+
+            <div class="bar"><div>LEAP-1C</div><div class="hbar"><div class="planned" style="width:64%"></div></div><div class="val">16,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:71%"></div></div><div class="val">17,8 j</div></div>
+
+            <div class="bar"><div>SaM146-1S</div><div class="hbar"><div class="planned" style="width:56%"></div></div><div class="val">14,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:64%"></div></div><div class="val">16,0 j</div></div>
+
+            <div class="bar"><div>Arriel 2D</div><div class="hbar"><div class="planned" style="width:52%"></div></div><div class="val">13,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:60%"></div></div><div class="val">15,0 j</div></div>
+
+            <div class="bar"><div>Arrano 1A</div><div class="hbar"><div class="planned" style="width:52%"></div></div><div class="val">13,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:59%"></div></div><div class="val">14,8 j</div></div>
+
+            <div class="bar"><div>Aneto-1K</div><div class="hbar"><div class="planned" style="width:56%"></div></div><div class="val">14,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:62%"></div></div><div class="val">15,5 j</div></div>
+
+            <div class="bar"><div>Makila 2A</div><div class="hbar"><div class="planned" style="width:52%"></div></div><div class="val">13,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:58%"></div></div><div class="val">14,5 j</div></div>
+          </div>
+          <div class="legend"><span><span class="dot pl"></span>Prévu</span><span><span class="dot ac"></span>Réel</span></div>
+        </div>
+
+        <!-- Quick Turn -->
+        <div id="panel-quick" class="panel">
+          <div class="bars">
+            <div class="bar"><div>LEAP-1A</div><div class="hbar"><div class="planned" style="width:20%"></div></div><div class="val">5,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:23%"></div></div><div class="val">5,8 j</div></div>
+            <div class="bar"><div>LEAP-1B</div><div class="hbar"><div class="planned" style="width:20%"></div></div><div class="val">5,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:22%"></div></div><div class="val">5,5 j</div></div>
+            <div class="bar"><div>CFM56-7B</div><div class="hbar"><div class="planned" style="width:18%"></div></div><div class="val">4,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:20%"></div></div><div class="val">5,0 j</div></div>
+            <div class="bar"><div>CFM56-5B</div><div class="hbar"><div class="planned" style="width:18%"></div></div><div class="val">4,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:21%"></div></div><div class="val">5,2 j</div></div>
+            <div class="bar"><div>LEAP-1C</div><div class="hbar"><div class="planned" style="width:20%"></div></div><div class="val">5,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:22%"></div></div><div class="val">5,5 j</div></div>
+            <div class="bar"><div>SaM146-1S</div><div class="hbar"><div class="planned" style="width:16%"></div></div><div class="val">4,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:19%"></div></div><div class="val">4,7 j</div></div>
+            <div class="bar"><div>Arriel 2D</div><div class="hbar"><div class="planned" style="width:14%"></div></div><div class="val">3,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:17%"></div></div><div class="val">4,2 j</div></div>
+            <div class="bar"><div>Arrano 1A</div><div class="hbar"><div class="planned" style="width:14%"></div></div><div class="val">3,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:16%"></div></div><div class="val">4,0 j</div></div>
+            <div class="bar"><div>Aneto-1K</div><div class="hbar"><div class="planned" style="width:16%"></div></div><div class="val">4,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:18%"></div></div><div class="val">4,5 j</div></div>
+            <div class="bar"><div>Makila 2A</div><div class="hbar"><div class="planned" style="width:14%"></div></div><div class="val">3,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:17%"></div></div><div class="val">4,2 j</div></div>
+          </div>
+          <div class="legend"><span><span class="dot pl"></span>Prévu</span><span><span class="dot ac"></span>Réel</span></div>
+        </div>
+
+        <!-- On-Wing -->
+        <div id="panel-onwing" class="panel">
+          <div class="bars">
+            <div class="bar"><div>LEAP-1A</div><div class="hbar"><div class="planned" style="width:28%"></div></div><div class="val">7,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:30%"></div></div><div class="val">7,6 j</div></div>
+            <div class="bar"><div>LEAP-1B</div><div class="hbar"><div class="planned" style="width:28%"></div></div><div class="val">7,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:29%"></div></div><div class="val">7,3 j</div></div>
+            <div class="bar"><div>CFM56-7B</div><div class="hbar"><div class="planned" style="width:26%"></div></div><div class="val">6,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:28%"></div></div><div class="val">7,0 j</div></div>
+            <div class="bar"><div>CFM56-5B</div><div class="hbar"><div class="planned" style="width:26%"></div></div><div class="val">6,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:29%"></div></div><div class="val">7,3 j</div></div>
+            <div class="bar"><div>LEAP-1C</div><div class="hbar"><div class="planned" style="width:28%"></div></div><div class="val">7,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:30%"></div></div><div class="val">7,6 j</div></div>
+            <div class="bar"><div>SaM146-1S</div><div class="hbar"><div class="planned" style="width:22%"></div></div><div class="val">5,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:24%"></div></div><div class="val">6,0 j</div></div>
+            <div class="bar"><div>Arriel 2D</div><div class="hbar"><div class="planned" style="width:18%"></div></div><div class="val">4,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:20%"></div></div><div class="val">5,0 j</div></div>
+            <div class="bar"><div>Arrano 1A</div><div class="hbar"><div class="planned" style="width:18%"></div></div><div class="val">4,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:19%"></div></div><div class="val">4,8 j</div></div>
+            <div class="bar"><div>Aneto-1K</div><div class="hbar"><div class="planned" style="width:20%"></div></div><div class="val">5,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:22%"></div></div><div class="val">5,6 j</div></div>
+            <div class="bar"><div>Makila 2A</div><div class="hbar"><div class="planned" style="width:18%"></div></div><div class="val">4,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:20%"></div></div><div class="val">5,0 j</div></div>
+          </div>
+          <div class="legend"><span><span class="dot pl"></span>Prévu</span><span><span class="dot ac"></span>Réel</span></div>
+        </div>
+
+        <!-- LLP Replacement -->
+        <div id="panel-llp" class="panel">
+          <div class="bars">
+            <div class="bar"><div>LEAP-1A</div><div class="hbar"><div class="planned" style="width:38%"></div></div><div class="val">9,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:41%"></div></div><div class="val">10,2 j</div></div>
+            <div class="bar"><div>LEAP-1B</div><div class="hbar"><div class="planned" style="width:38%"></div></div><div class="val">9,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:40%"></div></div><div class="val">10,0 j</div></div>
+            <div class="bar"><div>CFM56-7B</div><div class="hbar"><div class="planned" style="width:36%"></div></div><div class="val">9,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:39%"></div></div><div class="val">9,8 j</div></div>
+            <div class="bar"><div>CFM56-5B</div><div class="hbar"><div class="planned" style="width:36%"></div></div><div class="val">9,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:40%"></div></div><div class="val">10,0 j</div></div>
+            <div class="bar"><div>LEAP-1C</div><div class="hbar"><div class="planned" style="width:38%"></div></div><div class="val">9,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:41%"></div></div><div class="val">10,2 j</div></div>
+            <div class="bar"><div>SaM146-1S</div><div class="hbar"><div class="planned" style="width:32%"></div></div><div class="val">8,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:35%"></div></div><div class="val">8,8 j</div></div>
+            <div class="bar"><div>Arriel 2D</div><div class="hbar"><div class="planned" style="width:28%"></div></div><div class="val">7,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:31%"></div></div><div class="val">7,8 j</div></div>
+            <div class="bar"><div>Arrano 1A</div><div class="hbar"><div class="planned" style="width:28%"></div></div><div class="val">7,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:30%"></div></div><div class="val">7,5 j</div></div>
+            <div class="bar"><div>Aneto-1K</div><div class="hbar"><div class="planned" style="width:30%"></div></div><div class="val">7,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:33%"></div></div><div class="val">8,2 j</div></div>
+            <div class="bar"><div>Makila 2A</div><div class="hbar"><div class="planned" style="width:28%"></div></div><div class="val">7,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:31%"></div></div><div class="val">7,8 j</div></div>
+          </div>
+          <div class="legend"><span><span class="dot pl"></span>Prévu</span><span><span class="dot ac"></span>Réel</span></div>
+        </div>
+
+        <!-- Performance Restoration -->
+        <div id="panel-perf" class="panel">
+          <div class="bars">
+            <div class="bar"><div>LEAP-1A</div><div class="hbar"><div class="planned" style="width:46%"></div></div><div class="val">11,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:48%"></div></div><div class="val">12,1 j</div></div>
+            <div class="bar"><div>LEAP-1B</div><div class="hbar"><div class="planned" style="width:46%"></div></div><div class="val">11,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:48%"></div></div><div class="val">12,0 j</div></div>
+            <div class="bar"><div>CFM56-7B</div><div class="hbar"><div class="planned" style="width:44%"></div></div><div class="val">11,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:47%"></div></div><div class="val">11,7 j</div></div>
+            <div class="bar"><div>CFM56-5B</div><div class="hbar"><div class="planned" style="width:44%"></div></div><div class="val">11,0 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:47%"></div></div><div class="val">11,9 j</div></div>
+            <div class="bar"><div>LEAP-1C</div><div class="hbar"><div class="planned" style="width:46%"></div></div><div class="val">11,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:48%"></div></div><div class="val">12,1 j</div></div>
+            <div class="bar"><div>SaM146-1S</div><div class="hbar"><div class="planned" style="width:38%"></div></div><div class="val">9,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:41%"></div></div><div class="val">10,2 j</div></div>
+            <div class="bar"><div>Arriel 2D</div><div class="hbar"><div class="planned" style="width:30%"></div></div><div class="val">7,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:33%"></div></div><div class="val">8,2 j</div></div>
+            <div class="bar"><div>Arrano 1A</div><div class="hbar"><div class="planned" style="width:30%"></div></div><div class="val">7,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:32%"></div></div><div class="val">8,0 j</div></div>
+            <div class="bar"><div>Aneto-1K</div><div class="hbar"><div class="planned" style="width:34%"></div></div><div class="val">8,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:36%"></div></div><div class="val">9,0 j</div></div>
+            <div class="bar"><div>Makila 2A</div><div class="hbar"><div class="planned" style="width:30%"></div></div><div class="val">7,5 j</div></div>
+            <div class="bar"><div></div><div class="hbar"><div class="actual" style="width:33%"></div></div><div class="val">8,2 j</div></div>
+          </div>
+          <div class="legend"><span><span class="dot pl"></span>Prévu</span><span><span class="dot ac"></span>Réel</span></div>
+        </div>
+      </div>
+      <div class="sub">Astuce : les jauges montrent Prévu (barre bleue) vs Réel (barre verte) pour chaque modèle.</div>
+    </article>
+
+    <!-- 4. Temps moyen par type de demande — décomposition par opérations (stacked) -->
+    <article class="card">
+      <h3>🔁 Décomposition du temps moyen par type de demande (opérations)</h3>
+      <div class="stack">
+        <!-- Les pourcentages de segments sont statiques mais réalistes -->
+        <div class="stackrow">
+          <div>Overhaul</div>
+          <div class="stackbar">
+            <div class="seg ins" style="width:10%" title="Inspection"></div>
+            <div class="seg dis" style="width:30%" title="Disassembly"></div>
+            <div class="seg rep" style="width:42%" title="Repair"></div>
+            <div class="seg cln" style="width:8%"  title="Cleaning"></div>
+            <div class="seg tst" style="width:10%" title="Test Run"></div>
+          </div>
+          <div class="val">18,5 j</div>
+        </div>
+        <div class="stackrow">
+          <div>Quick Turn</div>
+          <div class="stackbar">
+            <div class="seg ins" style="width:35%"></div>
+            <div class="seg dis" style="width:8%"></div>
+            <div class="seg rep" style="width:27%"></div>
+            <div class="seg cln" style="width:15%"></div>
+            <div class="seg tst" style="width:15%"></div>
+          </div>
+          <div class="val">5,8 j</div>
+        </div>
+        <div class="stackrow">
+          <div>On-Wing</div>
+          <div class="stackbar">
+            <div class="seg ins" style="width:28%"></div>
+            <div class="seg dis" style="width:6%"></div>
+            <div class="seg rep" style="width:36%"></div>
+            <div class="seg cln" style="width:10%"></div>
+            <div class="seg tst" style="width:20%"></div>
+          </div>
+          <div class="val">7,6 j</div>
+        </div>
+        <div class="stackrow">
+          <div>LLP Replacement</div>
+          <div class="stackbar">
+            <div class="seg ins" style="width:12%"></div>
+            <div class="seg dis" style="width:24%"></div>
+            <div class="seg rep" style="width:44%"></div>
+            <div class="seg cln" style="width:8%"></div>
+            <div class="seg tst" style="width:12%"></div>
+          </div>
+          <div class="val">10,2 j</div>
+        </div>
+        <div class="stackrow">
+          <div>Performance Restoration</div>
+          <div class="stackbar">
+            <div class="seg ins" style="width:14%"></div>
+            <div class="seg dis" style="width:18%"></div>
+            <div class="seg rep" style="width:46%"></div>
+            <div class="seg cln" style="width:8%"></div>
+            <div class="seg tst" style="width:14%"></div>
+          </div>
+          <div class="val">12,1 j</div>
+        </div>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--op-inspect)"></span>Inspection</span>
+        <span><span class="dot" style="background:var(--op-disasm)"></span>Disassembly</span>
+        <span><span class="dot" style="background:var(--op-repair)"></span>Repair</span>
+        <span><span class="dot" style="background:var(--op-clean)"></span>Cleaning</span>
+        <span><span class="dot" style="background:var(--op-testr)"></span>Test Run</span>
+      </div>
+      <div class="sub">Couleurs stables par opération pour comparer visuellement entre demandes.</div>
+    </article>
+
+    <!-- 5. Qualité / Rework par causes techniques (inchangé) -->
+    <article class="card">
+      <h3>📉 Rework par cause technique (extrait)</h3>
+      <div style="display:grid;grid-template-columns:160px 1fr;gap:16px;align-items:center">
+        <div class="donut alt" style="--deg:13.68deg">
+          <div class="label">3,8%<small>rework</small></div>
+        </div>
+        <div class="bars">
+          <div class="bar"><div>Échec Test Cell (Engine Run)</div><div class="track"><div class="fill" style="width:1.6%"></div></div><div class="val">1,6%</div></div>
+          <div class="bar"><div>Non-conformité NDT (EC/DPI)</div><div class="track"><div class="fill" style="width:1.0%"></div></div><div class="val">1,0%</div></div>
+          <div class="bar"><div>Écart process Hot Section</div><div class="track"><div class="fill" style="width:0.7%"></div></div><div class="val">0,7%</div></div>
+          <div class="bar"><div>Docs & traçabilité (EASA Part-145)</div><div class="track"><div class="fill" style="width:0.3%"></div></div><div class="val">0,3%</div></div>
+          <div class="bar"><div>FADEC mise à jour / calibration</div><div class="track"><div class="fill" style="width:0.1%"></div></div><div class="val">0,1%</div></div>
+          <div class="bar"><div>Fuel Nozzle – débit / pattern</div><div class="track"><div class="fill" style="width:0.1%"></div></div><div class="val">0,1%</div></div>
+        </div>
+        <div class="sub">Seuil d’alerte : rework &gt; 4,5% (rolling 30j)</div>
+      </div>
+    </article>
+
+    <!-- 6. Mix demandes par modèle moteur (top 10) -->
+    <article class="card wide">
+      <h3>🛫 Mix demandes par modèle moteur (top 10)</h3>
+      <div class="bars">
+        <div class="bar"><div>LEAP-1A (A320neo)</div><div class="track"><div class="fill" style="width:24%"></div></div><div class="val">24%</div></div>
+        <div class="bar"><div>LEAP-1B (737 MAX)</div><div class="track"><div class="fill" style="width:21%"></div></div><div class="val">21%</div></div>
+        <div class="bar"><div>CFM56-7B (737NG)</div><div class="track"><div class="fill" style="width:18%"></div></div><div class="val">18%</div></div>
+        <div class="bar"><div>CFM56-5B (A320ceo)</div><div class="track"><div class="fill" style="width:14%"></div></div><div class="val">14%</div></div>
+        <div class="bar"><div>LEAP-1C (C919)</div><div class="track"><div class="fill" style="width:4%"></div></div><div class="val">4%</div></div>
+        <div class="bar"><div>SaM146-1S (SSJ100)</div><div class="track"><div class="fill" style="width:3%"></div></div><div class="val">3%</div></div>
+        <div class="bar"><div>Arriel 2D (hélico)</div><div class="track"><div class="fill" style="width:6%"></div></div><div class="val">6%</div></div>
+        <div class="bar"><div>Arrano 1A (hélico)</div><div class="track"><div class="fill" style="width:4%"></div></div><div class="val">4%</div></div>
+        <div class="bar"><div>Aneto-1K (hélico)</div><div class="track"><div class="fill" style="width:3%"></div></div><div class="val">3%</div></div>
+        <div class="bar"><div>Makila 2A (hélico)</div><div class="track"><div class="fill" style="width:3%"></div></div><div class="val">3%</div></div>
+      </div>
+      <div class="sub">Somme ≈ 100% (arrondis). Répartition plausible du parc traité à t0.</div>
+    </article>
+
+    <!-- 7. Encadré contexte -->
+    <article class="card wide">
+      <h3>ℹ️ Hypothèses & réalisme des chiffres</h3>
+      <div style="display:grid;gap:4px;font-size:13px;opacity:.9">
+        <div>• 5 types de demandes : Overhaul, Quick Turn, On-Wing, LLP Replacement, Performance Restoration.</div>
+        <div>• 50 types d’opérations (familles) utilisées pour la décomposition : Inspection, Disassembly, Repair, Cleaning, Test Run.</div>
+        <div>• 5 000 opérations pour 1 000 demandes : inclut retests & opérations accessoires (ratio > 4/opérations par demande).</div>
+        <div>• Utilisation saine 70–90% ; OTD cible ≥ 90% ; rework seuil 4,5%.</div>
+      </div>
+    </article>
+  </section>
+</main>
+</body>
+</html>
