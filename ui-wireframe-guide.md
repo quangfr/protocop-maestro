@@ -29,6 +29,8 @@ https://chatgpt.com/share/68a2691d-73cc-8006-b5bc-003d21a127c1
 
 # Prompt
 
+<img width="1540" height="1019" alt="image" src="https://github.com/user-attachments/assets/5a1bcfb3-3ead-464c-be18-c304706b6a2e" />
+
 ## 1. 🎯 Contexte  
 - **Outil** : MAESTRO — gestion des demandes & opérations de maintenance moteurs Safran.  
 - **Objectif** : Suivi **temps réel** des performances globales de 1000 demandes et 5000 opérations réparties sur 50 centres de maintenance.  
