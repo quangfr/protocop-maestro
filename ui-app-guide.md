@@ -30,6 +30,8 @@ https://chatgpt.com/share/68a0d807-4840-8006-9d30-151a537dea22
 ```
 
 # Prompt
+<img width="733" height="532" alt="image" src="https://github.com/user-attachments/assets/28b60175-fffa-463f-9536-39aed6c139bd" />
+
 
 ## 1) 🎯 CONTEXTE
 ❓ À quoi sert ce prototype ?
