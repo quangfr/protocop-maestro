@@ -1,4 +1,4 @@
-# Contexte
+# Introduction
 **📌 Objectifs d'un prototype Excel :**
 - ✅ Valider la logique de calculs sur un périmètre réduit
 - 📥 Importer de la donnée fictive en masse
