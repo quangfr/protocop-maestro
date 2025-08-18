@@ -1,6 +1,6 @@
 # Protocop Maestro
 
-Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un outil explorant la planification de capacité.
+Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un outil explorant la planification des capacités de maintenance d'ateliers.
 
 
 ## Contenu
