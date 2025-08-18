@@ -63,7 +63,7 @@ https://chatgpt.com/share/68a33867-818c-8006-ac8c-efbd47c3d3ec
   - **OccTE(jour)** = `loadTE / capTE`. **OccTE(semaine)** = **max** des 7 jours.
 
 ```mermaid
-%% UML — Vue "Données & Règles" (TE-light)
+%% UML — Vue "Données & Règles" (TE-light) — types composés réduits à String
 classDiagram
   direction LR
 
@@ -100,28 +100,27 @@ classDiagram
     +engine: Engine
     +key(): String
   }
-  %% TE = Type × Engine (le couple "type de demande × moteur")
-  %% Capacité/charge sont mesurées et pilotées à ce grain.
+  %% TE = Type x Engine (couple "type de demande x moteur")
 
   class Centre {
     +name: String
-    +engines: List_of_Engine
-    +types: List_of_RequestType
-    +capByDay: IntArray
-    +quotaTE: Map_TE_to_Float
-    +loadByDay: IntArray
-    +loadByDayByType: Map_Type_to_IntArray
-    +loadByDayByTE: Map_TE_to_IntArray
-    +supports(e:Engine,t:RequestType): bool
+    +engines: String
+    +types: String
+    +capByDay: String
+    +quotaTE: String
+    +loadByDay: String
+    +loadByDayByType: String
+    +loadByDayByTE: String
+    +supports(e:Engine,t:RequestType): String
   }
 
   class ShipMatrix {
-    +shipDays: Map_Customer_to_Centre_to_Int
+    +shipDays: String
     +getDays(cust:Customer, centre:Centre): int
   }
 
   class OpDurTable {
-    +dur: Map_Type_to_Engine_to_Int
+    +dur: String
     +getDays(type:RequestType, engine:Engine): int
   }
 
@@ -135,8 +134,8 @@ classDiagram
 
   class EvalRow {
     +centre: Centre
-    +fast: int           %% FastETA (jours)
-    +responsible: int    %% ResponsibleETA (jours)
+    +fast: int
+    +responsible: int
     +shipOut: int
     +shipBack: int
     +dur: int
@@ -145,7 +144,7 @@ classDiagram
   }
 
   class EvalResult {
-    +rows: EvalRow[]
+    +rows: String
     +bestFast: EvalRow
     +bestResponsible: EvalRow
   }
@@ -190,10 +189,9 @@ classDiagram
 
   %% Règles TE-light (notes)
   note for Evaluator "FastETA = shipOut + dur(TE) + shipBack + Wait\nResponsibleETA = FastETA + Penalty"
-  note for Centre "capTE = round(capCentre * quotaTE)\nquotaTE: uniforme par défaut"
-  note "Simplification priorisation : Urgent = attente 0 ; Standard absorbe l'attente via OccTE(sem0)" as Nprio
+  note for Centre "capTE = round(capCentre * quotaTE)\nquotaTE: uniforme par defaut"
+  note "Simplification priorisation : Urgent -> attente 0 ; Standard absorbe l'attente via OccTE(sem0)" as Nprio
   Priority .. Nprio
-
 
 ```
 
