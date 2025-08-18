@@ -6,21 +6,21 @@ Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un ou
 ## Contenu
 - `ui-wireframe-guide.md` et `ui-wireframe.html` – exemple d'un tableau de bord des délais de traitement moyen et des capacités d'un atelier
 
-<img width="1189" height="878" alt="image" src="https://github.com/user-attachments/assets/74e48704-7bc4-4771-a4d6-40949c4c427b" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/74e48704-7bc4-4771-a4d6-40949c4c427b" />
 
 - `test-data-guide.md` et `test-data.xlsx` – exemple d'une vérification des écarts de calcul du taux de remplissage d'un atelie
 
-<img width="1107" height="397" alt="image" src="https://github.com/user-attachments/assets/05869586-39c9-4b23-824a-8e790a7066e5" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/05869586-39c9-4b23-824a-8e790a7066e5" />
 
 
 - `ui-app-guide.md` et `ui-app.html` – exemple d'une interface de navigation SAP-IBP Fiori pour un planificateur en ateliers
 
-<img width="1919" height="972" alt="image" src="https://github.com/user-attachments/assets/5a1cae0f-e770-4be9-8db1-10435398d9da" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/5a1cae0f-e770-4be9-8db1-10435398d9da" />
 
  
 - `ui-feature-guide.md` et `ui-feature.html` – exemple d'un moteur de choix d'atelier de maintenance selon les délais de traitement
 
-- <img width="1919" height="891" alt="image" src="https://github.com/user-attachments/assets/e1dc92ed-c66e-4c01-b49f-859642f2b4c9" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/e1dc92ed-c66e-4c01-b49f-859642f2b4c9" />
 
 
 ## Utilisation
