@@ -32,9 +32,7 @@ https://chatgpt.com/share/68a33867-818c-8006-ac8c-efbd47c3d3ec
 
 # Prompt
 
-<img width="1919" height="891" alt="image" src="https://github.com/user-attachments/assets/3f8390b4-a6b9-42b9-98c8-75f0255b3de8" />
-<img width="1905" height="955" alt="image" src="https://github.com/user-attachments/assets/2652ae92-d215-4df9-869f-67ad48bf6919" />
-<img width="1917" height="746" alt="image" src="https://github.com/user-attachments/assets/cccadec9-d5c2-4814-999e-e74977584c68" />
+
 
 ## 1. Contexte  
 **❓Quel problème on résout ? Pour qui ? Avec quels compromis ?**  
@@ -43,6 +41,9 @@ https://chatgpt.com/share/68a33867-818c-8006-ac8c-efbd47c3d3ec
 - Compromis (prototype) : **réaliste mais léger** → acheminement **fixe** (client×centre), durée **fixe** (type×moteur), **pas** de géodistance, **pas** d’aléas.  
 - Déterminisme : à paramètres identiques (y c. **date de dispo**), l’ETA **ne varie pas**.
 
+<img width="1919" height="891" alt="image" src="https://github.com/user-attachments/assets/3f8390b4-a6b9-42b9-98c8-75f0255b3de8" />
+<img width="1905" height="955" alt="image" src="https://github.com/user-attachments/assets/2652ae92-d215-4df9-869f-67ad48bf6919" />
+<img width="1917" height="746" alt="image" src="https://github.com/user-attachments/assets/cccadec9-d5c2-4814-999e-e74977584c68" />
 ---
 
 ## 2. Données  
