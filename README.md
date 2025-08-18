@@ -8,7 +8,7 @@ Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un ou
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/74e48704-7bc4-4771-a4d6-40949c4c427b" />
 
-- `test-data-guide.md` et `test-data.xlsx` – exemple d'une vérification des écarts de calcul du taux de remplissage d'un atelie
+- `test-data-guide.md` et `test-data.xlsx` – exemple d'une vérification des écarts de calcul du taux de remplissage d'un atelier
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/05869586-39c9-4b23-824a-8e790a7066e5" />
 
