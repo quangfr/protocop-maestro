@@ -55,7 +55,7 @@ MAESTRO est un outil de **gestion et d’allocation des demandes de maintenance 
 - **Bris d’égalité** : léger bruit (jitter ±0,5 j), puis **fiabilité** du centre.
 
 ## Simplifications retenues (pour le proto)
-- **Acheminement** : tirage aléatoire discret (0–4 jours) à l’aller **et** au retour (pas de distance géo).
+- **Acheminement** : tirage aléatoire discret (0–4 jours) à l’aller **et** au retour, durée fixe d'acheminement le centre et le client (pas de distance géo).
 - **Durées d’opérations** : dépendent **du type** uniquement (pas de variation par moteur/centre).
 - **Aucun aléa d’exécution** (maintenance déterministe hors randomisation initiale).
 - **Arrivées des demandes** : linéaires (densité croissante à l’approche de la date d’opération).
