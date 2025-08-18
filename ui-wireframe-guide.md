@@ -18,7 +18,7 @@
 2. 🎲 **Chiffres** → générer aléatoirement, sans logique métier  
 3. 🌍 **Périmètre** → définir réaliste, mais afficher seulement un extrait  
 4. 📑 **Méthode** → procéder **onglet par onglet**, **composant par composant**  
-5. ✅ **Validation** → valider d’abord la structure avant de générer le composant  
+5. ✅ **Validation** → valider la structure avec un schéma visuel texte avant de générer le composant  
 6. 🔧 **Itération** → mettre un maximum de modifications par composant avant régénération  
 7. 🏗️ **Assemblage** → une fois satisfait, assembler toute l’interface  
 8. 📜 **Clôture** → demander la synthèse du prompt final  
