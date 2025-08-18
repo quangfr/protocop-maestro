@@ -2,8 +2,8 @@
 
 **📌 Objectifs d'un prototype de calcul HTML :**
 
-- 💡 Concrétiser une nouvelle idée
-- 🗂️ Expliciter les besoins sous-jacents
+- 💡 Transformer une idée en prototype
+- 🗂️ Identifier les besoins métiers précis
 
 **🛠 Usages concrets :**
 
@@ -29,6 +29,12 @@ https://chatgpt.com/share/68a33867-818c-8006-ac8c-efbd47c3d3ec
 ```
 
 # Prompt
+
+<img width="1518" height="804" alt="image" src="https://github.com/user-attachments/assets/48b36336-36b6-4104-b454-a580fb341e54" />
+<img width="1414" height="694" alt="image" src="https://github.com/user-attachments/assets/84d6038e-1e75-4c07-bdd5-c3289613e018" />
+<img width="1500" height="496" alt="image" src="https://github.com/user-attachments/assets/fd998509-0486-423f-919b-de3ac27fe79f" />
+<img width="1520" height="567" alt="image" src="https://github.com/user-attachments/assets/c75098b3-72da-4504-974b-eaa51d5d9d9e" />
+
 
 # 1) Contexte 🌍
 **❓ Cette section répond à :**
