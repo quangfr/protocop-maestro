@@ -2,7 +2,6 @@
 
 **📌 Objectifs d'une maquette HTML :**
 
-- 💡 Proposer et valider une vision produit
 - 🖥️ Discuter et valider des idées d'interface ou un modèle de données
 - 📑 Illustrer et préciser une spécification avec les développeurs comme les usagers
 
