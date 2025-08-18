@@ -29,9 +29,6 @@ https://chatgpt.com/share/68a0d807-4840-8006-9d30-151a537dea22
 ```
 
 # Prompt
-<img width="1919" height="972" alt="image" src="https://github.com/user-attachments/assets/93b302e1-13ba-4efc-8e49-d50df1fc97b9" />
-<img width="1919" height="896" alt="image" src="https://github.com/user-attachments/assets/9b959e45-9a1d-4d47-a2e0-8ab5e28be1f5" />
-<img width="1905" height="876" alt="image" src="https://github.com/user-attachments/assets/c9b8d916-a45e-4b52-907e-e9209747ab21" />
 
 ## 1) 🎯 CONTEXTE
 ❓ À quoi sert ce prototype ?
@@ -41,6 +38,10 @@ https://chatgpt.com/share/68a0d807-4840-8006-9d30-151a537dea22
 - Objectif : suivre l’**occupation des shops** (ateliers) et le **respect des délais** (dont urgences AOG) sur **8 semaines**.
 - Utilisateurs : **planificateurs Safran** (suivi, micro-replanification, vérification capacité).
 - Succès POC : **heatmap** exploitable (shops × jours), **recherche par ID**, navigation par **liens cliquables**, **édition inline** avec **persistance locale**, **import/export JSON**.
+
+<img width="1919" height="972" alt="image" src="https://github.com/user-attachments/assets/93b302e1-13ba-4efc-8e49-d50df1fc97b9" />
+<img width="1919" height="896" alt="image" src="https://github.com/user-attachments/assets/9b959e45-9a1d-4d47-a2e0-8ab5e28be1f5" />
+<img width="1905" height="876" alt="image" src="https://github.com/user-attachments/assets/c9b8d916-a45e-4b52-907e-e9209747ab21" />
 
 ## 2) 🗂️ MODÈLE DE DONNÉES
 ❓ Quels objets métier minimum ?
