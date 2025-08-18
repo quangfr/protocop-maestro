@@ -10,7 +10,6 @@ Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un ou
 - `ui-feature-guide.md` et `ui-feature.html` – exemple centré sur une fonctionnalité spécifique illustrant le comportement cible.
 
 ## Utilisation
-Ouvrez les fichiers `.html` dans votre navigateur pour explorer les interfaces. Les documents `.md` fournissent des explications détaillées pour chaque prototype. La feuille `test-data.xlsx` peut être utilisée pour rejouer les scénarios de calcul et valider les résultats.
+Ouvrez les fichiers `.html` dans votre navigateur pour explorer les interfaces. La feuille `test-data.xlsx` peut être utilisée pour rejouer les scénarios de calcul et valider les résultats. Les documents `.md` fournissent des explications détaillées pour chaque prototype. 
 
-## Contributions
-Les suggestions d'amélioration sont les bienvenues. N'hésitez pas à ouvrir une issue ou à proposer une pull request pour partager vos idées.
+
