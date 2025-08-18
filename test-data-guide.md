@@ -14,7 +14,7 @@
 2. 🧩 Simplification → prototyper petit avec hypothèses légères  
 3. 🎤 Clarification → demander à GPT de poser des questions  
 4. 💡 Amélioration → demander à GPT des pistes d’optimisation  
-5. 📦 Exhaustivité → regrouper un max de demandes avant régénération  
+5. 📦 Exhaustivité → regrouper un max de demandes dans un message avant régénération   
 6. 📐 Vérification → générer un diagramme UML pour documenter  
 7. 📝 Itération → amender le prompt jusqu’à satisfaction  
 8. 📌 Transmission → demander à GPT de refournir le prompt final
