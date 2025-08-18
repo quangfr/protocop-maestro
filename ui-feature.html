@@ -57,11 +57,15 @@
     .badge{padding:3px 8px;border-radius:999px;background:var(--chip);font-size:12px}
 
     .grid{display:grid;gap:8px}
-    .eta-grid{grid-template-columns: 220px 1fr 1fr 1fr}
+    .eta-grid{grid-template-columns: 220px 1fr 1fr 1.6fr}
     .eta-head{font-size:12px;color:var(--muted);font-weight:700}
     .eta-row{padding:8px;border-bottom:1px solid var(--border);display:contents}
     .eta-cell{padding:6px 8px}
-    .reco{background:#f0f7ff;border-radius:10px}
+
+    /* Highlights */
+    .best-resp{background:#e8f5e9;border-radius:10px}
+    .best-fast{background:#fffbe6;border-radius:10px}
+    .red{color:var(--bad);font-weight:700}
 
     /* Heatmap */
     .heatmap{display:grid;grid-template-columns:220px repeat(12,1fr);gap:4px;align-items:stretch}
@@ -85,17 +89,17 @@
   <div class="topbar full-width">
     <div class="brand">🛠️ MAESTRO — Maintenance • <span class="pill">Prototype Fiori</span></div>
     <div class="tabs" role="tablist" aria-label="Navigation des onglets">
-      <button class="tab active" data-tab="t1">1) Demande & Reco</button>
-      <button class="tab" data-tab="t2">2) Master Data</button>
-      <button class="tab" data-tab="t3">3) Centres • Heatmap</button>
-      <button class="tab" data-tab="t4">4) Demandes • Liste</button>
+      <button class="tab active" data-tab="t1">1) 📥 Demande & Reco</button>
+      <button class="tab" data-tab="t2">2) 🧩 Master Data</button>
+      <button class="tab" data-tab="t3">3) 🏭 Centres • Heatmap</button>
+      <button class="tab" data-tab="t4">4) 📄 Demandes • Liste</button>
     </div>
   </div>
 
   <div class="content full-width">
     <!-- TAB 1 -->
     <section id="t1" class="card">
-      <h3>📥 Saisie de la demande & recommandations</h3>
+      <h3>📥 Saisie de la demande & recommandations (⚡ FastETA • 🍀 ResponsibleETA)</h3>
       <div class="row" style="align-items:end">
         <div class="field col"><label>Client</label><select id="r-client"></select></div>
         <div class="field col"><label>Moteur</label><select id="r-engine"></select></div>
@@ -121,12 +125,12 @@
       <div class="card" style="margin-top:12px">
         <div class="grid eta-grid">
           <div class="eta-head">Centre</div>
-          <div class="eta-head">FastETA (j)</div>
-          <div class="eta-head">ResponsibleETA (j)</div>
+          <div class="eta-head">⚡ FastETA (j)</div>
+          <div class="eta-head">🍀 ResponsibleETA (j)</div>
           <div class="eta-head">Détails</div>
           <div id="eta-rows" class="eta-body" style="display:contents"></div>
         </div>
-        <div class="hint" id="eta-hint">Résultats basés sur les compatibilités Centre × (Moteur, Type) et sur les capacités prévues.</div>
+        <div class="hint" id="eta-hint">Tri par 🍀 ResponsibleETA. Résultats basés sur compatibilités Centre × (Moteur, Type) et capacités prévues.</div>
       </div>
     </section>
 
@@ -234,7 +238,6 @@ function choice(arr){return arr[Math.floor(rand()*arr.length)]}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function clamp(v,min,max){return v<min?min:v>max?max:v}
 function triangular(min,mode,max){const u=rand();const c=(mode-min)/(max-min);return u<c?min+Math.sqrt(u*(max-min)*(mode-min)):max-Math.sqrt((1-u)*(max-min)*(max-mode))}
-function fmtPct(v){return (v*100).toFixed(0)+"%"}
 function days(n){return n*24*60*60*1000}
 function startOfToday(){const d=new Date();d.setHours(0,0,0,0);return d}
 
@@ -257,6 +260,8 @@ let State={
   horizonDays:84, baseDate:startOfToday(),
   centres:[], customers:[], demands:[], // existing
   compatSummary:[],
+  shipDays:{}, // client -> centre -> days (fixed)
+  opDurTE:{} // type -> engine -> days (fixed)
 }
 
 // ----------------------- Generation -----------------------
@@ -297,9 +302,25 @@ function sampleShipDays(){
   return 4
 }
 
-function sampleDuration(type){
-  const [min,mode,max]=Params.durations[type]
-  return Math.round(triangular(min,mode,max))
+function buildShipMatrix(){
+  const ship={}
+  for(const cl of State.customers){
+    ship[cl]={}
+    for(const c of State.centres){ ship[cl][c.name]=sampleShipDays() }
+  }
+  State.shipDays=ship
+}
+
+function buildOpDurTE(){
+  const table={}
+  for(const t of TYPES){
+    table[t]={}
+    const [min,mode,max]=Params.durations[t]
+    for(const e of ENGINES){
+      table[t][e]=Math.round(triangular(min,mode,max))
+    }
+  }
+  State.opDurTE=table
 }
 
 function pickCompatibleCentre(type,engine){
@@ -314,7 +335,7 @@ function pickCompatibleCentre(type,engine){
 }
 
 function placeDemandOnCalendar(demand){
-  // naive: occupy 1 slot per day for 'duration' consecutive days starting at startDayIdx
+  // occupy 1 slot/day for 'duration' days from start
   const c=demand.centre
   const startIdx = Math.max(0, Math.floor((demand.startDate - State.baseDate)/days(1)))
   for(let d=0; d<demand.duration; d++){
@@ -330,13 +351,11 @@ function buildExistingDemands(){
   State.demands=[]
   for(let i=0;i<Params.existing;i++){
     const type=choice(TYPES)
-    // pick centre that supports this type and some engine it supports
     const centre=choice(State.centres.filter(c=>c.types.has(type)))
     if(!centre) continue
     const engine=choice([...centre.engines])
     const priority = rand()*100 < Params.pUrgent ? 'Urgent' : 'Standard'
-    const duration=sampleDuration(type)
-    // start date within horizon
+    const duration=State.opDurTE[type][engine]
     const startOffset = rInt(0, State.horizonDays-1)
     const startDate = new Date(State.baseDate.getTime()+days(startOffset))
     const d={id:`E${i+1}`, client: choice(State.customers), centre, centreName: centre.name, engine, type, priority, duration, startDate}
@@ -360,6 +379,8 @@ function regenerate(){
   State.horizonDays=Params.weeks*7
   buildCentres()
   buildCustomers()
+  buildShipMatrix()
+  buildOpDurTE()
   buildExistingDemands()
   rebuildCompatSummary()
   hydrateUI()
@@ -371,7 +392,6 @@ function regenerate(){
 // ----------------------- ETA calculation -----------------------
 function avgDurationByType(type){
   const [min,mode,max]=Params.durations[type]
-  // approximate mean for triangular: (min+mode+max)/3
   return Math.round((min+mode+max)/3)
 }
 
@@ -396,7 +416,7 @@ function computePenaltyDays(centre,type){
 }
 
 function waitDaysIfFull(centre, priority){
-  // simple: if next week >100% and Standard, add small wait; urgent bypass via reserved capacity
+  // if next week >100% and Standard, add wait; urgent bypass (<= Standard guaranteed)
   const week=1
   const start=(week-1)*7; const end=start+7
   let maxOcc=0
@@ -411,26 +431,26 @@ function waitDaysIfFull(centre, priority){
 }
 
 function evaluateRequest(req){
-  const {engine,type,priority} = req
+  const {client,engine,type,priority} = req
   const eligible=State.centres.filter(c=>c.engines.has(engine)&&c.types.has(type))
   const rows=[]
   for(const c of eligible){
-    const shipOut=sampleShipDays()
-    const shipBack=sampleShipDays()
-    const dur=sampleDuration(type)
+    const ship = (State.shipDays[client] && State.shipDays[client][c.name]!==undefined) ? State.shipDays[client][c.name] : 0
+    const shipOut=ship, shipBack=ship // fixe & symétrique
+    const dur=State.opDurTE[type][engine]
     const baseETA=shipOut + dur + shipBack
     const wait=waitDaysIfFull(c, priority)
     const fast=baseETA + wait
     const penalty=computePenaltyDays(c,type)
     const responsible=fast + penalty
-    const jitter=(rand()-0.5)*1.0 // ±0.5j
-    rows.push({centre:c,fast:Math.max(0,Math.round(fast+jitter)),responsible:Math.max(0,Math.round(responsible+jitter)),
-      detail:`Aller ${shipOut}j • Ops ${dur}j • Attente ${wait}j • Retour ${shipBack}j • Pénalité ${penalty}j`})
+    rows.push({centre:c,fast,responsible,shipOut,shipBack,dur,wait,penalty,
+      detailHTML:`Aller ${shipOut}j • Ops ${dur}j • Attente <span class='${wait>0?"red":""}'>${wait}</span>j • Retour ${shipBack}j • Pénalité <span class='${penalty>0?"red":""}'>${penalty}</span>j`})
   }
-  rows.sort((a,b)=>a.fast-b.fast)
-  const bestFast=rows.length? rows.reduce((p,c)=>c.fast<p.fast?c:p,rows[0]):null
+  // bests
+  const bestFast = rows.length ? rows.reduce((p,c)=> c.fast<p.fast?c:p, rows[0]) : null
+  const bestResp = rows.length ? rows.reduce((p,c)=> c.responsible<p.responsible?c:p, rows[0]) : null
+  // sort by ResponsibleETA ascending
   rows.sort((a,b)=>a.responsible-b.responsible)
-  const bestResp=rows.length? rows.reduce((p,c)=>c.responsible<p.responsible?c:p,rows[0]):null
   return {rows,bestFast,bestResp}
 }
 
@@ -472,19 +492,20 @@ function evaluateCurrent(){
   res.rows.forEach(r=>{
     const isFastReco = res.bestFast && r.centre===res.bestFast.centre
     const isRespReco = res.bestResp && r.centre===res.bestResp.centre
+    const redFlag = (r.wait>0 || r.penalty>0)
     body.insertAdjacentHTML('beforeend',`
       <div class="eta-row">
-        <div class="eta-cell ${isFastReco||isRespReco?'reco':''}"><strong>${r.centre.name}</strong></div>
-        <div class="eta-cell ${isFastReco?'reco':''}">${r.fast}</div>
-        <div class="eta-cell ${isRespReco?'reco':''}">${r.responsible}</div>
-        <div class="eta-cell hint" title="${r.detail}">${r.detail}</div>
+        <div class="eta-cell ${isRespReco?"best-resp":(isFastReco?"best-fast":"")}"><strong>${r.centre.name}</strong></div>
+        <div class="eta-cell ${(isFastReco?"best-fast":"")} ${redFlag?"red":""}">${r.fast}</div>
+        <div class="eta-cell ${(isRespReco?"best-resp":"")} ${redFlag?"red":""}">${r.responsible}</div>
+        <div class="eta-cell hint">${r.detailHTML}</div>
       </div>`)
   })
   const hint=document.getElementById('eta-hint')
   if(res.bestFast||res.bestResp){
-    const bestF=res.bestFast? res.bestFast.centre.name+` (${res.bestFast.fast}j)` : '—'
-    const bestR=res.bestResp? res.bestResp.centre.name+` (${res.bestResp.responsible}j)` : '—'
-    hint.textContent = `Reco FastETA: ${bestF} • Reco ResponsibleETA: ${bestR}`
+    const bestF=res.bestFast? res.bestFast.centre.name+` (${res.bestFast.fast}j ⚡)` : '—'
+    const bestR=res.bestResp? res.bestResp.centre.name+` (${res.bestResp.responsible}j 🍀)` : '—'
+    hint.textContent = `Tri: 🍀 ResponsibleETA • Reco ⚡: ${bestF} • Reco 🍀: ${bestR}`
   }
 }
 
@@ -562,18 +583,22 @@ function buildReqTable(){
 }
 
 function addCurrentRequest(){
-  // create and place the currently set request into dataset (affects heatmap/future ETA)
-  const centreNameBest=document.querySelector('#eta-rows .reco')?.parentElement?.querySelector('.eta-cell strong')?.textContent
-  // fallback: pick first eligible centre
+  // place currently set request into dataset
   const type=document.getElementById('r-type').value
   const engine=document.getElementById('r-engine').value
+  let centreNameBest = null
+  const rows=document.querySelectorAll('#eta-rows .eta-row')
+  if(rows.length){
+    // first row is best ResponsibleETA due to sorting
+    centreNameBest = rows[0].querySelector('.eta-cell strong')?.textContent || null
+  }
   let centre = State.centres.find(c=>c.name===centreNameBest && c.types.has(type) && c.engines.has(engine))
   if(!centre){ centre = pickCompatibleCentre(type, engine) }
   if(!centre){ alert('Aucun centre compatible pour cette demande.'); return }
   const client=document.getElementById('r-client').value
   const priority=document.getElementById('r-priority').value
   const startDate=document.getElementById('r-available').valueAsDate || State.baseDate
-  const duration=sampleDuration(type)
+  const duration=State.opDurTE[type][engine]
   const id=`N${State.demands.length+1}`
   const d={id, client, centre, centreName:centre.name, engine, type, priority, duration, startDate}
   State.demands.push(d)
@@ -644,7 +669,9 @@ document.getElementById('btn-export').addEventListener('click',()=>{
     baseDate: State.baseDate.toISOString().slice(0,10),
     horizonDays: State.horizonDays,
     centres: State.centres.map(c=>({name:c.name, engines:[...c.engines], types:[...c.types], capBase:c.capBase, trend:c.trend, capByDay:c.capByDay})),
-    demands: State.demands.map(d=>({id:d.id, client:d.client, centre:d.centreName, engine:d.engine, type:d.type, priority:d.priority, duration:d.duration, startDate:d.startDate.toISOString().slice(0,10)}))
+    demands: State.demands.map(d=>({id:d.id, client:d.client, centre:d.centreName, engine:d.engine, type:d.type, priority:d.priority, duration:d.duration, startDate:d.startDate.toISOString().slice(0,10)})),
+    shipDays: State.shipDays,
+    opDurTE: State.opDurTE
   }}
   download('maestro_dataset.json', JSON.stringify(out,null,2))
 })
@@ -660,9 +687,8 @@ document.getElementById('import-file').addEventListener('change',evt=>{
       // rebuild State from import (simple)
       State.baseDate = new Date((data.State?.baseDate)||startOfToday())
       State.horizonDays = data.State?.horizonDays || Params.weeks*7
-      // minimal rebuild path
       seedRng(Params.seed)
-      buildCentres(); buildCustomers(); State.demands=[]
+      buildCentres(); buildCustomers();
       // override centres from file when possible
       if(Array.isArray(data.State?.centres)){
         data.State.centres.slice(0,20).forEach((c,i)=>{
@@ -672,6 +698,9 @@ document.getElementById('import-file').addEventListener('change',evt=>{
           target.loadByDay=new Array(State.horizonDays).fill(0); target.loadByDayByType=Object.fromEntries(TYPES.map(t=>[t,new Array(State.horizonDays).fill(0)]))
         })
       }
+      State.shipDays = data.State?.shipDays || {}
+      State.opDurTE = data.State?.opDurTE || {}
+      State.demands=[]
       if(Array.isArray(data.State?.demands)){
         data.State.demands.forEach(d=>{
           const centre=State.centres.find(c=>c.name===d.centre)
