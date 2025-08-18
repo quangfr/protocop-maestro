@@ -14,14 +14,14 @@
 
 **💡 Démarche IA**
 
-0. 🏃‍♂️ Privilégier peu de logique métier (données statiques), un style minimaliste avec le minimum de données
-1. 🔍 Prototyper petit avec des hypothèses de simplification
-2. ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
-3. 🆘 Demander à GPT de te proposer des pistes d'amélioration ou de simplification
-4. 🔄 Mettre le plus de demandes possibles dans ton prompt avant régénération
-5. 📥 Amender le prompt jusqu'à ce qu'il te convient avec de générer le prototype
-6. 📋 Quand tu es satisfait, demande à GPT de te refournir le prompt pour reprendre ailleurs
-7. 🔶 Demander à GPT de générer le diagramme UML pour vérifier ou documenter
+1. 🚲 Minimalisme → privilégier peu de logique métier, données statiques  
+2. 🧩 Simplification → prototyper petit avec hypothèses légères  
+3. 🎤 Clarification → demander à GPT de poser des questions  
+4. 💡 Amélioration → demander à GPT des pistes d’optimisation  
+5. 📦 Exhaustivité → regrouper un max de demandes avant régénération  
+6. 📐 Vérification → générer un diagramme UML pour documenter  
+7. 📝 Itération → amender le prompt jusqu’à satisfaction  
+8. 📌 Transmission → demander à GPT de refournir le prompt final
 
 **🤖 Lien à la conversation IA**
 ```
