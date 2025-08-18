@@ -74,10 +74,10 @@ classDiagram
 
   class Engine {
     <<enumeration>>
-    +LEAP-1A
-    +LEAP-1B
-    +CFM56-5B
-    +CFM56-7B
+    +LEAP_1A
+    +LEAP_1B
+    +CFM56_5B
+    +CFM56_7B
     +SaM146
   }
 
@@ -105,23 +105,23 @@ classDiagram
 
   class Centre {
     +name: String
-    +engines: Set<Engine>
-    +types: Set<RequestType>
-    +capByDay: int[]
-    +quotaTE: Map<TE, float>
-    +loadByDay: int[]
-    +loadByDayByType: Map<RequestType, int[]>
-    +loadByDayByTE: Map<TE, int[]>
+    +engines: List_of_Engine
+    +types: List_of_RequestType
+    +capByDay: IntArray
+    +quotaTE: Map_TE_to_Float
+    +loadByDay: IntArray
+    +loadByDayByType: Map_Type_to_IntArray
+    +loadByDayByTE: Map_TE_to_IntArray
     +supports(e:Engine,t:RequestType): bool
   }
 
   class ShipMatrix {
-    +shipDays: Map<Customer, Map<Centre,int>>
+    +shipDays: Map_Customer_to_Centre_to_Int
     +getDays(cust:Customer, centre:Centre): int
   }
 
   class OpDurTable {
-    +dur: Map<RequestType, Map<Engine,int>>
+    +dur: Map_Type_to_Engine_to_Int
     +getDays(type:RequestType, engine:Engine): int
   }
 
@@ -135,8 +135,8 @@ classDiagram
 
   class EvalRow {
     +centre: Centre
-    +fast: int           %% ⚡ FastETA (jours)
-    +responsible: int    %% 🍀 ResponsibleETA (jours)
+    +fast: int           %% FastETA (jours)
+    +responsible: int    %% ResponsibleETA (jours)
     +shipOut: int
     +shipBack: int
     +dur: int
@@ -183,16 +183,16 @@ classDiagram
   Demand --> Engine
   Demand --> RequestType
 
-  Evaluator --> ShipMatrix : utilise (shipAller/Retour)
-  Evaluator --> OpDurTable : utilise (dur(TE))
-  Evaluator --> Centre : filtre éligibles & lit cap/charges
-  Calendar --> Centre : met à jour loadByDay / loadByDayByTE
+  Evaluator --> ShipMatrix : uses shipOut/shipBack
+  Evaluator --> OpDurTable : uses dur(TE)
+  Evaluator --> Centre : reads caps/loads
+  Calendar --> Centre : updates loads
 
   %% Règles TE-light (notes)
   note for Evaluator "FastETA = shipOut + dur(TE) + shipBack + Wait\nResponsibleETA = FastETA + Penalty"
   note for Centre "capTE = round(capCentre * quotaTE)\nquotaTE: uniforme par défaut"
-  note "Simplification priorisation : Urgent préemptif doux ⇒ Wait(Urgent)=0 ; Standard absorbe l'attente via OccTE(sem0)" as Nprio
-  Nprio .. Priority
+  note "Simplification priorisation : Urgent = attente 0 ; Standard absorbe l'attente via OccTE(sem0)" as Nprio
+  Priority .. Nprio
 
 
 ```
