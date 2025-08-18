@@ -2,8 +2,8 @@
 
 **📌 Objectifs d'un prototype de calcul HTML :**
 
-- 💡 Transformer une idée en prototype
-- 🗂️ Identifier les besoins métiers précis
+- 💡 Transformer une idée en prototype concret
+- 🗂️ Identifier les nouveau besoins métiers
 
 **🛠 Usages concrets :**
 
@@ -73,6 +73,131 @@ MAESTRO est un outil de **gestion et d’allocation des demandes de maintenance 
 - **Centre** `{id, name, engines:Set, types:Set, capBase, trend, capByDay[], loadByDay[], loadByDayByType[type][]}`
 - **Demande** `{id, client, centreName, engine, type, priority, startDate, duration}`
 - **Paramètres** `seed, weeks, clients, existing, pUrgent, capMin..capMax, trendMin..trendMax, durations[type]=[min,mode,max], shipW[0..4], reserveUrgPct, penaltyFactor`
+
+```mermaid
+
+%% Modèle de données — MAESTRO (Class Diagram)
+classDiagram
+  direction LR
+
+  class Client {
+    +id: string
+    +nom: string
+  }
+
+  class Moteur {
+    +code: string
+    +libelle: string
+  }
+
+  class TypeDemande {
+    +code: string
+    +libelle: string
+  }
+
+  class Centre {
+    +id: string
+    +nom: string
+    +capBase: int
+    +trendPct: float
+    +capByDay: int[H]
+    +loadByDay: int[H]
+    +loadByDayByType: Map<TypeDemande,int[H]>
+  }
+
+  class Demande {
+    +id: string
+    +priorite: string  %% "Urgent" | "Standard"
+    +dateMiseADispo: Date
+    +dureeOpsJours: int
+  }
+
+  class Params {
+    +seed: int
+    +weeks: int
+    +nClients: int
+    +nDemandesExistantes: int
+    +pUrgentPct: int
+    +capMin: int
+    +capMax: int
+    +trendMinPct: int
+    +trendMaxPct: int
+    +durations: Map<TypeDemande, TriParams>
+    +shipWeights: int[5]   %% proba 0..4 jours
+    +reserveUrgPct: int
+    +penaltyFactor: float
+  }
+
+  class TriParams {
+    +min: int
+    +mode: int
+    +max: int
+  }
+
+  class ResultatETA {
+    +centre: string
+    +fastETA_j: int
+    +responsibleETA_j: int
+    +detail: string  %% aller/ops/attente/retour/pénalité
+  }
+
+  class AllocationService {
+    +evaluerDemande(input: DemandeInput): ResultatETA[]
+    +computeFastETA(...): int
+    +computeResponsibleETA(...): int
+    +waitDaysIfFull(centre, priorite): int
+    +computePenaltyDays(centre, type): int
+    +occAtWeek4(centre, type): float
+  }
+
+  class DemandeInput {
+    +client: Client
+    +moteur: Moteur
+    +type: TypeDemande
+    +priorite: string
+    +dateMiseADispo: Date
+  }
+
+  %% Relations
+  Client "1" --> "0..*" Demande : passe
+  Demande "1" --> "1" Client
+  Demande "1" --> "1" Moteur
+  Demande "1" --> "1" TypeDemande
+  Demande "0..1" --> "1" Centre : allouéeÀ
+
+  Centre "0..*" -- "0..*" Moteur : supporte
+  Centre "0..*" -- "0..*" TypeDemande : traite
+
+  AllocationService ..> Params : utilise
+  AllocationService ..> Centre : lit capacités/charge
+  AllocationService ..> DemandeInput : calcule ETA
+  AllocationService ..> ResultatETA : renvoie
+mermaid
+Copy
+Edit
+%% Flux d'évaluation — MAESTRO (Sequence Diagram)
+sequenceDiagram
+  autonumber
+  actor User as Utilisateur
+  participant UI as UI (Onglet 1)
+  participant SVC as AllocationService
+  participant DATA as State/Params
+
+  User->>UI: Saisit (Client, Moteur, Type, Priorité, Date)
+  UI->>SVC: evaluerDemande(DemandeInput)
+  SVC->>DATA: Récup. centres compatibles (Moteur ∧ Type)
+  loop Pour chaque centre éligible
+    SVC->>DATA: Tirage acheminement aller/retour (0..4j)
+    SVC->>DATA: Durée(type) ~ Tri(min,mode,max)
+    SVC->>DATA: Occ. S1 (attente std) & Occ. S4 (pénalité)
+    SVC->>SVC: waitDaysIfFull(centre, priorité)
+    SVC->>SVC: computePenaltyDays(centre, type)
+    SVC-->>UI: Ligne (Centre, FastETA, ResponsibleETA, détail)
+  end
+  UI-->>User: Tableau ETA + reco Fast & Responsible
+
+```
+
 
 ## Référentiels
 - **Moteurs (5)** : `LEAP-1A, LEAP-1B, CFM56-5B, CFM56-7B, SaM146`
