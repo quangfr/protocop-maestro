@@ -28,7 +28,7 @@
 https://chatgpt.com/share/68a33867-818c-8006-ac8c-efbd47c3d3ec
 ```
 > [!NOTE] 
-> L'exemple montré n'est pas à suivre. Il comporte des itérations de code existant qui échouent. Cela montre bien l'importance de regrouper les demandes dans un un message pour générer le nouveau code. Pour résoudre le problème, il est nécessaire de demander la régénération complet du prototype même pour des amélioration mineurs. 
+> La conversation en exemple n'est pas à suivre. Il comporte des itérations de code existant qui échouent. Pour résoudre le problème, il est nécessaire de demander la régénération complet du prototype même pour des amélioration mineures. 
 
 # Prompt
 
