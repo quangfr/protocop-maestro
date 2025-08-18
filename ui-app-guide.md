@@ -3,9 +3,7 @@
 **📌 Objectifs d'un prototype applicatif / HTML :**
 
 - 💡 Proposer et valider une vision produit
-- 🗂️ Aider à structurer une feuille de route et à prioriser les fonctionnalités à haute valeur ajoutée
-- 🖥️ Discuter et valider des idées d'interface ou un modèle de données
-- 📑 Illustrer et préciser une spécification avec les développeurs comme les usagers
+- 🗂️ Structurer et prioriser des fonctionnalités à haute valeur ajoutée
 
 **🛠 Usages concrets :**
 
