@@ -1,11 +1,7 @@
 # Protocop Maestro
 
-Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un outil explorant la planification de capacité et l'expérience utilisateur. Il sert de terrain d'expérimentation pour tester et affiner les principes du futur produit.
+Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un outil explorant la planification de capacité.
 
-## Objectifs
-- Illustrer des parcours utilisateurs et des interfaces possibles.
-- Mettre à disposition des jeux de données types pour vérifier les calculs.
-- Servir de base pour recueillir des retours et guider les développements ultérieurs.
 
 ## Contenu
 - `ui-wireframe-guide.md` et `ui-wireframe.html` – guide et maquette graphique pour esquisser rapidement l'interface.
