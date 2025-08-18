@@ -14,8 +14,8 @@
 
 **💡 Démarche IA**
 
-1. 📝 **Texte** → privilégier les données en dur (toujours validées)  
-2. 🎲 **Chiffres** → générer aléatoirement, sans logique métier  
+1. 📝 **Texte** → privilégier les **données réalistes en dur** à valider
+2. 🎲 **Chiffres** → générer **aléatoirement, sans logique métier**  
 3. 🌍 **Périmètre** → définir réaliste, mais afficher seulement un extrait  
 4. 📑 **Méthode** → procéder onglet par onglet, **composant par composant**  
 5. ✅ **Validation** → valider la structure avec un **schéma visuel texte** avant de générer le composant  
