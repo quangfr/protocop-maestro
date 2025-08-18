@@ -30,281 +30,148 @@ https://chatgpt.com/share/68a33867-818c-8006-ac8c-efbd47c3d3ec
 
 # Prompt
 
-<img width="1518" height="804" alt="image" src="https://github.com/user-attachments/assets/48b36336-36b6-4104-b454-a580fb341e54" />
-<img width="1414" height="694" alt="image" src="https://github.com/user-attachments/assets/84d6038e-1e75-4c07-bdd5-c3289613e018" />
-<img width="1500" height="496" alt="image" src="https://github.com/user-attachments/assets/fd998509-0486-423f-919b-de3ac27fe79f" />
-<img width="1520" height="567" alt="image" src="https://github.com/user-attachments/assets/c75098b3-72da-4504-974b-eaa51d5d9d9e" />
+<img width="1263" height="693" alt="image" src="https://github.com/user-attachments/assets/c9063399-6182-4e13-bbf5-190a5174e29e" />
+<img width="1918" height="924" alt="image" src="https://github.com/user-attachments/assets/29f5d26d-d8f7-49c6-b3df-3367ec4b1e6e" />
+<img width="1907" height="634" alt="image" src="https://github.com/user-attachments/assets/d5418cfc-539d-4a7a-a19b-80e53b9fdb76" />
+<img width="1919" height="703" alt="image" src="https://github.com/user-attachments/assets/c6f3b8c2-4988-487a-9d79-27c90ed90110" />
 
 
-# 1) Contexte 🌍
-**❓ Cette section répond à :**
-- À quoi sert MAESTRO et pour qui ?
-- Quelles règles métier guident la recommandation de centre ?
-- Quelles simplifications ont été prises pour le prototype ?
-- Quelles stratégies de recommandation sont comparées ?
-
-## Objectif
-MAESTRO est un outil de **gestion et d’allocation des demandes de maintenance moteur**. Le prototype vise à **recommander le centre** le plus adapté pour une demande donnée et à **visualiser la charge/capacité** des centres sur 3 mois, avec deux stratégies :
-- **FastETA** : minimise le délai total théorique (acheminement + ops + retour + attente basique).
-- **ResponsibleETA** : ajoute une **pénalité de saturation** à 4 semaines pour éviter les centres fréquemment pleins (approche “responsable”).
-
-## Règles métier (pilotage de la reco)
-- Compatibilité **Centre × (Moteur, Type)** requise.
-- **Urgent** prioritaire (pas d’attente additionnelle si saturation immédiate ; Standard peut attendre la 1ʳᵉ semaine si >100%).
-- Pénalité ResponsibleETA basée sur le **taux d’occupation prévu** à 4 semaines pour le **type** (indépendant du moteur).
-- **Bris d’égalité** : léger bruit (jitter ±0,5 j), puis **fiabilité** du centre.
-
-## Simplifications retenues (pour le proto)
-- **Acheminement** : tirage aléatoire discret (0–4 jours) à l’aller **et** au retour, durée fixe d'acheminement le centre et le client (pas de distance géo).
-- **Durées d’opérations** : dépendent **du type** uniquement (pas de variation par moteur/centre).
-- **Aucun aléa d’exécution** (maintenance déterministe hors randomisation initiale).
-- **Arrivées des demandes** : linéaires (densité croissante à l’approche de la date d’opération).
+## 1) CONTEXTE
+- **But** : recommander un **centre de maintenance** pour une demande (client, moteur, type, priorité) avec 2 stratégies d’ETA :
+  - ⚡ **FastETA** = acheminement aller + durée d’opération + attente (si pleine capacité) + acheminement retour
+  - 🍀 **ResponsibleETA** = FastETA + **pénalité** de saturation (projection à 4 semaines)
+- **Contraintes métier**
+  - Urgent ≤ Standard (jamais plus long à paramètres identiques)
+  - ETA **stable** si les entrées ne changent pas : aucune randomness lors du calcul (seulement à la génération initiale des master data)
+  - 20 centres, chacun **2–3 moteurs** supportés (sur 5) et **2–3 types** (sur 4)
+- **Simplifications**
+  - **Acheminement fixe** pour chaque *client × centre* (généré une fois, aller=retour)
+  - **Durée d’opération fixe** par *type × moteur* (indépendant du centre, générée une fois)
+  - Pas d’aléas en exécution (seulement à la génération)
 
 ---
 
-# 2) Données 📊
-**❓ Cette section répond à :**
-- Quels objets et attributs composent le modèle de données ?
-- Quelles listes de référence (moteurs, types, centres) sont utilisées ?
-- Comment sont générées les capacités, charges et demandes existantes ?
-- Quels paramètres de randomisation contrôlent le jeu de données ?
+## 2) DONNÉES (modèle + randomization)
+### 2.1 Entités
+- **Centre**
+  - `name`, `engines:Set`, `types:Set`
+  - `capBase` (slots/jour), `trend` (−10%..+10%)
+  - `capByDay[0..H-1]` (capacité quotidienne), `loadByDay[0..H-1]`
+  - `loadByDayByType[type][0..H-1]`
+- **Client** : `id / name`
+- **Demande**
+  - `id`, `client`, `centre`, `engine`, `type`, `priority ∈ {Urgent, Standard}`
+  - `startDate`, `durationDays`
+- **Master tables fixes**
+  - `shipDays[client][centre] → jours` (fixe)
+  - `opDurTE[type][engine] → jours` (fixe)
 
-## Modèle (objets principaux)
-- **Centre** `{id, name, engines:Set, types:Set, capBase, trend, capByDay[], loadByDay[], loadByDayByType[type][]}`
-- **Demande** `{id, client, centreName, engine, type, priority, startDate, duration}`
-- **Paramètres** `seed, weeks, clients, existing, pUrgent, capMin..capMax, trendMin..trendMax, durations[type]=[min,mode,max], shipW[0..4], reserveUrgPct, penaltyFactor`
+### 2.2 Paramètres (éditables)
+- `seed=42`, `weeks=12` (horizon 84j), `clients=30`, `existing=250`, `%Urgent=25`
+- Capacité : `capMin=4`..`capMax=10`, `trendMin=-10%`..`trendMax=+10%`
+- **Durées triangulaires par type** (pour générer `opDurTE`) :
+  - `TestOnly: 2,3,4` · `QuickInspection: 3,4,6` · `RepairOnly: 12,18,28` · `Overhaul: 35,45,65`
+- **Acheminement** (pour générer `shipDays`) : probas pour {0..4} = {25,35,20,15,5}%
+- Règles : `reserveUrgPct=25` (concept), `penaltyFactor=1.0`
 
-```mermaid
+### 2.3 Génération (seedée, déterministe)
+1. **Centres** (20 villes FR) : moteurs & types via échantillonnage (2–3 chacun), `capBase` U[4..10], `trend` U[-10%..+10%].  
+   `capByDay[d] = round(capBase × facteurJour × dérive linéaire(trend))`.
+2. **Clients** : `Client-001..Client-030`.
+3. **Ship matrix** `shipDays[client][centre]` : tirage discret {0..4} selon les poids.
+4. **OpDurTE** : pour chaque `type×engine`, tirage triangulaire → **fixé**.
+5. **Demandes existantes** (charge/heatmap) : `existing` demandes réparties dans l’horizon, affectées à un centre **compatible**, `duration = opDurTE[type][engine]`, priorité selon `%Urgent`.  
+   > (Option de réalisme : biais d’arrivées “plus proche de la date d’opération”, et arrivée jusqu’à 6 mois avant, si l’horizon est étendu.)
 
-%% Modèle de données — MAESTRO (Class Diagram)
-classDiagram
-  direction LR
+---
 
-  class Client {
-    +id: string
-    +nom: string
-  }
+## 3) INTERFACE (4 onglets, largeur 100%)
+### 3.1 Onglet 1 — 📥 Demande & Reco
+**Champs** : Client, Moteur, Type, Priorité, Date dispo.  
+**Actions** : `Évaluer`, `Ajouter au planning`.  
+**Table des centres** (compatibles seulement) :
+- Colonnes : **Centre**, **⚡ FastETA (j)**, **🍀 ResponsibleETA (j)**, **Détails**  
+- **Tri** par 🍀 ResponsibleETA croissant  
+- **Surlignage** :  
+  - 🍀 meilleur Responsible → **fond vert**  
+  - ⚡ meilleur Fast → **fond jaune**  
+  - `Attente>0` ou `Pénalité>0` → **valeur en rouge**  
+- **Détails** (ex.) : `Aller Xj • Ops Yj • Attente Zj • Retour Xj • Pénalité Pj`
 
-  class Moteur {
-    +code: string
-    +libelle: string
-  }
+### 3.2 Onglet 2 — 🧩 Master Data
+- Sliders/inputs pour tous les paramètres de 2.2
+- **Regénérer** (recrée centres, matrices, demandes existantes)
+- **Export/Import JSON** des `Params` + snapshot `State` (centres, demandes, matrices fixes)
 
-  class TypeDemande {
-    +code: string
-    +libelle: string
-  }
+### 3.3 Onglet 3 — 🏭 Centres • Heatmap
+- Sélecteur de centre
+- Heatmap **type × moteur** (lignes) × **S1..S12** (colonnes)
+- Valeur = **max**(occupation_jour) sur la semaine ; palette **vert → jaune → rouge**
 
-  class Centre {
-    +id: string
-    +nom: string
-    +capBase: int
-    +trendPct: float
-    +capByDay: int[H]
-    +loadByDay: int[H]
-    +loadByDayByType: Map<TypeDemande,int[H]>
-  }
+### 3.4 Onglet 4 — 📄 Demandes • Liste
+- Filtres : centre, moteur, type, priorité, période
+- Tableau trié par date
 
-  class Demande {
-    +id: string
-    +priorite: string  %% "Urgent" | "Standard"
-    +dateMiseADispo: Date
-    +dureeOpsJours: int
-  }
+---
 
-  class Params {
-    +seed: int
-    +weeks: int
-    +nClients: int
-    +nDemandesExistantes: int
-    +pUrgentPct: int
-    +capMin: int
-    +capMax: int
-    +trendMinPct: int
-    +trendMaxPct: int
-    +durations: Map<TypeDemande, TriParams>
-    +shipWeights: int[5]   %% proba 0..4 jours
-    +reserveUrgPct: int
-    +penaltyFactor: float
-  }
+## 4) TECHNIQUE (algos & règles)
+### 4.1 Calculs
+- **Attente (semaine+1)** :  
+  - Standard : si `max( load_j / cap_j )` sur Semaine 1 > 100%, `waitDays = ceil((occ-1)*7)`  
+  - Urgent : `waitDays = 0` (priorité garantit ETA ≤ Standard)
+- **FastETA** = `ship + opDurTE[type][engine] + wait + ship`  
+  *(avec `ship = shipDays[client][centre]`, aller=retour, **fixe**)*  
+- **Pénalité (Responsible)** :  
+  - `occ4 = max_j∈S4( loadType_j / cap_j )`  (charge **par type**, au centre)  
+  - `excess = max(0, occ4 - 1)`  
+  - `avgDays(type) = (min + mode + max) / 3` (triangulaire)  
+  - `penaltyDays = penaltyFactor * excess * avgDays(type)` (arrondi)  
+- **🍀 ResponsibleETA** = `FastETA + penaltyDays`
+- **Tri** : centres éligibles triés par **ResponsibleETA croissant** (onglet 1)
 
-  class TriParams {
-    +min: int
-    +mode: int
-    +max: int
-  }
+### 4.2 Occupation & Heatmap
+- `loadByDay` et `loadByDayByType[type]` incrémentés **1 slot/jour** pendant `durationDays` à partir de `startDate`
+- Heatmap : pour chaque **semaine** et **(type×moteur)** supporté par le centre,
+  - On approxime la répartition “par moteur” en **partageant** `loadByDayByType[type]` sur le nombre de moteurs supportés
+  - Cellule = `max( loadTypeShare_j / cap_j )` de la semaine, **bornée à 150%**
 
-  class ResultatETA {
-    +centre: string
-    +fastETA_j: int
-    +responsibleETA_j: int
-    +detail: string  %% aller/ops/attente/retour/pénalité
-  }
+### 4.3 Déterminisme / stabilité
+- Toute randomness est effectuée **une seule fois** à la **génération** (seed).
+- À **paramètres de demande** inchangés, l’**ETA ne bouge pas** entre clics “Évaluer”.
+- Passer **Standard → Urgent** ne peut que **réduire** (ou égaler) l’ETA.
 
-  class AllocationService {
-    +evaluerDemande(input: DemandeInput): ResultatETA[]
-    +computeFastETA(...): int
-    +computeResponsibleETA(...): int
-    +waitDaysIfFull(centre, priorite): int
-    +computePenaltyDays(centre, type): int
-    +occAtWeek4(centre, type): float
-  }
+### 4.4 États / Types (pseudo-TS)
+```ts
+type Priority = "Urgent" | "Standard";
+type Engine = "LEAP-1A"|"LEAP-1B"|"CFM56-5B"|"CFM56-7B"|"SaM146";
+type ReqType = "Overhaul"|"RepairOnly"|"QuickInspection"|"TestOnly";
 
-  class DemandeInput {
-    +client: Client
-    +moteur: Moteur
-    +type: TypeDemande
-    +priorite: string
-    +dateMiseADispo: Date
-  }
+interface Centre {
+  id:number; name:string;
+  engines:Set<Engine>; types:Set<ReqType>;
+  capBase:number; trend:number;
+  capByDay:number[]; loadByDay:number[];
+  loadByDayByType: Record<ReqType, number[]>;
+}
 
-  %% Relations
-  Client "1" --> "0..*" Demande : passe
-  Demande "1" --> "1" Client
-  Demande "1" --> "1" Moteur
-  Demande "1" --> "1" TypeDemande
-  Demande "0..1" --> "1" Centre : allouéeÀ
+interface Demand {
+  id:string; client:string; centre:Centre; centreName:string;
+  engine:Engine; type:ReqType; priority:Priority;
+  startDate:Date; duration:number;
+}
 
-  Centre "0..*" -- "0..*" Moteur : supporte
-  Centre "0..*" -- "0..*" TypeDemande : traite
+interface Params {
+  seed:number; weeks:number; clients:number; existing:number; pUrgent:number;
+  capMin:number; capMax:number; trendMin:number; trendMax:number;
+  durations: Record<ReqType, [number,number,number]>;
+  shipW:number[]; reserveUrgPct:number; penaltyFactor:number;
+}
 
-  AllocationService ..> Params : utilise
-  AllocationService ..> Centre : lit capacités/charge
-  AllocationService ..> DemandeInput : calcule ETA
-  AllocationService ..> ResultatETA : renvoie
+interface State {
+  baseDate:Date; horizonDays:number;
+  centres:Centre[]; customers:string[]; demands:Demand[];
+  shipDays: Record<string, Record<string, number>>; // client->centre->days
+  opDurTE: Record<ReqType, Record<Engine, number>>;
+}
 ```
 
-```mermaid
-%% Flux d'évaluation — MAESTRO (Sequence Diagram)
-sequenceDiagram
-  autonumber
-  actor User as Utilisateur
-  participant UI as UI (Onglet 1)
-  participant SVC as AllocationService
-  participant DATA as State/Params
-
-  User->>UI: Saisit (Client, Moteur, Type, Priorité, Date)
-  UI->>SVC: evaluerDemande(DemandeInput)
-  SVC->>DATA: Récup. centres compatibles (Moteur ∧ Type)
-  loop Pour chaque centre éligible
-    SVC->>DATA: Tirage acheminement aller/retour (0..4j)
-    SVC->>DATA: Durée(type) ~ Tri(min,mode,max)
-    SVC->>DATA: Occ. S1 (attente std) & Occ. S4 (pénalité)
-    SVC->>SVC: waitDaysIfFull(centre, priorité)
-    SVC->>SVC: computePenaltyDays(centre, type)
-    SVC-->>UI: Ligne (Centre, FastETA, ResponsibleETA, détail)
-  end
-  UI-->>User: Tableau ETA + reco Fast & Responsible
-
-```
-
-
-## Référentiels
-- **Moteurs (5)** : `LEAP-1A, LEAP-1B, CFM56-5B, CFM56-7B, SaM146`
-- **Types (4)** : `Overhaul, RepairOnly, QuickInspection, TestOnly`
-- **Centres (20 villes)** : Paris, Lyon, Toulouse, Bordeaux, Nantes, Lille, Marseille, Nice, Strasbourg, Rennes, Grenoble, Montpellier, Clermont-F., Rouen, Tours, Dijon, Nancy, Orléans, Metz, Reims
-  - Chaque centre supporte **2–3 moteurs** et **2–3 types** (tirage uniforme sans doublon).
-
-## Paramètres & distributions (éditables dans “Master Data”)
-- **Seed** `42` ; **Horizon** `12 semaines` ; **Clients** `30` ; **Demandes existantes** `250` ; **%Urgent** `25%`.
-- **Capacité de base (slots/jour)** : entier **U[4,10]**.
-- **Facteur jour** : Lun–Jeu ~U[0.9,1.1] ; Ven ~U[0.8,1.0] ; Sam ~U[0.6,0.8] ; Dim ~U[0.4,0.6].
-- **Tendance** (linéaire sur 12 sem.) : **U[-10%, +10%]**.
-- **Durées (jours, triangulaire [min, mode, max])**  
-  | Type             | Tri[min, mode, max] |
-  |------------------|----------------------|
-  | TestOnly         | [2, 3, 4]            |
-  | QuickInspection  | [3, 4, 6]            |
-  | RepairOnly       | [12, 18, 28]         |
-  | Overhaul         | [35, 45, 65]         |
-- **Acheminement (jours)** : tirage {0,1,2,3,4} avec poids `{25,35,20,15,5}%`. Retour = aller.
-- **Urgent réservé** (concept) : `reserveUrgPct = 25%` (utilisé via la règle “Urgent = pas d’attente basique”).
-- **Facteur de pénalité** : `penaltyFactor = 1.0` (échelle de la pénalité ResponsibleETA).
-
-## Génération & calculs de charge
-- **Capacité/jour** = `capBase × facteur_jour × drift(tendance)`.
-- **Demandes existantes** : 250, avec **date de début** tirée dans l’horizon, **priorité** selon `%Urgent`.
-- **Plottage** de la charge : pour chaque demande, **+1 slot/jour** pendant `durée`.
-- **Occupation_jour** = `loadByDay / capByDay`, bornée à 150%.
-- **Heatmap (hebdo)** : **max**(Occupation_jour) de la semaine.
-- **Approx. moteur** pour heatmap (ligne `type × moteur`) : la charge de `type` est répartie **à parts égales** entre moteurs supportés (hypothèse d’affichage).
-
----
-
-# 3) Interface 🧩
-**❓ Cette section répond à :**
-- Quels onglets et actions l’interface propose-t-elle ?
-- Comment saisir une demande et consulter la recommandation ?
-- Comment éditer la donnée et rejouer le calcul ?
-- Quelles vues d’analyse (heatmap, listes filtrées) sont disponibles ?
-
-## Structure Fiori-like (full width, responsive)
-- **Topbar** : branding + **4 onglets**.
-- **Cartes** (cards) avec entêtes, barres d’outils et **tables** lisibles.
-- **Composants** : sélecteurs, boutons (primaire/secondaire/ghost), grilles.
-
-## Onglet 1 — *Saisie & Reco*
-- Formulaire : **Client**, **Moteur**, **Type**, **Priorité**, **Date de mise à disposition**.
-- Bouton **Évaluer** → calcule et affiche toutes les options **Centre** avec **FastETA**, **ResponsibleETA** et **détail** (aller, ops, attente, retour, pénalité).
-- Mise en avant de la **reco Fast** et **reco Responsible** (surbrillance).
-- Bouton **Ajouter cette demande** → inscrit la demande dans la **charge** (impacte heatmap & futures ETAs).
-
-## Onglet 2 — *Master Data & Randomization*
-- Panneaux pour éditer : **Seed**, **Horizon**, **Volumes**, **Capacité min/max**, **Tendance min/max**, **Durées triangulaires**, **Poids d’acheminement**, **%Urgent**, **Facteur de pénalité**.
-- Boutons : **Regénérer la donnée**, **Export JSON**, **Import JSON**.
-- Tableau **Compatibilités** : Centre → Moteurs/Types/Cap. base.
-
-## Onglet 3 — *Centres • Heatmap*
-- Sélecteur **Centre**.
-- **Heatmap 12 semaines** : lignes = **(Type × Moteur)** compatibles, colonnes = semaines, cellule = **max d’occupation** de la semaine.
-- Infobulle survol : détail de la semaine / %.
-
-## Onglet 4 — *Demandes • Liste*
-- Filtres : **Centre**, **Moteur**, **Type**, **Priorité**, **Période (date de début)**.
-- Tableau trié par date : `#`, `Client`, `Centre`, `Moteur`, `Type`, `Priorité`, `Début`, `Durée`.
-
----
-
-# 4) Technique 🧠
-**❓ Cette section répond à :**
-- Quelles sont les formules d’ETA et les algorithmes de pénalité/attente ?
-- Comment la randomisation est-elle implémentée ?
-- De quoi est composé le stack technique et comment est gérée la performance ?
-- Quelles limites/approximations connues ?
-
-## Stack & patterns
-- **HTML/CSS/JS vanilla** (standalone, **sans dépendances externes**) ; style **Fiori-like**.
-- **RNG déterministe** : `mulberry32(seed)`.
-- **Distributions** :
-  - **Triangulaire** pour les durées (par type).
-  - **Catégorielle pondérée** pour l’acheminement (0–4 jours).
-- **État** en mémoire (`Params`, `State`) ; **export/import JSON**.
-- **Performance** : horizon 12×7 jours ; tableaux effilés ; pas de canvas/DOM lourd.
-
-## Formules
-- **Durée moyenne par type** (pour pénalité) ≈ `(min + mode + max) / 3`.
-- **Attente basique (semaine 1)** :
-  - `waitDays(Standard) = ceil(max(0, Occ_semaine1 - 1) × 7)`.
-  - `waitDays(Urgent) = 0`.
-- **Pénalité Responsible (à 4 semaines, par type)** :
-  - `Occ₄w = max_jour(semaine 4, loadType / cap)`
-  - `excess = max(0, Occ₄w - 1)`.
-  - `penaltyDays = penaltyFactor × excess × avgDuration(type)`.
-- **ETA** :
-  - `FastETA = shipOut + duration(type) + waitDays + shipBack`.
-  - `ResponsibleETA = FastETA + penaltyDays`.
-  - **Jitter** (anti-égalité) : ±0–0,5 j gaussien tronqué (arrondi final).
-- **Compatibilité** : filtre **Centre × (Moteur, Type)**.
-- **Placement de charge** (existing & ajout) : +1 **slot/jour** sur `duration` jours, à partir de `startDate`.
-
-## Limites / approximations (connues)
-- **Durées par type** uniquement (pas de granularité moteur/centre).
-- **Approx. moteur heatmap** : partage égal de la charge du type entre moteurs supportés.
-- **Urgent** : pas de file d’attente fine ni capacité réservée “dure” (règle simple = pas d’attente basique).
-- **Acheminement** : pas de géoloc ; tirage discret.
-- **Saisies** : pas de validation complexe (focus sur l’exploration).
-
-## Extensions possibles (2–3 pistes)
-- Introduire **durées par (Type × Moteur)** et **facteur centre**.
-- Réserver **capacité dure** aux urgents par centre (ex. 20–30%).
-- Ajouter **Top-3** centres avec **score multi-critères** (ETA, saturation, distance proxy).
