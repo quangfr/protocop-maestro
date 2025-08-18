@@ -15,8 +15,7 @@ Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un ou
 
 - `ui-app-guide.md` et `ui-app.html` – exemple d'une interface de navigation SAP-IBP Fiori pour un planificateur en ateliers
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/5a1cae0f-e770-4be9-8db1-10435398d9da" />
-
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/e6199cd2-8025-4c24-9324-e791b4c1f90b" />
  
 - `ui-feature-guide.md` et `ui-feature.html` – exemple d'un moteur de choix d'atelier de maintenance selon les délais de traitement
 
