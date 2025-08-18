@@ -1,6 +1,6 @@
 # Protocop Maestro
 
-Ce dépôt regroupe des matériaux prototypes pour le concept **MAESTRO**, un outil explorant la planification des capacités de maintenance d'ateliers.
+Ce dépôt regroupe des prototypes générés par IA pour le projet **MAESTRO**, un outil de planification et de suivi de la maintenance des moteurs d'avion.
 
 
 ## Contenu
