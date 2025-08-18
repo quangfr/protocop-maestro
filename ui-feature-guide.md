@@ -63,7 +63,8 @@ https://chatgpt.com/share/68a33867-818c-8006-ac8c-efbd47c3d3ec
   - **OccTE(jour)** = `loadTE / capTE`. **OccTE(semaine)** = **max** des 7 jours.
 
 ```mermaid
-%% UML — Vue "Données & Règles" (TE-light) — types composés réduits à String
+
+%% UML — Vue "Données & Règles" (TE-light) — safe GitHub
 classDiagram
   direction LR
 
@@ -111,17 +112,17 @@ classDiagram
     +loadByDay: String
     +loadByDayByType: String
     +loadByDayByTE: String
-    +supports(e:Engine,t:RequestType): String
+    +supports(): String
   }
 
   class ShipMatrix {
     +shipDays: String
-    +getDays(cust:Customer, centre:Centre): int
+    +getDays(): int
   }
 
   class OpDurTable {
     +dur: String
-    +getDays(type:RequestType, engine:Engine): int
+    +getDays(): int
   }
 
   class Request {
@@ -150,15 +151,15 @@ classDiagram
   }
 
   class Evaluator {
-    +evaluate(req:Request): EvalResult
-    +capTE(c:Centre, te:TE, day:int): int
-    +occWeekTE(c:Centre, te:TE, weekStart:int): float
-    +waitDays(c:Centre, te:TE, prio:Priority, anchor:int): int
-    +penaltyDays(c:Centre, te:TE, anchor:int): int
+    +evaluate(): EvalResult
+    +capTE(): int
+    +occWeekTE(): float
+    +waitDays(): int
+    +penaltyDays(): int
   }
 
   class Calendar {
-    +place(d:Demand): void
+    +place(): void
   }
 
   class Demand {
@@ -182,16 +183,16 @@ classDiagram
   Demand --> Engine
   Demand --> RequestType
 
-  Evaluator --> ShipMatrix : uses shipOut/shipBack
-  Evaluator --> OpDurTable : uses dur(TE)
-  Evaluator --> Centre : reads caps/loads
+  Evaluator --> ShipMatrix : uses ship out and back
+  Evaluator --> OpDurTable : uses duration TE
+  Evaluator --> Centre : reads capacities and loads
   Calendar --> Centre : updates loads
 
   %% Règles TE-light (notes)
-  note for Evaluator "FastETA = shipOut + dur(TE) + shipBack + Wait\nResponsibleETA = FastETA + Penalty"
-  note for Centre "capTE = round(capCentre * quotaTE)\nquotaTE: uniforme par defaut"
-  note "Simplification priorisation : Urgent -> attente 0 ; Standard absorbe l'attente via OccTE(sem0)" as Nprio
-  Priority .. Nprio
+  note for Evaluator "FastETA = shipOut + dur TE + shipBack + Wait\nResponsibleETA = FastETA + Penalty"
+  note for Centre "capTE = round capCentre * quotaTE\nquotaTE uniforme par defaut"
+  note for Priority "Simplification priorisation : Urgent = attente 0 ; Standard absorbe l'attente via OccTE sem0"
+
 
 ```
 
