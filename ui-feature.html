@@ -3,211 +3,156 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MAESTRO — Prototype Fiori</title>
+  <title>MAESTRO — Prototype Fiori (TE-light • Rebuild)</title>
   <style>
     :root{
-      --bg:#f6f7f9;/* fond doux Fiori-like */
-      --card:#ffffff;
-      --text:#1b1f24;
-      --muted:#6b7280;
-      --brand:#0a6ed1;/* SAP blue */
-      --brand-2:#0854a0;
-      --ok:#2ecc71; --warn:#f1c40f; --bad:#e74c3c;
-      --chip:#eef2f7;
-      --border:#e5e7eb;
+      --bg:#f6f7f9;--card:#fff;--text:#1b1f24;--muted:#6b7280;--brand:#0a6ed1;--border:#e5e7eb;
+      --ok:#2ecc71;--warn:#f1c40f;--bad:#e74c3c;--chip:#eef2f7;
+      --green-bg:#e8f5e9;--yellow-bg:#fffbe6
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial}
-    .app{display:flex;flex-direction:column;min-height:100vh;width:100vw;max-width:100vw;}
-
-    /* Topbar */
-    .topbar{position:sticky;top:0;z-index:10;background:var(--card);box-shadow:0 1px 0 var(--border);padding:12px 20px;display:flex;align-items:center;gap:16px}
-    .brand{font-weight:700;letter-spacing:.2px}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial}
+    .app{display:flex;flex-direction:column;min-height:100vh;width:100vw;max-width:100vw}
+    .topbar{position:sticky;top:0;z-index:10;background:var(--card);box-shadow:0 1px 0 var(--border);padding:12px 20px;display:flex;gap:16px;align-items:center}
+    .brand{font-weight:700}
     .pill{padding:4px 8px;border-radius:999px;background:var(--chip);color:var(--muted);font-size:12px}
-
-    /* Tabs */
     .tabs{display:flex;gap:6px;flex-wrap:wrap}
     .tab{border:none;background:transparent;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:600}
-    .tab.active{color:var(--card);background:var(--brand)}
-
-    /* Content */
+    .tab.active{color:#fff;background:var(--brand)}
     .content{flex:1;display:flex;flex-direction:column;padding:14px;gap:14px;width:100%}
-
-    /* Card */
     .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.02)}
     .card h3{margin:0 0 8px 0;font-size:16px}
     .row{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;width:100%}
     @media(max-width:1200px){.row{grid-template-columns:repeat(6,1fr)}}
     @media(max-width:800px){.row{grid-template-columns:repeat(2,1fr)}}
-
     .field{display:flex;flex-direction:column;gap:6px}
     label{font-size:12px;color:var(--muted)}
     select,input[type="number"],input[type="text"],input[type="date"]{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#fff}
-
     .btn{appearance:none;border:none;background:var(--brand);color:#fff;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700}
     .btn.secondary{background:#e9eef6;color:#0a2540}
     .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
-
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-
     .table{width:100%;border-collapse:separate;border-spacing:0;overflow:auto}
     .table th,.table td{padding:10px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
     .table th{font-size:12px;color:var(--muted);font-weight:700}
     .badge{padding:3px 8px;border-radius:999px;background:var(--chip);font-size:12px}
 
     .grid{display:grid;gap:8px}
-    .eta-grid{grid-template-columns: 220px 1fr 1fr 1.6fr}
+    .eta-grid{grid-template-columns:220px 1fr 1fr 1.6fr}
     .eta-head{font-size:12px;color:var(--muted);font-weight:700}
-    .eta-row{padding:8px;border-bottom:1px solid var(--border);display:contents}
-    .eta-cell{padding:6px 8px}
-
-    /* Highlights */
-    .best-resp{background:#e8f5e9;border-radius:10px}
-    .best-fast{background:#fffbe6;border-radius:10px}
+    .eta-row{display:contents}
+    .eta-cell{padding:6px 8px;border-bottom:1px solid var(--border)}
+    .best-resp{background:var(--green-bg);border-radius:10px}
+    .best-fast{background:var(--yellow-bg);border-radius:10px}
     .red{color:var(--bad);font-weight:700}
 
-    /* Heatmap */
     .heatmap{display:grid;grid-template-columns:220px repeat(12,1fr);gap:4px;align-items:stretch}
     .heat-head{font-size:12px;color:var(--muted)}
-    .heat-row{display:contents}
     .heat-label{padding:6px 8px;border:1px solid var(--border);border-radius:10px;background:#fff}
     .heat-cell{height:34px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px}
 
     .footer{padding:10px;color:var(--muted);text-align:center}
-
-    .hint{font-size:12px;color:var(--muted)}
-    .split{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
-    @media(max-width:1200px){.split{grid-template-columns:1fr}}
-
-    /* Full-width helpers */
-    .full-width{width:100%;max-width:100%}
   </style>
 </head>
 <body>
 <div class="app">
-  <div class="topbar full-width">
-    <div class="brand">🛠️ MAESTRO — Maintenance • <span class="pill">Prototype Fiori</span></div>
+  <div class="topbar">
+    <div class="brand">🛠️ MAESTRO — Maintenance • <span class="pill">Prototype Fiori • TE-light (Rebuild)</span></div>
     <div class="tabs" role="tablist" aria-label="Navigation des onglets">
       <button class="tab active" data-tab="t1">1) 📥 Demande & Reco</button>
       <button class="tab" data-tab="t2">2) 🧩 Master Data</button>
-      <button class="tab" data-tab="t3">3) 🏭 Centres • Heatmap</button>
-      <button class="tab" data-tab="t4">4) 📄 Demandes • Liste</button>
+      <button class="tab" data-tab="t3">3) 📄 Demandes • Liste</button>
     </div>
   </div>
 
-  <div class="content full-width">
+  <div class="content">
     <!-- TAB 1 -->
     <section id="t1" class="card">
-      <h3>📥 Saisie de la demande & recommandations (⚡ FastETA • 🍀 ResponsibleETA)</h3>
+      <h3>📥 Saisie & recommandations (⚡ FastETA • 🍀 ResponsibleETA)</h3>
       <div class="row" style="align-items:end">
-        <div class="field col"><label>Client</label><select id="r-client"></select></div>
-        <div class="field col"><label>Moteur</label><select id="r-engine"></select></div>
-        <div class="field col"><label>Type de demande</label><select id="r-type"></select></div>
-        <div class="field col"><label>Priorité</label>
-          <select id="r-priority">
-            <option value="Urgent">Urgent</option>
-            <option value="Standard" selected>Standard</option>
-          </select>
+        <div class="field"><label>Client</label><select id="r-client"></select></div>
+        <div class="field"><label>Moteur</label><select id="r-engine"></select></div>
+        <div class="field"><label>Type de demande</label><select id="r-type"></select></div>
+        <div class="field"><label>Priorité</label>
+          <select id="r-priority"><option>Urgent</option><option selected>Standard</option></select>
         </div>
-        <div class="field col"><label>Date de mise à disposition</label>
-          <input id="r-available" type="date" />
-        </div>
-        <div class="field col">
-          <button class="btn" id="btn-evaluate">Évaluer</button>
-        </div>
-        <div class="field col">
-          <button class="btn secondary" id="btn-add">Ajouter cette demande au planning</button>
-          <span class="hint">Ajoute à la charge & à la heatmap</span>
-        </div>
+        <div class="field"><label>Date de mise à disposition</label><input id="r-available" type="date" /></div>
+        <div class="field"><button class="btn" id="btn-evaluate">Évaluer</button></div>
+        <div class="field"><button class="btn secondary" id="btn-add">Ajouter au planning</button><span class="badge">Maj charge & heatmap</span></div>
       </div>
-
       <div class="card" style="margin-top:12px">
         <div class="grid eta-grid">
           <div class="eta-head">Centre</div>
           <div class="eta-head">⚡ FastETA (j)</div>
           <div class="eta-head">🍀 ResponsibleETA (j)</div>
           <div class="eta-head">Détails</div>
-          <div id="eta-rows" class="eta-body" style="display:contents"></div>
+          <div id="eta-rows" style="display:contents"></div>
         </div>
-        <div class="hint" id="eta-hint">Tri par 🍀 ResponsibleETA. Résultats basés sur compatibilités Centre × (Moteur, Type) et capacités prévues.</div>
+        <div class="badge" id="eta-hint">Tri par 🍀 ResponsibleETA. Fixe: ship(client×centre) & dur(type×engine).</div>
+      </div>
+
+      <!-- Heatmap intégrée, indépendante -->
+      <div class="card" style="margin-top:14px">
+        <h3>🏭 Heatmap TE (type×moteur) — indépendante</h3>
+        <div class="toolbar"><label class="field" style="min-width:240px"><span>Centre</span>
+          <select id="c-centre-t1"></select></label>
+        </div>
+        <div class="card">
+          <div class="heatmap" id="heatmap-t1"></div>
+          <div class="badge">En-têtes = 1er jour de semaine (DD/MM/YYYY). Chaque cellule = max(chargeTE/capTE) hebdo.</div>
+        </div>
       </div>
     </section>
 
     <!-- TAB 2 -->
     <section id="t2" class="card" hidden>
       <h3>🧩 Master Data & Randomization</h3>
-      <div class="split">
-        <div class="card">
-          <h3>Paramètres globaux</h3>
-          <div class="row">
-            <div class="field"><label>Seed</label><input type="number" id="m-seed" value="42"/></div>
-            <div class="field"><label>Horizon (semaines)</label><input type="number" id="m-weeks" value="12" min="4" max="26"/></div>
-            <div class="field"><label>Clients (N)</label><input type="number" id="m-clients" value="30" min="1"/></div>
-            <div class="field"><label>Demandes existantes (N)</label><input type="number" id="m-reqs" value="250" min="0"/></div>
-            <div class="field"><label>% Urgent</label><input type="number" id="m-pUrgent" value="25" min="0" max="100"/></div>
-          </div>
-          <h3>Capacités des centres</h3>
-          <div class="row">
-            <div class="field"><label>Slots/jour min</label><input type="number" id="m-capMin" value="4" min="1"/></div>
-            <div class="field"><label>Slots/jour max</label><input type="number" id="m-capMax" value="10" min="1"/></div>
-            <div class="field"><label>Tendance (%) min</label><input type="number" id="m-trendMin" value="-10"/></div>
-            <div class="field"><label>Tendance (%) max</label><input type="number" id="m-trendMax" value="10"/></div>
-          </div>
-          <h3>Durées par type (triangulaire, jours)</h3>
-          <div class="row">
-            <div class="field"><label>TestOnly (min,mode,max)</label><input type="text" id="m-dur-test" value="2,3,4"/></div>
-            <div class="field"><label>QuickInspection</label><input type="text" id="m-dur-qi" value="3,4,6"/></div>
-            <div class="field"><label>RepairOnly</label><input type="text" id="m-dur-rep" value="12,18,28"/></div>
-            <div class="field"><label>Overhaul</label><input type="text" id="m-dur-ovh" value="35,45,65"/></div>
-          </div>
-          <h3>Acheminement (jours, poids pour 0..4)</h3>
-          <div class="row">
-            <div class="field"><label>Poids 0j</label><input type="number" id="m-w0" value="25"/></div>
-            <div class="field"><label>Poids 1j</label><input type="number" id="m-w1" value="35"/></div>
-            <div class="field"><label>Poids 2j</label><input type="number" id="m-w2" value="20"/></div>
-            <div class="field"><label>Poids 3j</label><input type="number" id="m-w3" value="15"/></div>
-            <div class="field"><label>Poids 4j</label><input type="number" id="m-w4" value="5"/></div>
-          </div>
-          <h3>Règles & pénalité</h3>
-          <div class="row">
-            <div class="field"><label>Capacité réservée urgents (%)</label><input type="number" id="m-reserveUrg" value="25"/></div>
-            <div class="field"><label>Facteur pénalité saturation</label><input type="number" id="m-penaltyFactor" value="1.0" step="0.1"/></div>
-          </div>
-          <div class="toolbar" style="margin-top:8px">
-            <button class="btn" id="btn-regenerate">Regénérer la donnée</button>
-            <button class="btn ghost" id="btn-export">Export JSON</button>
-            <input type="file" id="import-file" accept="application/json" hidden>
-            <button class="btn ghost" id="btn-import">Import JSON</button>
-          </div>
-          <div class="hint">Modifiez les paramètres puis cliquez sur « Regénérer » pour recalculer capacités, charges, ETA & heatmap.</div>
-        </div>
-        <div class="card">
-          <h3>Résumé des compatibilités</h3>
-          <table class="table" id="compat-table"></table>
-        </div>
+      <div class="row">
+        <div class="field"><label>Seed</label><input type="number" id="m-seed" value="42"/></div>
+        <div class="field"><label>Horizon (sem.)</label><input type="number" id="m-weeks" value="12" min="4" max="26"/></div>
+        <div class="field"><label>Clients (N)</label><input type="number" id="m-clients" value="30" min="1"/></div>
+        <div class="field"><label>Demandes existantes (N)</label><input type="number" id="m-reqs" value="250" min="0"/></div>
+        <div class="field"><label>% Urgent</label><input type="number" id="m-pUrgent" value="25" min="0" max="100"/></div>
+        <div class="field"><label>Slots/jour min</label><input type="number" id="m-capMin" value="4"/></div>
+        <div class="field"><label>Slots/jour max</label><input type="number" id="m-capMax" value="10"/></div>
+        <div class="field"><label>Tendance (%) min</label><input type="number" id="m-trendMin" value="-10"/></div>
+        <div class="field"><label>Tendance (%) max</label><input type="number" id="m-trendMax" value="10"/></div>
+      </div>
+      <h3>Durées par type (triangulaire, jours) → gèle dur(type×engine)</h3>
+      <div class="row">
+        <div class="field"><label>TestOnly</label><input type="text" id="m-dur-test" value="2,3,4"/></div>
+        <div class="field"><label>QuickInspection</label><input type="text" id="m-dur-qi" value="3,4,6"/></div>
+        <div class="field"><label>RepairOnly</label><input type="text" id="m-dur-rep" value="12,18,28"/></div>
+        <div class="field"><label>Overhaul</label><input type="text" id="m-dur-ovh" value="35,45,65"/></div>
+      </div>
+      <h3>Acheminement (jours, poids 0..4) → ship(client×centre) fixe</h3>
+      <div class="row">
+        <div class="field"><label>Poids 0j</label><input type="number" id="m-w0" value="25"/></div>
+        <div class="field"><label>Poids 1j</label><input type="number" id="m-w1" value="35"/></div>
+        <div class="field"><label>Poids 2j</label><input type="number" id="m-w2" value="20"/></div>
+        <div class="field"><label>Poids 3j</label><input type="number" id="m-w3" value="15"/></div>
+        <div class="field"><label>Poids 4j</label><input type="number" id="m-w4" value="5"/></div>
+      </div>
+      <h3>Règles</h3>
+      <div class="row">
+        <div class="field"><label>Facteur pénalité saturation</label><input type="number" id="m-penaltyFactor" value="1.0" step="0.1"/></div>
+      </div>
+      <div class="toolbar" style="margin-top:8px">
+        <button class="btn" id="btn-regenerate">Regénérer</button>
+        <button class="btn ghost" id="btn-export">Export JSON</button>
+        <input type="file" id="import-file" accept="application/json" hidden>
+        <button class="btn ghost" id="btn-import">Import JSON</button>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Résumé des compatibilités</h3>
+        <table class="table" id="compat-table"></table>
       </div>
     </section>
 
     <!-- TAB 3 -->
     <section id="t3" class="card" hidden>
-      <h3>🏭 Vue Centre → Heatmap d'occupation (12 semaines)</h3>
-      <div class="toolbar">
-        <label class="field" style="min-width:240px">
-          <span>Centre</span>
-          <select id="c-centre"></select>
-        </label>
-      </div>
-      <div class="card">
-        <div class="heatmap" id="heatmap">
-          <!-- header row -->
-        </div>
-        <div class="hint">Chaque cellule = taux d'occupation max de la semaine (0–150%). Survoler pour le détail.</div>
-      </div>
-    </section>
-
-    <!-- TAB 4 -->
-    <section id="t4" class="card" hidden>
       <h3>📄 Toutes les demandes</h3>
       <div class="toolbar">
         <label>Centre <select id="f-centre"></select></label>
@@ -218,17 +163,22 @@
         <label>À <input type="date" id="f-to"></label>
         <button class="btn ghost" id="btn-reset-f">Réinitialiser</button>
       </div>
-      <div class="card">
-        <table class="table" id="req-table"></table>
-      </div>
+      <div class="card"><table class="table" id="req-table"></table></div>
     </section>
   </div>
 
-  <div class="footer">Prototype HTML standalone • Fiori-like • largeur totale</div>
+  <div class="footer">Prototype HTML standalone • Fiori-like • largeur totale • TE-light</div>
 </div>
 
 <script>
-// ----------------------- Utilities -----------------------
+// ===== Helpers & safety =====
+(function(){
+  const css = `.toast{position:fixed;top:12px;right:12px;background:#ffeaea;color:#8b0000;border:1px solid #f5c2c7;padding:10px 12px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);font:13px/1.4 system-ui}`;
+  const style=document.createElement('style'); style.textContent=css; document.head.appendChild(style);
+  window.__toast = (msg)=>{ const t=document.createElement('div'); t.className='toast'; t.textContent='Erreur: '+msg; document.body.appendChild(t); setTimeout(()=>t.remove(), 4000) }
+  window.addEventListener('error', e=>{ try{ window.__toast(e.message) }catch(_){} })
+})();
+
 function mulberry32(a){return function(){var t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 let RNG = mulberry32(42);
 function seedRng(s){RNG = mulberry32(Number(s)||42)}
@@ -240,8 +190,17 @@ function clamp(v,min,max){return v<min?min:v>max?max:v}
 function triangular(min,mode,max){const u=rand();const c=(mode-min)/(max-min);return u<c?min+Math.sqrt(u*(max-min)*(mode-min)):max-Math.sqrt((1-u)*(max-min)*(max-mode))}
 function days(n){return n*24*60*60*1000}
 function startOfToday(){const d=new Date();d.setHours(0,0,0,0);return d}
+function getInputDate(id){
+  const el=document.getElementById(id); if(!el) return State.baseDate;
+  if(typeof el.valueAsDate!=="undefined" && el.valueAsDate) return el.valueAsDate;
+  if(el.value){ const p=el.value.split('-'); if(p.length===3) return new Date(Number(p[0]), Number(p[1])-1, Number(p[2])) }
+  return State.baseDate;
+}
+function keyTE(t,e){return t+'|'+e}
+function pad2(n){return String(n).padStart(2,'0')} 
+function fmtDate(d){return `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`}
 
-// ----------------------- Master Data -----------------------
+// ===== Master Data =====
 const ENGINES=["LEAP-1A","LEAP-1B","CFM56-5B","CFM56-7B","SaM146"]
 const TYPES=["Overhaul","RepairOnly","QuickInspection","TestOnly"]
 const CITIES=["Paris","Lyon","Toulouse","Bordeaux","Nantes","Lille","Marseille","Nice","Strasbourg","Rennes","Grenoble","Montpellier","Clermont-F.","Rouen","Tours","Dijon","Nancy","Orléans","Metz","Reims"]
@@ -250,21 +209,17 @@ const Params={
   seed:42,weeks:12,clients:30,existing:250,pUrgent:25,
   capMin:4,capMax:10,trendMin:-10,trendMax:10,
   durations:{TestOnly:[2,3,4],QuickInspection:[3,4,6],RepairOnly:[12,18,28],Overhaul:[35,45,65]},
-  shipW:[25,35,20,15,5], // weights for 0..4 days
-  reserveUrgPct:25,
+  shipW:[25,35,20,15,5],
   penaltyFactor:1.0
 }
 
-// Derived
 let State={
-  horizonDays:84, baseDate:startOfToday(),
-  centres:[], customers:[], demands:[], // existing
-  compatSummary:[],
-  shipDays:{}, // client -> centre -> days (fixed)
-  opDurTE:{} // type -> engine -> days (fixed)
+  baseDate:startOfToday(), horizonDays:84,
+  centres:[], customers:[], demands:[],
+  compatSummary:[], shipDays:{}, opDurTE:{},
 }
 
-// ----------------------- Generation -----------------------
+// ===== Generation =====
 function buildCentres(){
   const centres=[]
   for(let i=0;i<20;i++){
@@ -273,11 +228,10 @@ function buildCentres(){
     const types=shuffle([...TYPES]).slice(0,rInt(2,3))
     const capBase=rInt(Params.capMin,Params.capMax)
     const trend= (rInt(Params.trendMin,Params.trendMax))/100
-    // capacity per day over horizon with weekday factor + linear trend
     const capByDay=[]
     for(let d=0; d<State.horizonDays; d++){
       const date=new Date(State.baseDate.getTime()+days(d))
-      const wd=date.getDay() // 0=Sun
+      const wd=date.getDay()
       let factor=1
       if(wd===0) factor=clamp(0.5+rand()*0.1,0.4,0.6)
       else if(wd===6) factor=clamp(0.6+rand()*0.2,0.6,0.8)
@@ -286,8 +240,17 @@ function buildCentres(){
       const drift=1 + trend * (d/(State.horizonDays-1))
       capByDay.push(Math.max(1, Math.round(capBase*factor*drift)))
     }
-    centres.push({id:i,name,engines:new Set(engines),types:new Set(types),capBase,trend,capByDay,loadByDay: new Array(State.horizonDays).fill(0),
-      loadByDayByType: Object.fromEntries(TYPES.map(t=>[t,new Array(State.horizonDays).fill(0)]))})
+    // TE-light quotas uniformes
+    const teList=[]; for(const t of types){ for(const e of engines){ teList.push(keyTE(t,e)) } }
+    const quota= 1/Math.max(1, teList.length)
+    const quotaTE={}; teList.forEach(k=>quotaTE[k]=quota)
+    centres.push({
+      id:i,name,engines:new Set(engines),types:new Set(types),
+      capBase,trend,capByDay,quotaTE,
+      loadByDay:new Array(State.horizonDays).fill(0),
+      loadByDayByType:Object.fromEntries(TYPES.map(t=>[t,new Array(State.horizonDays).fill(0)])),
+      loadByDayByTE:Object.fromEntries(teList.map(k=>[k,new Array(State.horizonDays).fill(0)]))
+    })
   }
   State.centres=centres
 }
@@ -316,34 +279,20 @@ function buildOpDurTE(){
   for(const t of TYPES){
     table[t]={}
     const [min,mode,max]=Params.durations[t]
-    for(const e of ENGINES){
-      table[t][e]=Math.round(triangular(min,mode,max))
-    }
+    for(const e of ENGINES){ table[t][e]=Math.round(triangular(min,mode,max)) }
   }
   State.opDurTE=table
 }
 
-function pickCompatibleCentre(type,engine){
-  const eligible=State.centres.filter(c=>c.types.has(type)&&c.engines.has(engine))
-  if(eligible.length===0) return null
-  // prefer centres with lower average load ratio today
-  const scored=eligible.map(c=>{
-    const cap=c.capByDay[0]||1; const load=c.loadByDay[0]||0; const util=load/cap
-    return {c, score: util + rand()*0.1}
-  }).sort((a,b)=>a.score-b.score)
-  return scored[0].c
-}
-
-function placeDemandOnCalendar(demand){
-  // occupy 1 slot/day for 'duration' days from start
-  const c=demand.centre
-  const startIdx = Math.max(0, Math.floor((demand.startDate - State.baseDate)/days(1)))
-  for(let d=0; d<demand.duration; d++){
-    const idx=startIdx+d
-    if(idx>=0 && idx<State.horizonDays){
-      c.loadByDay[idx] += 1
-      c.loadByDayByType[demand.type][idx] += 1
-    }
+function placeDemandOnCalendar(d){
+  const c=d.centre
+  const startIdx=Math.max(0,Math.floor((d.startDate-State.baseDate)/days(1)))
+  const te=keyTE(d.type,d.engine)
+  for(let k=0;k<d.duration;k++){
+    const idx=startIdx+k; if(idx<0||idx>=State.horizonDays) continue
+    c.loadByDay[idx]+=1
+    c.loadByDayByType[d.type][idx]+=1
+    if(c.loadByDayByTE[te]) c.loadByDayByTE[te][idx]+=1
   }
 }
 
@@ -356,204 +305,154 @@ function buildExistingDemands(){
     const engine=choice([...centre.engines])
     const priority = rand()*100 < Params.pUrgent ? 'Urgent' : 'Standard'
     const duration=State.opDurTE[type][engine]
-    const startOffset = rInt(0, State.horizonDays-1)
-    const startDate = new Date(State.baseDate.getTime()+days(startOffset))
-    const d={id:`E${i+1}`, client: choice(State.customers), centre, centreName: centre.name, engine, type, priority, duration, startDate}
-    State.demands.push(d)
-    placeDemandOnCalendar(d)
+    const startOffset=rInt(0,State.horizonDays-1)
+    const startDate=new Date(State.baseDate.getTime()+days(startOffset))
+    const d={id:`E${i+1}`, client: choice(State.customers), centre, centreName:centre.name, engine, type, priority, duration, startDate}
+    State.demands.push(d); placeDemandOnCalendar(d)
   }
 }
 
 function rebuildCompatSummary(){
-  State.compatSummary = State.centres.map(c=>({
-    centre:c.name,
-    moteurs:[...c.engines].join(', '),
-    types:[...c.types].join(', '),
-    capBase:c.capBase
-  }))
+  State.compatSummary=State.centres.map(c=>{
+    const teCount=Object.keys(c.quotaTE).length
+    return {centre:c.name,moteurs:[...c.engines].join(', '),types:[...c.types].join(', '),capBase:c.capBase,te:teCount}
+  })
 }
 
 function regenerate(){
   seedRng(Params.seed)
-  State.baseDate=startOfToday()
-  State.horizonDays=Params.weeks*7
-  buildCentres()
-  buildCustomers()
-  buildShipMatrix()
-  buildOpDurTE()
-  buildExistingDemands()
-  rebuildCompatSummary()
-  hydrateUI()
-  evaluateCurrent() // refresh eta table if inputs set
-  buildHeatmap()
-  buildReqTable()
+  State.baseDate=startOfToday(); State.horizonDays=Params.weeks*7
+  buildCentres(); buildCustomers(); buildShipMatrix(); buildOpDurTE(); buildExistingDemands(); rebuildCompatSummary();
+  hydrateUI(); evaluateCurrent(); buildHeatmapFor('c-centre-t1','heatmap-t1'); buildReqTable()
 }
 
-// ----------------------- ETA calculation -----------------------
-function avgDurationByType(type){
-  const [min,mode,max]=Params.durations[type]
-  return Math.round((min+mode+max)/3)
-}
-
-function occAtWeek4(centre,type){
-  const week=4; // 1-based week index
-  const start=(week-1)*7; const end=start+7
+// ===== ETA (TE-light) =====
+function avgDurationByType(type){ const [min,mode,max]=Params.durations[type]; return Math.round((min+mode+max)/3) }
+function capTE(centre, teKey, dayIdx){ const q=centre.quotaTE[teKey]||0; const cap=centre.capByDay[dayIdx]||1; return Math.max(1, Math.round(cap*q)) }
+function occWeekTE(centre, teKey, weekStartIdx){
   let maxOcc=0
-  for(let i=start;i<end && i<State.horizonDays;i++){
-    const cap=centre.capByDay[i]||1
-    const loadType=centre.loadByDayByType[type]?.[i]||0
-    const occ = loadType / cap
+  for(let i=weekStartIdx;i<weekStartIdx+7 && i<State.horizonDays;i++){
+    const cap=capTE(centre, teKey, i)
+    const load=(centre.loadByDayByTE[teKey]?.[i]||0)
+    const occ = load / cap
     if(occ>maxOcc) maxOcc=occ
   }
-  return maxOcc // e.g., 1.25 means 125%
+  return maxOcc
 }
-
-function computePenaltyDays(centre,type){
-  const occ=occAtWeek4(centre,type)
-  const excess = Math.max(0, occ - 1)
-  const avgDays = avgDurationByType(type)
-  return Math.round(Params.penaltyFactor * excess * avgDays)
+function computePenaltyDays(centre,type,engine,anchorIdx){
+  const teKey=keyTE(type,engine)
+  const week4Start=(anchorIdx||0)+3*7
+  const occ=occWeekTE(centre, teKey, week4Start)
+  const excess=Math.max(0, occ-1)
+  return Math.round(Params.penaltyFactor * excess * avgDurationByType(type))
 }
-
-function waitDaysIfFull(centre, priority){
-  // if next week >100% and Standard, add wait; urgent bypass (<= Standard guaranteed)
-  const week=1
-  const start=(week-1)*7; const end=start+7
-  let maxOcc=0
-  for(let i=start;i<end && i<State.horizonDays;i++){
-    const cap=centre.capByDay[i]||1
-    const load=centre.loadByDay[i]||0
-    const occ=load/cap; if(occ>maxOcc) maxOcc=occ
-  }
+function waitDaysIfFull(centre, type, engine, priority, anchorIdx){
   if(priority==='Urgent') return 0
-  if(maxOcc<=1) return 0
-  return Math.ceil((maxOcc-1)*7)
+  const teKey=keyTE(type,engine)
+  const occ=occWeekTE(centre, teKey, anchorIdx||0)
+  if(occ<=1) return 0
+  return Math.ceil((occ-1)*7)
 }
-
 function evaluateRequest(req){
-  const {client,engine,type,priority} = req
+  const {client,engine,type,priority,available}=req
   const eligible=State.centres.filter(c=>c.engines.has(engine)&&c.types.has(type))
   const rows=[]
+  const anchorIdx=Math.max(0, Math.floor(((available||State.baseDate)-State.baseDate)/days(1)))
   for(const c of eligible){
-    const ship = (State.shipDays[client] && State.shipDays[client][c.name]!==undefined) ? State.shipDays[client][c.name] : 0
-    const shipOut=ship, shipBack=ship // fixe & symétrique
+    const ship= (State.shipDays[client]&&State.shipDays[client][c.name]!==undefined)? State.shipDays[client][c.name]:0
+    const shipOut=ship, shipBack=ship
     const dur=State.opDurTE[type][engine]
-    const baseETA=shipOut + dur + shipBack
-    const wait=waitDaysIfFull(c, priority)
-    const fast=baseETA + wait
-    const penalty=computePenaltyDays(c,type)
-    const responsible=fast + penalty
+    const baseETA=shipOut+dur+shipBack
+    const wait=waitDaysIfFull(c,type,engine,priority,anchorIdx)
+    const fast=baseETA+wait
+    const penalty=computePenaltyDays(c,type,engine,anchorIdx)
+    const responsible=fast+penalty
     rows.push({centre:c,fast,responsible,shipOut,shipBack,dur,wait,penalty,
       detailHTML:`Aller ${shipOut}j • Ops ${dur}j • Attente <span class='${wait>0?"red":""}'>${wait}</span>j • Retour ${shipBack}j • Pénalité <span class='${penalty>0?"red":""}'>${penalty}</span>j`})
   }
-  // bests
-  const bestFast = rows.length ? rows.reduce((p,c)=> c.fast<p.fast?c:p, rows[0]) : null
-  const bestResp = rows.length ? rows.reduce((p,c)=> c.responsible<p.responsible?c:p, rows[0]) : null
-  // sort by ResponsibleETA ascending
+  const bestFast = rows.length? rows.reduce((p,c)=>c.fast<p.fast?c:p, rows[0]) : null
+  const bestResp = rows.length? rows.reduce((p,c)=>c.responsible<p.responsible?c:p, rows[0]) : null
   rows.sort((a,b)=>a.responsible-b.responsible)
   return {rows,bestFast,bestResp}
 }
 
-// ----------------------- UI Binding -----------------------
+// ===== UI =====
 function hydrateSelectors(){
-  const elC=document.getElementById('r-client'); elC.innerHTML=State.customers.map(c=>`<option>${c}</option>`).join('')
-  const elE=document.getElementById('r-engine'); elE.innerHTML=ENGINES.map(e=>`<option>${e}</option>`).join('')
-  const elT=document.getElementById('r-type'); elT.innerHTML=TYPES.map(t=>`<option>${t}</option>`).join('')
-  // defaults
+  document.getElementById('r-client').innerHTML=State.customers.map(c=>`<option>${c}</option>`).join('')
+  document.getElementById('r-engine').innerHTML=ENGINES.map(e=>`<option>${e}</option>`).join('')
+  document.getElementById('r-type').innerHTML=TYPES.map(t=>`<option>${t}</option>`).join('')
   document.getElementById('r-available').valueAsDate=State.baseDate
-
-  // filters tab4
-  const fC=document.getElementById('f-centre'); fC.innerHTML=['All',...State.centres.map(c=>c.name)].map(c=>`<option>${c}</option>`).join('')
-  const fE=document.getElementById('f-engine'); fE.innerHTML=['All',...ENGINES].map(e=>`<option>${e}</option>`).join('')
-  const fT=document.getElementById('f-type'); fT.innerHTML=['All',...TYPES].map(t=>`<option>${t}</option>`).join('')
+  document.getElementById('f-centre').innerHTML=['All',...State.centres.map(c=>c.name)].map(c=>`<option>${c}</option>`).join('')
+  document.getElementById('f-engine').innerHTML=['All',...ENGINES].map(e=>`<option>${e}</option>`).join('')
+  document.getElementById('f-type').innerHTML=['All',...TYPES].map(t=>`<option>${t}</option>`).join('')
   document.getElementById('f-from').valueAsDate=State.baseDate
   const to=new Date(State.baseDate.getTime()+days(State.horizonDays-1)); document.getElementById('f-to').valueAsDate=to
-
-  // centres for heatmap
-  const cSelect=document.getElementById('c-centre'); cSelect.innerHTML=State.centres.map(c=>`<option>${c.name}</option>`).join('')
+  const c1=document.getElementById('c-centre-t1'); if(c1){ c1.innerHTML=State.centres.map(c=>`<option>${c.name}</option>`).join('') }
 }
 
 function hydrateCompatTable(){
-  const tbl=document.getElementById('compat-table')
-  tbl.innerHTML=`<thead><tr><th>Centre</th><th>Moteurs</th><th>Types</th><th>Cap. base</th></tr></thead>`+
-    '<tbody>'+State.compatSummary.map(r=>`<tr><td>${r.centre}</td><td>${r.moteurs}</td><td>${r.types}</td><td>${r.capBase}</td></tr>`).join('')+'</tbody>'
+  const tbl=document.getElementById('compat-table'); if(!tbl) return
+  tbl.innerHTML=`<thead><tr><th>Centre</th><th>Moteurs</th><th>Types</th><th>Cap. base</th><th>TE combos</th></tr></thead>`+
+    '<tbody>'+State.compatSummary.map(r=>`<tr><td>${r.centre}</td><td>${r.moteurs}</td><td>${r.types}</td><td>${r.capBase}</td><td>${r.te}</td></tr>`).join('')+'</tbody>'
 }
 
 function evaluateCurrent(){
   const req={
-    client: document.getElementById('r-client').value,
-    engine: document.getElementById('r-engine').value,
-    type: document.getElementById('r-type').value,
-    priority: document.getElementById('r-priority').value,
-    available: document.getElementById('r-available').valueAsDate
+    client:document.getElementById('r-client').value,
+    engine:document.getElementById('r-engine').value,
+    type:document.getElementById('r-type').value,
+    priority:document.getElementById('r-priority').value,
+    available:getInputDate('r-available')
   }
-  const res=evaluateRequest(req)
+  const {rows,bestFast,bestResp}=evaluateRequest(req)
   const body=document.getElementById('eta-rows'); body.innerHTML=''
-  res.rows.forEach(r=>{
-    const isFastReco = res.bestFast && r.centre===res.bestFast.centre
-    const isRespReco = res.bestResp && r.centre===res.bestResp.centre
-    const redFlag = (r.wait>0 || r.penalty>0)
+  for(const r of rows){
+    const isFast= bestFast && r.centre===bestFast.centre
+    const isResp= bestResp && r.centre===bestResp.centre
+    const redFlag=(r.wait>0||r.penalty>0)
     body.insertAdjacentHTML('beforeend',`
       <div class="eta-row">
-        <div class="eta-cell ${isRespReco?"best-resp":(isFastReco?"best-fast":"")}"><strong>${r.centre.name}</strong></div>
-        <div class="eta-cell ${(isFastReco?"best-fast":"")} ${redFlag?"red":""}">${r.fast}</div>
-        <div class="eta-cell ${(isRespReco?"best-resp":"")} ${redFlag?"red":""}">${r.responsible}</div>
-        <div class="eta-cell hint">${r.detailHTML}</div>
+        <div class="eta-cell ${isResp?"best-resp":(isFast?"best-fast":"")}"><strong>${r.centre.name}</strong></div>
+        <div class="eta-cell ${(isFast?"best-fast":"")} ${redFlag?"red":""}">${r.fast}</div>
+        <div class="eta-cell ${(isResp?"best-resp":"")} ${redFlag?"red":""}">${r.responsible}</div>
+        <div class="eta-cell">${r.detailHTML}</div>
       </div>`)
-  })
+  }
   const hint=document.getElementById('eta-hint')
-  if(res.bestFast||res.bestResp){
-    const bestF=res.bestFast? res.bestFast.centre.name+` (${res.bestFast.fast}j ⚡)` : '—'
-    const bestR=res.bestResp? res.bestResp.centre.name+` (${res.bestResp.responsible}j 🍀)` : '—'
-    hint.textContent = `Tri: 🍀 ResponsibleETA • Reco ⚡: ${bestF} • Reco 🍀: ${bestR}`
+  if(bestFast||bestResp){
+    const bf=bestFast? `${bestFast.centre.name} (${bestFast.fast}j ⚡)`:'—'
+    const br=bestResp? `${bestResp.centre.name} (${bestResp.responsible}j 🍀)`:'—'
+    hint.textContent=`Tri: 🍀 Responsible • Reco ⚡: ${bf} • Reco 🍀: ${br}`
+  } else {
+    hint.textContent='Aucun centre compatible pour ce type×moteur.'
   }
 }
 
-function buildHeatmap(){
-  const grid=document.getElementById('heatmap')
-  grid.innerHTML=''
-  // header
-  grid.insertAdjacentHTML('beforeend', `<div></div>${Array.from({length:Params.weeks},(_,i)=>`<div class='heat-head' style='text-align:center'>S${i+1}</div>`).join('')}`)
-  const centreName=document.getElementById('c-centre').value || State.centres[0]?.name
-  const centre=State.centres.find(c=>c.name===centreName) || State.centres[0]
-  // rows = type×engine combos supported
-  const rows=[]
-  for(const t of TYPES){
-    for(const e of ENGINES){
-      if(centre.types.has(t) && centre.engines.has(e)) rows.push({label:`${t} × ${e}`, type:t, engine:e})
-    }
-  }
-  if(rows.length===0){ grid.insertAdjacentHTML('beforeend', `<div class='heat-label'>Aucune compatibilité</div>`); return }
-  // For occupancy by type we ignore engine granularity in generation; to approximate, split type load equally across supported engines
-  const supportedEngines=[...centre.engines]
-  const typeShare=Object.fromEntries(TYPES.map(t=>[t, Math.max(1,supportedEngines.length)]))
-
-  for(const r of rows){
-    grid.insertAdjacentHTML('beforeend', `<div class='heat-label'>${r.label}</div>`)
+function buildHeatmapFor(selectId, containerId){
+  const grid=document.getElementById(containerId); if(!grid) return; grid.innerHTML=''
+  grid.insertAdjacentHTML('beforeend', `<div></div>${Array.from({length:Params.weeks},(_,i)=>{const d=new Date(State.baseDate.getTime()+days(i*7));return `<div class='heat-head' style='text-align:center'>${fmtDate(d)}</div>`}).join('')}`)
+  const sel=document.getElementById(selectId)
+  const centreName= sel && sel.value ? sel.value : (State.centres[0]?.name)
+  const c=State.centres.find(x=>x.name===centreName) || State.centres[0]
+  const teKeys=c? Object.keys(c.quotaTE):[]
+  if(!c || teKeys.length===0){ grid.insertAdjacentHTML('beforeend', `<div class='heat-label'>Aucune compatibilité</div>`); return }
+  for(const k of teKeys){
+    const [t,e]=k.split('|')
+    grid.insertAdjacentHTML('beforeend', `<div class='heat-label'>${t} × ${e}</div>`)
     for(let w=0;w<Params.weeks;w++){
       let maxOcc=0
       for(let i=w*7;i<Math.min(State.horizonDays,(w+1)*7);i++){
-        const cap=centre.capByDay[i]||1
-        const loadType = (centre.loadByDayByType[r.type]?.[i]||0) / typeShare[r.type]
-        const occ = loadType / cap
+        const cap=capTE(c,k,i)
+        const load=c.loadByDayByTE[k]?.[i]||0
+        const occ= load/cap
         if(occ>maxOcc) maxOcc=occ
       }
-      const pct = clamp(maxOcc,0,1.5) // cap à 150%
-      const color = heatColor(pct)
-      const label = Math.round(pct*100)+"%"
-      grid.insertAdjacentHTML('beforeend', `<div class='heat-cell' title='Semaine ${w+1} • Occ: ${label}' style='background:${color}'>${label}</div>`)
+      const p=clamp(maxOcc,0,1.5)
+      const color= p<=0.5?`linear-gradient(0deg,#e8f5e9,#d6efdc)`: p<=1?`linear-gradient(0deg,#fff9e6,#ffecb3)`:`linear-gradient(0deg,#ffebe6,rgba(231,76,60,.25))`
+      const label=Math.round(p*100)+"%"
+      const weekStart=new Date(State.baseDate.getTime()+days(w*7))
+      grid.insertAdjacentHTML('beforeend', `<div class='heat-cell' title='${k} • Semaine du ${fmtDate(weekStart)} • Occ ${label}' style='background:${color}'>${label}</div>`)
     }
-  }
-}
-
-function heatColor(p){
-  // 0 -> #e8f5e9 (vert pâle), 1 -> #f39c12 (orange), 1.5 -> #e74c3c (rouge)
-  if(p<=0.5){ // 0..50%
-    return `linear-gradient(0deg, rgba(232,245,233,1) 0%, rgba(214,239,220,1) 100%)`
-  }else if(p<=1){
-    return `linear-gradient(0deg, rgba(255,249,230,1) 0%, rgba(255,236,179,1) 100%)`
-  }else{
-    return `linear-gradient(0deg, rgba(255,235,230,1) 0%, rgba(231,76,60,0.25) 100%)`
   }
 }
 
@@ -565,7 +464,6 @@ function buildReqTable(){
   const prio=document.getElementById('f-prio').value
   const from=document.getElementById('f-from').valueAsDate
   const to=document.getElementById('f-to').valueAsDate
-
   const rows=State.demands.filter(d=>{
     if(centre && centre!=='All' && d.centreName!==centre) return false
     if(engine && engine!=='All' && d.engine!==engine) return false
@@ -576,104 +474,84 @@ function buildReqTable(){
     return true
   })
   rows.sort((a,b)=>a.startDate-b.startDate)
-  const head=`<thead><tr>
-    <th>#</th><th>Client</th><th>Centre</th><th>Moteur</th><th>Type</th><th>Priorité</th><th>Début</th><th>Durée (j)</th></tr></thead>`
+  const head=`<thead><tr><th>#</th><th>Client</th><th>Centre</th><th>Moteur</th><th>Type</th><th>Priorité</th><th>Début</th><th>Durée (j)</th></tr></thead>`
   const body='<tbody>'+rows.map(r=>`<tr><td>${r.id}</td><td>${r.client}</td><td>${r.centreName}</td><td>${r.engine}</td><td>${r.type}</td><td><span class='badge'>${r.priority}</span></td><td>${r.startDate.toISOString().slice(0,10)}</td><td>${r.duration}</td></tr>`).join('')+'</tbody>'
   tbl.innerHTML=head+body
 }
 
 function addCurrentRequest(){
-  // place currently set request into dataset
   const type=document.getElementById('r-type').value
   const engine=document.getElementById('r-engine').value
-  let centreNameBest = null
+  let centreNameBest=null
   const rows=document.querySelectorAll('#eta-rows .eta-row')
-  if(rows.length){
-    // first row is best ResponsibleETA due to sorting
-    centreNameBest = rows[0].querySelector('.eta-cell strong')?.textContent || null
-  }
-  let centre = State.centres.find(c=>c.name===centreNameBest && c.types.has(type) && c.engines.has(engine))
-  if(!centre){ centre = pickCompatibleCentre(type, engine) }
-  if(!centre){ alert('Aucun centre compatible pour cette demande.'); return }
+  if(rows.length){ centreNameBest = rows[0].querySelector('.eta-cell strong')?.textContent || null }
+  let centre=State.centres.find(c=>c.name===centreNameBest && c.types.has(type) && c.engines.has(engine))
+  if(!centre){ centre = State.centres.find(c=>c.types.has(type)&&c.engines.has(engine)) }
+  if(!centre){ alert('Aucun centre compatible.'); return }
   const client=document.getElementById('r-client').value
   const priority=document.getElementById('r-priority').value
-  const startDate=document.getElementById('r-available').valueAsDate || State.baseDate
+  const startDate=getInputDate('r-available')
   const duration=State.opDurTE[type][engine]
   const id=`N${State.demands.length+1}`
   const d={id, client, centre, centreName:centre.name, engine, type, priority, duration, startDate}
-  State.demands.push(d)
-  placeDemandOnCalendar(d)
-  buildHeatmap(); buildReqTable(); evaluateCurrent()
+  State.demands.push(d); placeDemandOnCalendar(d)
+  buildHeatmapFor('c-centre-t1','heatmap-t1'); buildReqTable(); evaluateCurrent()
 }
 
 function hydrateUI(){
   hydrateSelectors(); hydrateCompatTable()
 }
 
-// ----------------------- Events -----------------------
-// Tabs
+// ===== Events =====
 for(const b of document.querySelectorAll('.tab')){
   b.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'))
     b.classList.add('active')
     const id=b.dataset.tab
     document.querySelectorAll('section.card').forEach(s=>s.hidden = s.id!==id)
-    if(id==='t3') buildHeatmap()
-    if(id==='t4') buildReqTable()
+    if(id==='t3') buildReqTable()
   })
 }
 
-// Evaluate & Add
-document.getElementById('btn-evaluate').addEventListener('click', evaluateCurrent)
+document.getElementById('btn-evaluate').addEventListener('click', ()=>{ try{ evaluateCurrent() }catch(e){ __toast(e.message) } })
 for(const id of ['r-client','r-engine','r-type','r-priority','r-available']){
-  document.getElementById(id).addEventListener('change', evaluateCurrent)
+  document.getElementById(id).addEventListener('change', ()=>{ try{ evaluateCurrent() }catch(e){ __toast(e.message) } })
 }
 
-document.getElementById('btn-add').addEventListener('click', addCurrentRequest)
+document.getElementById('btn-add').addEventListener('click', ()=>{ try{ addCurrentRequest() }catch(e){ __toast(e.message) } })
 
-// Master data
 function parseTriple(txt){return txt.split(',').map(x=>Number(x.trim()))}
 
 document.getElementById('btn-regenerate').addEventListener('click',()=>{
-  Params.seed = Number(document.getElementById('m-seed').value)
-  Params.weeks = Number(document.getElementById('m-weeks').value)
-  Params.clients = Number(document.getElementById('m-clients').value)
-  Params.existing = Number(document.getElementById('m-reqs').value)
-  Params.pUrgent = Number(document.getElementById('m-pUrgent').value)
-  Params.capMin = Number(document.getElementById('m-capMin').value)
-  Params.capMax = Number(document.getElementById('m-capMax').value)
-  Params.trendMin = Number(document.getElementById('m-trendMin').value)
-  Params.trendMax = Number(document.getElementById('m-trendMax').value)
-  Params.durations.TestOnly = parseTriple(document.getElementById('m-dur-test').value)
-  Params.durations.QuickInspection = parseTriple(document.getElementById('m-dur-qi').value)
-  Params.durations.RepairOnly = parseTriple(document.getElementById('m-dur-rep').value)
-  Params.durations.Overhaul = parseTriple(document.getElementById('m-dur-ovh').value)
+  Params.seed=Number(document.getElementById('m-seed').value)
+  Params.weeks=Number(document.getElementById('m-weeks').value)
+  Params.clients=Number(document.getElementById('m-clients').value)
+  Params.existing=Number(document.getElementById('m-reqs').value)
+  Params.pUrgent=Number(document.getElementById('m-pUrgent').value)
+  Params.capMin=Number(document.getElementById('m-capMin').value)
+  Params.capMax=Number(document.getElementById('m-capMax').value)
+  Params.trendMin=Number(document.getElementById('m-trendMin').value)
+  Params.trendMax=Number(document.getElementById('m-trendMax').value)
+  Params.durations.TestOnly=parseTriple(document.getElementById('m-dur-test').value)
+  Params.durations.QuickInspection=parseTriple(document.getElementById('m-dur-qi').value)
+  Params.durations.RepairOnly=parseTriple(document.getElementById('m-dur-rep').value)
+  Params.durations.Overhaul=parseTriple(document.getElementById('m-dur-ovh').value)
   Params.shipW=[0,1,2,3,4].map(i=>Number(document.getElementById('m-w'+i).value))
-  Params.reserveUrgPct = Number(document.getElementById('m-reserveUrg').value)
-  Params.penaltyFactor = Number(document.getElementById('m-penaltyFactor').value)
+  Params.penaltyFactor=Number(document.getElementById('m-penaltyFactor').value)
   regenerate()
 })
 
-document.getElementById('c-centre').addEventListener('change', buildHeatmap)
-
 // Export/Import
-function download(filename, text){
-  const a=document.createElement('a')
-  a.setAttribute('href','data:application/json;charset=utf-8,'+encodeURIComponent(text))
-  a.setAttribute('download',filename)
-  a.style.display='none'; document.body.appendChild(a); a.click(); document.body.removeChild(a)
-}
+function download(filename, text){ const a=document.createElement('a'); a.href='data:application/json;charset=utf-8,'+encodeURIComponent(text); a.download=filename; a.style.display='none'; document.body.appendChild(a); a.click(); a.remove() }
 
 document.getElementById('btn-export').addEventListener('click',()=>{
-  const out={Params, State: {
-    baseDate: State.baseDate.toISOString().slice(0,10),
-    horizonDays: State.horizonDays,
-    centres: State.centres.map(c=>({name:c.name, engines:[...c.engines], types:[...c.types], capBase:c.capBase, trend:c.trend, capByDay:c.capByDay})),
+  const out={Params, State:{
+    baseDate:State.baseDate.toISOString().slice(0,10), horizonDays:State.horizonDays,
+    centres: State.centres.map(c=>({name:c.name, engines:[...c.engines], types:[...c.types], capBase:c.capBase, trend:c.trend, capByDay:c.capByDay, quotaTE:c.quotaTE})),
     demands: State.demands.map(d=>({id:d.id, client:d.client, centre:d.centreName, engine:d.engine, type:d.type, priority:d.priority, duration:d.duration, startDate:d.startDate.toISOString().slice(0,10)})),
-    shipDays: State.shipDays,
-    opDurTE: State.opDurTE
+    shipDays: State.shipDays, opDurTE: State.opDurTE
   }}
-  download('maestro_dataset.json', JSON.stringify(out,null,2))
+  download('maestro_te_light.json', JSON.stringify(out,null,2))
 })
 
 document.getElementById('btn-import').addEventListener('click',()=>document.getElementById('import-file').click())
@@ -684,38 +562,36 @@ document.getElementById('import-file').addEventListener('change',evt=>{
     try{
       const data=JSON.parse(r.result)
       Object.assign(Params, data.Params||{})
-      // rebuild State from import (simple)
-      State.baseDate = new Date((data.State?.baseDate)||startOfToday())
-      State.horizonDays = data.State?.horizonDays || Params.weeks*7
+      State.baseDate=new Date(data.State?.baseDate||startOfToday())
+      State.horizonDays=data.State?.horizonDays||Params.weeks*7
       seedRng(Params.seed)
       buildCentres(); buildCustomers();
-      // override centres from file when possible
       if(Array.isArray(data.State?.centres)){
         data.State.centres.slice(0,20).forEach((c,i)=>{
-          const target=State.centres[i];
-          target.name=c.name; target.engines=new Set(c.engines||[]); target.types=new Set(c.types||[]);
-          target.capBase=c.capBase||target.capBase; target.trend=c.trend||target.trend; target.capByDay=c.capByDay||target.capByDay
-          target.loadByDay=new Array(State.horizonDays).fill(0); target.loadByDayByType=Object.fromEntries(TYPES.map(t=>[t,new Array(State.horizonDays).fill(0)]))
+          const tgt=State.centres[i]
+          tgt.name=c.name; tgt.engines=new Set(c.engines||[]); tgt.types=new Set(c.types||[]);
+          tgt.capBase=c.capBase||tgt.capBase; tgt.trend=c.trend||tgt.trend; tgt.capByDay=c.capByDay||tgt.capByDay; tgt.quotaTE=c.quotaTE||tgt.quotaTE
+          tgt.loadByDay=new Array(State.horizonDays).fill(0)
+          tgt.loadByDayByType=Object.fromEntries(TYPES.map(t=>[t,new Array(State.horizonDays).fill(0)]))
+          const teKeys=Object.keys(tgt.quotaTE); tgt.loadByDayByTE=Object.fromEntries(teKeys.map(k=>[k,new Array(State.horizonDays).fill(0)]))
         })
       }
-      State.shipDays = data.State?.shipDays || {}
-      State.opDurTE = data.State?.opDurTE || {}
+      State.shipDays=data.State?.shipDays||{}
+      State.opDurTE=data.State?.opDurTE||{}
       State.demands=[]
       if(Array.isArray(data.State?.demands)){
         data.State.demands.forEach(d=>{
-          const centre=State.centres.find(c=>c.name===d.centre)
-          if(!centre) return
-          const demand={id:d.id, client:d.client, centre, centreName:centre.name, engine:d.engine, type:d.type, priority:d.priority, duration:d.duration, startDate:new Date(d.startDate)}
-          State.demands.push(demand); placeDemandOnCalendar(demand)
+          const c=State.centres.find(x=>x.name===d.centre); if(!c) return
+          const D={id:d.id, client:d.client, centre:c, centreName:c.name, engine:d.engine, type:d.type, priority:d.priority, duration:d.duration, startDate:new Date(d.startDate)}
+          State.demands.push(D); placeDemandOnCalendar(D)
         })
       }
-      rebuildCompatSummary(); hydrateUI(); hydrateCompatTable(); buildHeatmap(); buildReqTable(); evaluateCurrent()
-    }catch(e){ alert('Import invalide : '+e.message) }
+      rebuildCompatSummary(); hydrateUI(); buildHeatmapFor('c-centre-t1','heatmap-t1'); buildReqTable(); evaluateCurrent()
+    }catch(e){ __toast('Import invalide : '+e.message) }
   }
   r.readAsText(file)
 })
 
-// Filters in tab4
 for(const id of ['f-centre','f-engine','f-type','f-prio','f-from','f-to']){
   document.getElementById(id).addEventListener('change', buildReqTable)
 }
@@ -730,8 +606,10 @@ document.getElementById('btn-reset-f').addEventListener('click',()=>{
   buildReqTable()
 })
 
-// ----------------------- Init -----------------------
-regenerate()
+// Init
+regenerate();
+// Heatmap selector change
+const selT1=document.getElementById('c-centre-t1'); if(selT1){ selT1.addEventListener('change', ()=>buildHeatmapFor('c-centre-t1','heatmap-t1')) }
 </script>
 </body>
 </html>
