@@ -1,6 +1,6 @@
 # Introduction
 
-**📌 Objectifs d'un prototype fonctionnelle HTML :**
+**📌 Objectifs d'un prototype fonctionnel HTML :**
 
 - 💡 Transformer une idée en une feature
 - 🗂️ Stabiliser les besoins autour de la feature en vue du développement
