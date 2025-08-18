@@ -14,110 +14,69 @@
 
 **💡 Démarche IA**
 
-0. 🏃‍♂️ Privilégier peu de logique métier (données statiques), un style minimaliste avec le minimum de données
-1. 🔍 Prototyper petit avec des hypothèses de simplification
-2. ✏️ Demander à GPT de te poser des questions pour préciser ton prompt
-3. 🆘 Demander à GPT de te proposer des pistes d'amélioration ou de simplification
-4. 🔄 Mettre le plus de demandes possibles dans ton prompt avant régénération
-5. 📥 Amender le prompt jusqu'à ce qu'il te convient avec de générer le prototype
-6. 📋 Quand tu es satisfait, demande à GPT de te refournir le prompt pour reprendre ailleurs
-7. 🔶 Demander à GPT de générer le diagramme UML pour vérifier ou documenter
+1. 📝 **Texte** → privilégier les données en dur (toujours validées)  
+2. 🎲 **Chiffres** → générer aléatoirement, sans logique métier  
+3. 🌍 **Périmètre** → définir réaliste, mais afficher seulement un extrait  
+4. 📑 **Méthode** → procéder **onglet par onglet**, **composant par composant**  
+5. ✅ **Validation** → valider d’abord la structure avant de générer le composant  
+6. 🔧 **Itération** → mettre un maximum de modifications par composant avant régénération  
+7. 🏗️ **Assemblage** → une fois satisfait, assembler toute l’interface  
+8. 📜 **Clôture** → demander la synthèse du prompt final  
+
 
 **🤖 Lien à la conversation IA**
 ```
-https://chatgpt.com/share/68a2691d-73cc-8006-b5bc-003d21a127c1
+https://chatgpt.com/share/68a2f878-e484-8006-998c-d25c5c591a19
 ```
 
 # Prompt
 
-<img width="1540" height="1019" alt="image" src="https://github.com/user-attachments/assets/5a1bcfb3-3ead-464c-be18-c304706b6a2e" />
+<img width="1189" height="878" alt="image" src="https://github.com/user-attachments/assets/11df08f2-6cf8-4e47-a2cd-2b1383cd89ca" />
 
-## 1. 🎯 Contexte  
-- **Outil** : MAESTRO — gestion des demandes & opérations de maintenance moteurs Safran.  
-- **Objectif** : Suivi **temps réel** des performances globales de 1000 demandes et 5000 opérations réparties sur 50 centres de maintenance.  
-- **KPI clés** :  
-  1. ⏱️ On-Time Delivery & Temps moyen par type de demande  
-  2. ⚡ Utilisation des capacités ateliers (par site)  
-  3. 🛫 Temps moyen par modèle moteur & type de demande  
-  4. 🔁 Décomposition des opérations (par type de demande)  
-  5. 🎯 Écart prévu vs planifié (avance/retard en jours et %)  
+## 1. Contexte
+- MAESTRO est un outil de gestion des demandes et opérations de maintenance moteur (MRO).
+- Objectif : donner une vision synthétique et opérationnelle à un instant T sur un grand volume de données.  
+- Public cible : planificateurs, responsables de maintenance, managers de centres.
+- Besoin : une interface claire, proche de SAP IBP / Fiori, qui permette de visualiser rapidement les écarts de délais, la qualité du respect des délais et l’utilisation des capacités.
 
 ---
 
-## 2. 📊 Données  
+## 2. Données
+- **Périmètre :**
+  - 1000 demandes de maintenance  
+  - 5000 opérations associées  
+  - 50 centres de maintenance dans le monde  
+  - 10 modèles de moteurs (ex : CFM56, LEAP, GE90…)  
+  - 50 types d’opérations (inspection, réparation, assemblage, tests…)  
+  - 5 types de demandes (Overhaul complet, AOG, Quick Inspection, Deep Repair, Scheduled Check)
 
-### 2.1 Objets principaux  
-- **Moteurs (10 modèles)** :  
-  - CFM56, LEAP-1A, LEAP-1B, GE90, GP7200, CF6-80E1, PW1100G, Trent 700, Silvercrest, M88.  
-
-- **Types de demandes (5)** :  
-  - Overhaul (Grande visite)  
-  - Quick Inspection (Inspection rapide)  
-  - Deep Repair (Réparation lourde)  
-  - Cleaning & Test (Nettoyage + essai)  
-  - Component Swap (Remplacement composants)  
-
-- **Opérations (50 types)** regroupées en familles :  
-  - Inspection  
-  - Disassembly  
-  - Repair  
-  - Cleaning  
-  - Assembly  
-  - Test Run  
-
-- **Sites (50 centres de maintenance)** :  
-  - Lyon, Toulouse, Bordeaux, Hambourg, Casablanca, Dubaï… (etc., 50 noms de sites réels ou plausibles).  
-
-### 2.2 Données quantitatives simulées (exemples réalistes)  
-- **1000 demandes** actives.  
-- **5000 opérations** en cours.  
-- Capacité : 50 sites avec 15 visibles par page (pagination).  
-- Δ prévu vs planifié exprimé en **jours** et **%** (de -50% avance à +50% retard).  
+- **Indicateurs suivis :**
+  1. ⏱️ Délai moyen de traitement : prévu vs réel
+  2. 📊 Taux de respect des délais (On-Time Delivery) : répartition à l’heure, léger retard, retard critique
+  3. ⚙️ Taux d’utilisation des capacités ateliers : % d’occupation par centre et par semaine
 
 ---
 
-## 3. 🖥️ Interface  
+## 3. Interface
+- **Barre de filtres généraux (statiques)** : période, centre, type d’opération, type de demande, moteur.  
+- **Disposition en 2 lignes :**
+  - Ligne 1 → 2 cartes côte à côte :  
+    - **Graphique 1 :** Barres horizontales, une par type de demande. La barre représente le délai réel, et un trait vertical indique le délai prévu. Tooltip : valeurs prévues, réelles et écart (%).  
+    - **Graphique 2 :** Barres horizontales empilées, une par type de moteur. Répartition verte (à l’heure), orange (léger retard), rouge (retard critique). Tooltip : nb exact + % par segment.
+  - Ligne 2 → 1 carte pleine largeur :  
+    - **Graphique 3 :** Heatmap 13 semaines × 20 centres. Chaque cellule = % d’utilisation (vert <85%, orange 85–100%, rouge >100%), avec le % affiché et un tooltip détaillé (opérations planifiées / capacité).
 
-### 3.1 Organisation  
-- Style SAP IBP / Fiori :  
-  - **Cartes KPI** avec icônes et jauges.  
-  - **Filtres & sélecteurs** (par moteur, type de demande).  
-  - **Graphiques interactifs** (barres, jauges, empilés).  
-  - Pagination pour les centres de maintenance (15/page).  
-
-### 3.2 Composants graphiques  
-1. **OTD & Temps moyen (bar chart + jauge centrale)**  
-   - Axe : Types de demandes.  
-   - Données : Temps prévu vs réel, Δ en jours et %.  
-   - Jauge centrale Δ global (-50% avance ↔ +50% retard).  
-
-2. **Utilisation des capacités (barres triées)**  
-   - Sites triés du moins capacitaire au plus capacitaire.  
-   - Nb d’opérations en cours affiché.  
-   - Pagination 15 sites par page.  
-
-3. **Temps moyen par moteur (gauge chart)**  
-   - Liste des 10 moteurs.  
-   - Sélecteur : type de demande.  
-   - Jauges comparant Prévu vs Réel.  
-
-4. **Décomposition par type de demande (stacked bar)**  
-   - Axe : Types de demandes.  
-   - Barres empilées : familles d’opérations (Inspection, Disassembly, Repair, etc.).  
-   - Couleurs stables par famille.  
+- **Style attendu :**
+  - Esthétique SAP Fiori / IBP : cartes blanches, ombrées, titres clairs.  
+  - Couleurs vives pour les états (vert, orange, rouge).  
+  - Cellules de heatmap collées avec séparateurs hebdo plus marqués.  
+  - Simplicité, lisibilité, centrage sur les indicateurs.
 
 ---
 
-## 4. ⚙️ Technique  
-
-- **Technologies front** : HTML5, CSS3, Chart.js (ou Recharts/Highcharts selon stack), pagination en Vanilla JS.  
-- **Statique** : données codées en dur pour prototype.  
-- **Navigation** :  
-  - Onglet “KPI Maintenance” dans l’interface Fiori-like.  
-  - Filtres disponibles (type de demande, modèle moteur, site).  
-- **Évolutions possibles** :  
-  - Thème sombre/light toggle.  
-  - Export PNG/PDF des KPI.  
-  - Seuils dynamiques de couleur (vert/orange/rouge).  
-
-
+## 4. Technique
+- **Volume simulé** : données générées automatiquement (pseudo-aléatoires crédibles).  
+- **Génération** : délais prévus et réels, répartition OTD, utilisation des capacités.  
+- **Tooltips** : toujours présents pour afficher la valeur détaillée.  
+- **Interactions** : filtres statiques en haut (non connectés), mais possibilité de les rendre dynamiques plus tard.  
+- **Responsive** : 2 colonnes sur desktop, 1 colonne sur mobile.  
