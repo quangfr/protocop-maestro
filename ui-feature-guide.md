@@ -65,6 +65,94 @@ https://chatgpt.com/share/68a33867-818c-8006-ac8c-efbd47c3d3ec
 - **Master tables fixes**
   - `shipDays[client][centre] → jours` (fixe)
   - `opDurTE[type][engine] → jours` (fixe)
+ 
+### UML — classe & séquence (Mermaid)
+
+```mermaid
+classDiagram
+  class Params {
+    +number seed
+    +number weeks
+    +number clients
+    +number existing
+    +number pUrgent
+    +number capMin
+    +number capMax
+    +number trendMin
+    +number trendMax
+    +Record<ReqType,[min,mode,max]> durations
+    +number[] shipW
+    +number reserveUrgPct
+    +number penaltyFactor
+  }
+
+  class State {
+    +Date baseDate
+    +number horizonDays
+    +Centre[] centres
+    +string[] customers
+    +Demand[] demands
+    +Record<string,Record<string,number>> shipDays
+    +Record<ReqType,Record<Engine,number>> opDurTE
+  }
+
+  class Centre {
+    +number id
+    +string name
+    +Set~Engine~ engines
+    +Set~ReqType~ types
+    +number capBase
+    +number trend
+    +number[] capByDay
+    +number[] loadByDay
+    +Record<ReqType, number[]> loadByDayByType
+  }
+
+  class Demand {
+    +string id
+    +string client
+    +string centreName
+    +Engine engine
+    +ReqType type
+    +Priority priority
+    +Date startDate
+    +number duration
+    +Centre centre
+  }
+
+  class Evaluator {
+    +Evaluate(client,engine,type,priority)
+    +WaitIfFull(centre,priority)
+    +PenaltyAt4Weeks(centre,type)
+  }
+
+  Params --> State : pilote la génération
+  State "1" o--> "20" Centre
+  State "1" o--> "*" Demand
+  Evaluator --> State : lit
+  Demand --> Centre
+```
+
+```mermaid
+sequenceDiagram
+  participant UI as UI (Onglet 1)
+  participant Eval as Evaluator
+  participant St as State
+
+  UI->>St: read inputs (client, engine, type, priority)
+  UI->>Eval: Evaluate(client, engine, type, priority)
+  Eval->>St: get eligible centres (compat)
+  loop pour chaque centre
+    Eval->>St: ship = shipDays[client][centre]
+    Eval->>St: dur  = opDurTE[type][engine]
+    Eval->>Eval: wait = WaitIfFull(centre, priority)
+    Eval->>Eval: pen  = PenaltyAt4Weeks(centre, type)
+    Eval->>Eval: fast = ship + dur + wait + ship
+    Eval->>Eval: resp = fast + pen
+  end
+  Eval-->>UI: rows triés par 🍀 ResponsibleETA
+  UI->>UI: highlight (🍀 vert, ⚡ jaune, pénalités/attente en rouge)
+```
 
 ### 2.2 Paramètres (éditables)
 - `seed=42`, `weeks=12` (horizon 84j), `clients=30`, `existing=250`, `%Urgent=25`
