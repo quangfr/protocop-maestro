@@ -18,8 +18,8 @@
 2. 🎲 **Chiffres** → générer **aléatoirement, sans logique métier**  
 3. 🌍 **Périmètre** → définir réaliste, mais afficher seulement un extrait  
 4. 📑 **Méthode** → procéder onglet par onglet, **composant par composant**  
-5. ✅ **Validation** → valider la structure avec un **schéma visuel texte** avant de générer le composant  
-6. 🔧 **Itération** → enrichir le messsage précédent avec toutes les précisions pour limiter les regénérations 
+5. ✅ **Validation** → valider la structure et le schéma visuel **en texte**   
+6. 📦 **Exhaustivité** → regrouper un max de demandes dans un message avant régénération  
 7. 🏗️ **Assemblage** → une fois satisfait, assembler toute l’interface  
 8. 📜 **Clôture** → demander la synthèse du prompt final  
 
