@@ -7,8 +7,10 @@
 
 **🛠 Usages concrets :**
 
+- 🎨 Brainstorming / Co-construction
 - ✍️ Spécifications / Critères d'acceptance
 - 👥 Tests utilisateurs (UI/UX)
+- 🖼️ Démos réalistes (UI/UX)
 
 **💡 Démarche IA**
 
