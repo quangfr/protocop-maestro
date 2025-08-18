@@ -172,9 +172,9 @@ classDiagram
   AllocationService ..> Centre : lit capacités/charge
   AllocationService ..> DemandeInput : calcule ETA
   AllocationService ..> ResultatETA : renvoie
-mermaid
-Copy
-Edit
+```
+
+```mermaid
 %% Flux d'évaluation — MAESTRO (Sequence Diagram)
 sequenceDiagram
   autonumber
