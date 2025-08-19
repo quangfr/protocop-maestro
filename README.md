@@ -7,7 +7,7 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 ## Types de prototypes
 
-| Critères                                           | 🎨 Maquette (Wireframe) | 📊 Feuille de calcul (Data) | 🧪 Fonctionnalité (PoC) | 💻 Interface (Démo) |
+| Critères                                           | 🎨 Maquette (UI) | 📊 Feuille de calcul (Data) | 🧪 Fonctionnalité (PoC) | 💻 Interface (Démo) |
 |----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
 | **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🟡 UI fonctionnelle | 🟢 Teste l’UX réelle   |
 | **🧩 Fonctionnel**                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
@@ -15,7 +15,7 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 | **🪶 Simplicité**                                      | 🟢 Rapide à faire     | 🟡 Formules = complexe| 🔴 Dev/Algo = complexe | 🟡 Dev/UX = modéré      |
 | **🧾 Exhaustivité**                                    | 🔴 Vue partielle      | 🟡 Cas principaux    | 🟢 Cas & bords testés       | 🟡 Flows majeurs       |
 
-### Maquette (Wireframe)
+### Maquette (UI)
 - `ui-wireframe-guide.md` et `ui-wireframe.html` – exemple d'un tableau de bord des délais de traitement moyen et des capacités d'un atelier
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/74e48704-7bc4-4771-a4d6-40949c4c427b" />
