@@ -1,9 +1,9 @@
 # Introduction
 
-**📌 Objectifs d'un prototype applicatif / HTML :**
+**📌 Objectifs d'une interface prototype :**
 
-- 💡 Proposer et valider une vision produit
-- 🗂️ Structurer et prioriser des fonctionnalités à haute valeur ajoutée
+- 💡 Proposer et valider un parcours utilisateur
+- 🗂️ Valider et prioriser des besoins
 
 **🛠 Usages concrets :**
 
