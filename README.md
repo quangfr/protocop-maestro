@@ -7,7 +7,7 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 ## Types de prototypes
 
-| Critères                                           | 🎨 Maquette (Wireframe) | 📊 Feuille de calcul | 🧪 Fonctionnalité (PoC) | 💻 Interface (Prototype) |
+| Critères                                           | 🎨 Maquette (Wireframe) | 📊 Feuille de calcul | 🧪 Fonctionnalité (PoC) | 💻 Interface (Démo) |
 |----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
 | **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🟡 UI fonctionnelle | 🟢 Teste l’UX réelle   |
 | **🧩 Fonctionnel**                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
@@ -25,7 +25,7 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/05869586-39c9-4b23-824a-8e790a7066e5" />
 
-### Interface (Prototype)
+### Interface (Démo)
 - `ui-app-guide.md` et `ui-app.html` – exemple d'une interface de navigation SAP-IBP Fiori pour un planificateur en ateliers
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/e6199cd2-8025-4c24-9324-e791b4c1f90b" />
