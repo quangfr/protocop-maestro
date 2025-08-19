@@ -1,9 +1,9 @@
 # Introduction
 
-**📌 Objectifs d'un prototype fonctionnel HTML :**
+**📌 Objectifs d'une fonctionnalité (PoC) :**
 
-- 💡 Transformer une idée en une feature
-- 🗂️ Stabiliser les besoins autour de la feature en vue du développement
+- 💡 Démontrer la faisabilité d'une idée
+- 🗂️ Explorer les besoins en vue du développement
 
 **🛠 Usages concrets :**
 
