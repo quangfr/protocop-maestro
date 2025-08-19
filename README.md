@@ -1,6 +1,6 @@
 # Protocop Maestro
 
-Ce dépôt regroupe des prototypes générés par IA pour le projet **MAESTRO**, un outil fictif de planification et de suivi de la maintenance des moteurs d'avion.
+Ce dépôt regroupe des prototypes générés avec l'IA pour le projet **MAESTRO**, un outil fictif de planification et de suivi de la maintenance des moteurs.
 
 
 ## Contenu
