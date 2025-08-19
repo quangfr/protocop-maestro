@@ -9,7 +9,7 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 | Critères                                           | 🎨 Maquette graphique | 📊 Feuille de calcul | 🧪 Fonctionnalité (PoC) | 💻 Interface (Prototype) |
 |----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
-| **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🔴 Non pertinent (pas d’UI) | 🟢 Teste l’UX réelle   |
+| **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🟡 UI fonctionnelle | 🟢 Teste l’UX réelle   |
 | **🧩 Fonctionnel**                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
 | **📈 Scalabilité**                                     | 🟡 Idées scalables    | 🟡 Limité en volume  | 🟡 Dépend archi/tests       | 🟡 Front seul          |
 | **🪶 Simplicité**                                      | 🟢 Rapide à faire     | 🟡 Formules = complexe| 🔴 Dev/Algo = complexe | 🟡 Dev/UX = modéré      |
