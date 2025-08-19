@@ -1,7 +1,7 @@
 # Introduction
-**📌 Objectifs d'un prototype Excel :**
-- ✅ Valider la logique de calculs sur un périmètre réduit
-- 📥 Importer de la donnée fictive en masse
+**📌 Objectifs d'une feuille de calcul (données) :**
+- ✅ Valider la logique de calcul sur un périmètre réduit
+- 📥 Alimenter le logiciel avec de la donnée réaliste en masse
 
 **🛠 Usages concrets :**
 - ✍️ Spécifications / Critères d'acceptance 
