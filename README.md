@@ -15,12 +15,12 @@ Ce dépôt regroupe des prototypes générés avec l'IA pour le projet **MAESTRO
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/05869586-39c9-4b23-824a-8e790a7066e5" />
 
-### Interface
+### Interface applicative
 - `ui-app-guide.md` et `ui-app.html` – exemple d'une interface de navigation SAP-IBP Fiori pour un planificateur en ateliers
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/e6199cd2-8025-4c24-9324-e791b4c1f90b" />
 
-### Featyre
+### Fonctionnalité
 - `ui-feature-guide.md` et `ui-feature.html` – exemple d'un moteur de choix d'atelier de maintenance selon les délais de traitement
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/e1dc92ed-c66e-4c01-b49f-859642f2b4c9" />
