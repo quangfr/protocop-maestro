@@ -7,7 +7,7 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 ## Types de prototypes
 
-| Critères                                           | 🎨 Maquette (UI) | 📊 Fichier de données (Test) | 🧪 Fonctionnalité (PoC) | 💻 Interface (Démo) |
+| Critères                                           | 🎨 Maquette (UI) | 📊 Fichier de données (Test) | 🧪 Fonctionnalité (PoC) | 💻 Application (Démo) |
 |----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
 | **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🟡 UI fonctionnelle | 🟢 Teste l’UX réelle   |
 | **🧩 Fonctionnel**                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
@@ -25,13 +25,13 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/05869586-39c9-4b23-824a-8e790a7066e5" />
 
-### Interface (Démo)
-- `ui-app-guide.md` et `ui-app.html` – exemple d'une interface de navigation SAP-IBP Fiori pour un planificateur en ateliers
+### Application (Démo)
+- `demo-app-guide.md` et `demo-app.html` – exemple d'une interface de navigation SAP-IBP Fiori pour un planificateur en ateliers
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/e6199cd2-8025-4c24-9324-e791b4c1f90b" />
 
 ### Fonctionnalité (PoC)
-- `ui-feature-guide.md` et `ui-feature.html` – exemple d'un moteur de choix d'atelier de maintenance selon les délais de traitement
+- `poc-feature-guide.md` et `poc-feature.html` – exemple d'un moteur de choix d'atelier de maintenance selon les délais de traitement
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/e1dc92ed-c66e-4c01-b49f-859642f2b4c9" />
 
