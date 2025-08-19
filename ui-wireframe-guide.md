@@ -1,9 +1,9 @@
 # Introduction
 
-**📌 Objectifs d'une maquette HTML :**
+**📌 Objectifs d'une maquette graphique :**
 
-- 🖥️ Discuter et valider des idées d'interface ou un modèle de données
-- 📑 Illustrer et préciser une spécification avec les développeurs comme les usagers
+- 🖥️ Discuter et valider des idées d'interface
+- 📑 Illustrer et préciser une spécification
 
 **🛠 Usages concrets :**
 
