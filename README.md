@@ -7,13 +7,13 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 ## Types de prototypes
 
-| Critères                                           | 🎨 Maquette (UI) | 📊 Fichier de données (Test) | 🧪 Fonctionnalité (PoC) | 💻 Application (Démo) |
-|----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
-| **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🟡 UI fonctionnelle | 🟢 Teste l’UX réelle   |
-| **🧩 Fonctionnel**                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
-| **📈 Scalabilité**                                     | 🟡 Idées scalables    | 🟡 Limité en volume  | 🟡 Dépend archi/tests       | 🟡 Front seul          |
-| **🪶 Simplicité**                                      | 🟢 Rapide à faire     | 🟡 Formules = complexe| 🔴 Dev/Algo = complexe | 🟡 Dev/UX = modéré      |
-| **🧾 Exhaustivité**                                    | 🔴 Vue partielle      | 🟡 Cas principaux    | 🟢 Cas & bords testés       | 🟡 Flows majeurs       |
+| **Critères**              | **🎨 Maquette (UI)** | **📊 Fichier de données (Test)** | **🧪 Fonctionnalité (PoC)** | **💻 Application (Démo)** |
+|----------------------------|----------------------|----------------------------------|-----------------------------|---------------------------|
+| **🧭 Ergonomie**           | 🟢 Look & feel clair | 🔴 UI limitée                    | 🟡 UI fonctionnelle          | 🟢 Teste l’UX réelle      |
+| **🧩 Fonctionnel**         | 🟡 Parcours illustrés| 🟢 Calcs & règles OK             | 🟢 Logique fidèle            | 🟡 Logique légère         |
+| **📈 Scalabilité**         | 🟡 Idées scalables   | 🟡 Limité en volume              | 🟡 Dépend archi/tests        | 🟡 Front seul             |
+| **🪶 Simplicité**          | 🟢 Rapide à faire    | 🟡 Formules = complexe           | 🔴 Dev/Algo = complexe       | 🟡 Dev/UX = modéré        |
+| **🧾 Exhaustivité**        | 🔴 Vue partielle     | 🟡 Cas principaux                | 🟢 Cas & bords testés        | 🟡 Flows majeurs          |
 
 ### Maquette (UI)
 - `ui-wireframe-guide.md` et `ui-wireframe.html` – exemple d'un tableau de bord des délais de traitement moyen et des capacités d'un atelier
