@@ -5,9 +5,9 @@ Ce dépôt regroupe des prototypes générés avec l'IA pour le projet **MAESTRO
 Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx` avec un tableur. Les fichiers `.md` fournissent un guide pas-à-pas pour reproduire chaque prototype. 
 
 
-## Prototypes
+## Types de prototypes
 
-| Critères                                           | 🎨 Maquette graphique | 📊 Feuille de calcul | 🧪 Fonctionnalité (PoC) | 💻 Interface (Prototype) |
+| Critères                                           | 🎨 Maquette (Wireframe) | 📊 Feuille de calcul | 🧪 Fonctionnalité (PoC) | 💻 Interface (Prototype) |
 |----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
 | **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🟡 UI fonctionnelle | 🟢 Teste l’UX réelle   |
 | **🧩 Fonctionnel**                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
@@ -15,7 +15,7 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 | **🪶 Simplicité**                                      | 🟢 Rapide à faire     | 🟡 Formules = complexe| 🔴 Dev/Algo = complexe | 🟡 Dev/UX = modéré      |
 | **🧾 Exhaustivité**                                    | 🔴 Vue partielle      | 🟡 Cas principaux    | 🟢 Cas & bords testés       | 🟡 Flows majeurs       |
 
-### Maquette graphique
+### Maquette (Wireframe)
 - `ui-wireframe-guide.md` et `ui-wireframe.html` – exemple d'un tableau de bord des délais de traitement moyen et des capacités d'un atelier
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/74e48704-7bc4-4771-a4d6-40949c4c427b" />
