@@ -9,11 +9,11 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 | Critères                                           | 🎨 Maquette graphique | 📊 Feuille de calcul | 🧪 Fonctionnalité prototype | 💻 Interface prototype |
 |----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
-| 🧭 Ergonomie                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🔴 Non pertinent (pas d’UI) | 🟢 Teste l’UX réelle   |
-| 🧩 Fonctionnel                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
-| 📈 Scalabilité                                     | 🟡 Idées scalables    | 🟡 Limité en volume  | 🟡 Dépend archi/tests       | 🟡 Front seul          |
-| 🪶 Simplicité                                      | 🟢 Rapide à faire     | 🟡 Formules = complex| 🔴 Dev/Algo requis = complex | 🟡 Dev/UX = modéré      |
-| 🧾 Exhaustivité                                    | 🔴 Vue partielle      | 🟡 Cas principaux    | 🟢 Cas & bords testés       | 🟡 Flows majeurs       |
+| **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🔴 Non pertinent (pas d’UI) | 🟢 Teste l’UX réelle   |
+| **🧩 Fonctionnel**                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
+| **📈 Scalabilité**                                     | 🟡 Idées scalables    | 🟡 Limité en volume  | 🟡 Dépend archi/tests       | 🟡 Front seul          |
+| **🪶 Simplicité**                                      | 🟢 Rapide à faire     | 🟡 Formules = complex| 🔴 Dev/Algo requis = complex | 🟡 Dev/UX = modéré      |
+| **🧾 Exhaustivité**                                    | 🔴 Vue partielle      | 🟡 Cas principaux    | 🟢 Cas & bords testés       | 🟡 Flows majeurs       |
 
 ### Maquette graphique
 - `ui-wireframe-guide.md` et `ui-wireframe.html` – exemple d'un tableau de bord des délais de traitement moyen et des capacités d'un atelier
