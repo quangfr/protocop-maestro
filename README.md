@@ -7,7 +7,7 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 ## Prototypes
 
-| Critère \ Option                                   | 🎨 Maquette graphique | 📊 Feuille de calcul | 🧪 Fonctionnalité prototype | 💻 Interface prototype |
+| Critères                                           | 🎨 Maquette graphique | 📊 Feuille de calcul | 🧪 Fonctionnalité prototype | 💻 Interface prototype |
 |----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
 | 🧭 Ergonomie                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🔴 Non pertinent (pas d’UI) | 🟢 Teste l’UX réelle   |
 | 🧩 Fonctionnel                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
