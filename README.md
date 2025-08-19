@@ -7,12 +7,12 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 ## Prototypes
 
-| Critères                                           | 🎨 Maquette graphique | 📊 Feuille de calcul | 🧪 Fonctionnalité prototype | 💻 Interface prototype |
+| Critères                                           | 🎨 Maquette graphique | 📊 Feuille de calcul | 🧪 Fonctionnalité (PoC) | 💻 Interface (Prototype) |
 |----------------------------------------------------|-----------------------|----------------------|-----------------------------|------------------------|
 | **🧭 Ergonomie**                                       | 🟢 Look & feel clair  | 🔴 UI limitée        | 🔴 Non pertinent (pas d’UI) | 🟢 Teste l’UX réelle   |
 | **🧩 Fonctionnel**                                     | 🟡 Parcours illustrés | 🟢 Calcs & règles OK | 🟢 Logique fidèle           | 🟡 Logique légère      |
 | **📈 Scalabilité**                                     | 🟡 Idées scalables    | 🟡 Limité en volume  | 🟡 Dépend archi/tests       | 🟡 Front seul          |
-| **🪶 Simplicité**                                      | 🟢 Rapide à faire     | 🟡 Formules = complex| 🔴 Dev/Algo requis = complex | 🟡 Dev/UX = modéré      |
+| **🪶 Simplicité**                                      | 🟢 Rapide à faire     | 🟡 Formules = complexe| 🔴 Dev/Algo = complexe | 🟡 Dev/UX = modéré      |
 | **🧾 Exhaustivité**                                    | 🔴 Vue partielle      | 🟡 Cas principaux    | 🟢 Cas & bords testés       | 🟡 Flows majeurs       |
 
 ### Maquette graphique
@@ -25,12 +25,12 @@ Ouvrir les fichiers `.html` dans votre navigateur et la feuille `test-data.xlsx`
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/05869586-39c9-4b23-824a-8e790a7066e5" />
 
-### Interface applicative
+### Interface (Prototype)
 - `ui-app-guide.md` et `ui-app.html` – exemple d'une interface de navigation SAP-IBP Fiori pour un planificateur en ateliers
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/e6199cd2-8025-4c24-9324-e791b4c1f90b" />
 
-### Fonctionnalité
+### Fonctionnalité (PoC)
 - `ui-feature-guide.md` et `ui-feature.html` – exemple d'un moteur de choix d'atelier de maintenance selon les délais de traitement
 
 <img width="800" alt="image" src="https://github.com/user-attachments/assets/e1dc92ed-c66e-4c01-b49f-859642f2b4c9" />
