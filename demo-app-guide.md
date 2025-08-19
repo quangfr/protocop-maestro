@@ -1,6 +1,6 @@
 # Introduction
 
-**📌 Objectifs d'une interface prototype :**
+**📌 Objectifs d'une interface de démo :**
 
 - 💡 Proposer et valider un parcours utilisateur
 - 🗂️ Valider et prioriser des besoins
