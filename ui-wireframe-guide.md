@@ -14,9 +14,9 @@
 
 **💡 Démarche IA**
 
-1. 📝 **Texte** → privilégier les **données réalistes en dur** à valider
-2. 🎲 **Chiffres** → générer **aléatoirement, sans logique métier**  
-3. 🌍 **Périmètre** → définir réaliste, mais afficher seulement un extrait  
+1. 👁️ **Scan** → envoyer une copie d'écran pour **générer un wireframe** ou une maquette HTML  
+2. 📝 **Prompt** → demander un **descriptif** à amender avant de générer le code HTML
+3. 🎲 **Choix** → demander **plusieurs propositions** d'approche UX ou de style UI
 4. 📑 **Méthode** → procéder onglet par onglet, **composant par composant**  
 5. ✅ **Validation** → valider la structure et le schéma visuel **en texte**   
 6. 📦 **Exhaustivité** → regrouper un max de demandes dans un message avant régénération  
