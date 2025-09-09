@@ -14,14 +14,14 @@
 
 **💡 Démarche IA**
 
-1. 👁️ **Conversion** → Faire une copie d'écran de l'existant et en **générer un wireframe ou une maquette HTML**  
-2. 📝 **Protodescription** → demander un **descriptif** du copie d'écran à amender
-3. 📑 **Décomposition** → procéder onglet par onglet, **composant par composant**  
-4. 🎲 **Choix** → demander **plusieurs propositions** d'approche UX ou de style UI
-5. ✅ **Validation** → valider la structure et le schéma visuel **en texte**   
+1. 👁️ **Conversion** → générer un **wireframe ou une maquette HTML** à partir d'une copie d'écran  
+2. 📝 **Protodescription** → demander un **prompt descriptif** de la maquette ou de la copie d'écran
+3. ✅ **Validation** → valider la structure graphique **en texte**   
+4. 📑 **Décomposition** → procéder graphiquement onglet par onglet, **composant par composant**  
+5. 🎲 **Choix** → demander **plusieurs propositions visuels UX/UI** pour choisir
 6. 📦 **Exhaustivité** → regrouper un max de demandes dans un message avant régénération  
 7. 🏗️ **Assemblage** → une fois satisfait, assembler toute l’interface  
-8. 📜 **Clôture** → demander la synthèse du prompt final  
+8. 📜 **Clôture** → demander la synthèse du **prompt final**  
 
 
 **🤖 Lien à la conversation IA**
