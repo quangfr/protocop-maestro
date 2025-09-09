@@ -14,10 +14,10 @@
 
 **💡 Démarche IA**
 
-1. 👁️ **Scan** → envoyer une copie d'écran pour **générer un wireframe** ou une maquette HTML  
+1. 👁️ **Conversion** → Faire une copie d'écran et demander de **générer un wireframe ou une maquette HTML**  
 2. 📝 **Prompt** → demander un **descriptif** à amender avant de générer le code HTML
-3. 🎲 **Choix** → demander **plusieurs propositions** d'approche UX ou de style UI
-4. 📑 **Méthode** → procéder onglet par onglet, **composant par composant**  
+3. 📑 **Méthode** → procéder onglet par onglet, **composant par composant**  
+4. 🎲 **Choix** → demander **plusieurs propositions** d'approche UX ou de style UI
 5. ✅ **Validation** → valider la structure et le schéma visuel **en texte**   
 6. 📦 **Exhaustivité** → regrouper un max de demandes dans un message avant régénération  
 7. 🏗️ **Assemblage** → une fois satisfait, assembler toute l’interface  
