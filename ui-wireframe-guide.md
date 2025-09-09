@@ -15,8 +15,8 @@
 **💡 Démarche IA**
 
 1. 👁️ **Conversion HTML** → Faire une copie d'écran de l'existant et en **générer un wireframe ou une maquette HTML**  
-2. 📝 **Protodescription** → demander un **descriptif** du copie d'écran à amender avant de générer le code HTML
-3. 📑 **Méthode** → procéder onglet par onglet, **composant par composant**  
+2. 📝 **Protodescription** → demander un **descriptif** du copie d'écran à amender
+3. 📑 **Décomposition** → procéder onglet par onglet, **composant par composant**  
 4. 🎲 **Choix** → demander **plusieurs propositions** d'approche UX ou de style UI
 5. ✅ **Validation** → valider la structure et le schéma visuel **en texte**   
 6. 📦 **Exhaustivité** → regrouper un max de demandes dans un message avant régénération  
