@@ -14,7 +14,7 @@
 
 **💡 Démarche IA**
 
-1. 👁️ **Conversion HTML** → Faire une copie d'écran de l'existant et en **générer un wireframe ou une maquette HTML**  
+1. 👁️ **Conversion** → Faire une copie d'écran de l'existant et en **générer un wireframe ou une maquette HTML**  
 2. 📝 **Protodescription** → demander un **descriptif** du copie d'écran à amender
 3. 📑 **Décomposition** → procéder onglet par onglet, **composant par composant**  
 4. 🎲 **Choix** → demander **plusieurs propositions** d'approche UX ou de style UI
